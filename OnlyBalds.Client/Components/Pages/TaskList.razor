@@ -1,0 +1,92 @@
+﻿@page "/Tasks"
+
+@attribute [Authorize]
+
+@inject IHttpClientFactory HttpClientFactory
+
+<h3>Tasks</h3>
+
+@if (_tasks is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <ul>
+        @foreach (TaskItem taskItem in _tasks)
+        {
+            <li>
+                @taskItem.Name
+            </li>
+        }
+    </ul>
+}
+
+<input @bind="_newTask" />
+<button @onclick="AddTaskAsync">Add Task</button>
+
+@code {
+
+    private List<TaskItem>? _tasks;
+
+    private string _newTask = String.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var httpClient = HttpClientFactory.CreateClient("tasks-api");
+            
+            // Don't include leading slash - see https://stackoverflow.com/a/23438417
+            _tasks = await httpClient.GetFromJsonAsync<List<TaskItem>>("tasks") ?? new();
+            
+            StateHasChanged();
+        }
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private string Username = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is not null)
+        {
+            var state = await authenticationState;
+
+            Username = state?.User?.Identity?.Name ?? string.Empty;
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private async Task AddTaskAsync()
+    {
+        if (String.IsNullOrEmpty(_newTask))
+        {
+            return;
+        }
+
+        var taskItem = new TaskItem()
+        {
+            Name = _newTask
+        };
+        
+        var httpClient = HttpClientFactory.CreateClient("tasks-api");
+
+        var responseMessage = await httpClient.PostAsJsonAsync("tasks", taskItem);
+
+        responseMessage.EnsureSuccessStatusCode();
+
+        if (_tasks is null)
+        {
+            return;
+        }
+
+        _tasks.Add(taskItem);
+
+        _newTask = String.Empty;
+
+        StateHasChanged();
+    }
+}

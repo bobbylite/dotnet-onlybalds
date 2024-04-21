@@ -1,0 +1,9 @@
+@OnlyBalds.Api.Api_HostAddress = https://localhost:7204
+
+@ACCESS_JWT=*********************************
+
+GET {{OnlyBalds.Api.Api_HostAddress}}/tasks/
+Accept: application/json
+Authorization: Bearer {{ACCESS_JWT}}
+
+###

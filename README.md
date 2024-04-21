@@ -18,7 +18,7 @@ The solution contains three projects:
 
 To get started with the OnlyBalds application, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/yourusername/OnlyBalds.git`
+1. Clone the repository: `git clone https://github.com/bobbylite/OnlyBalds.git`
 2. Navigate to the project directory: `cd OnlyBalds`
 3. Restore the packages: `dotnet restore`
 4. Run the application: `dotnet run`
@@ -31,7 +31,7 @@ To get started with the OnlyBalds application, follow these steps:
 
 ## :handshake: Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/yourusername/OnlyBalds/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/bobbylite/OnlyBalds/issues).
 
 ## :memo: License
 

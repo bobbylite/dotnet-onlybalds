@@ -1,0 +1,114 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using OnlyBalds.Api.Data;
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+namespace OnlyBalds.Api.Extensions;
+
+/// <summary>
+/// Extension methods for <see cref="WebApplicationBuilder"/>.
+/// </summary>
+public static class WebApplicationBuilderExtensions
+{
+    /// <summary>
+    /// Add support for persisting data to a database.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    public static WebApplicationBuilder AddDataPersistence(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        webApplicationBuilder.Services.AddDbContext<TaskDataContext>(opt => 
+            opt.UseInMemoryDatabase("TaskList"));
+        webApplicationBuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        
+        return webApplicationBuilder;
+    }
+    
+    /// <summary>
+    /// Add support for exposing API documentation.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    public static WebApplicationBuilder AddApiDocumentation(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        // Bind the Swagger options to the configuration
+        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<SwaggerOptions>()
+            .BindConfiguration(SwaggerOptions.SectionKey);
+
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        webApplicationBuilder.Services.AddEndpointsApiExplorer();
+        webApplicationBuilder.Services.AddSwaggerGen(c =>
+        {            
+            // Get Swagger options from the configuration
+            var serviceProvider = webApplicationBuilder.Services.BuildServiceProvider();
+            var swaggerOptions = serviceProvider.GetService<IOptionsMonitor<SwaggerOptions>>();
+
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Only Balds API", Version = "v1" });
+
+            // Define the OAuth2 scheme that's in use (i.e. Implicit Flow)
+            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows
+                {
+                    Implicit = new OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = new Uri(swaggerOptions?.CurrentValue.AuthorizationUrl!),
+                        TokenUrl = new Uri(swaggerOptions?.CurrentValue.TokenUrl!),
+                        Scopes = swaggerOptions?.CurrentValue.Scopes
+                    }
+                }
+            });
+
+            // Assign the security requirements to the operations
+            c.OperationFilter<SecurityRequirementsOperationFilter>();
+        });
+        
+        return webApplicationBuilder;
+    }
+
+    public class SecurityRequirementsOperationFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            operation.Security = new List<OpenApiSecurityRequirement>
+            {
+                new OpenApiSecurityRequirement
+                {
+                    [
+                        new OpenApiSecurityScheme {Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "oauth2"}}
+                    ] = new[] {"api://onlybalds"}
+                }
+            };
+        }
+    }
+
+    /// <summary>
+    /// Add support for authentication and authorization to the application.
+    ///
+    /// With .NET 8, the configuration for this can be controled completely from 'appsettings.json'.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    public static WebApplicationBuilder AddAccessControl(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        webApplicationBuilder.Services
+            .AddAuthentication()
+            .AddJwtBearer();
+        webApplicationBuilder.Services.AddAuthorization(o =>
+        {
+            o.AddPolicy("Tasks.Read", p => p.
+                RequireAuthenticatedUser().
+                RequireClaim("scope", "Tasks.Read"));
+        });
+        
+        return webApplicationBuilder;
+    }
+}
