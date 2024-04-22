@@ -25,9 +25,9 @@ To get started with the OnlyBalds application, follow these steps:
 
 ## :gear: Built With
 
-- [.NET 5](https://dotnet.microsoft.com/download/dotnet/5.0)
+- [.NET 8](https://dotnet.microsoft.com/en-us/)
 - [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
-- [ASP.NET Core Web API](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-5.0)
+- [.NET Core Web API](https://dotnet.microsoft.com/en-us/apps/aspnet/apis)
 
 ## :handshake: Contributing
 
