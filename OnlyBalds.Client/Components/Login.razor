@@ -8,7 +8,7 @@
         <form method="post" action="authentication/logout">
             <AntiforgeryToken />
             <input type="hidden" name="ReturnUrl" value="@NavigationManager.BaseUri" />
-            <button type="submit" class="nav-link">
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
                 <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout @context.User.Claims?.FirstOrDefault(c => c.Type == "name")?.Value
             </button>
         </form>
@@ -17,7 +17,7 @@
         <form method="get" action="authentication/login">
             <AntiforgeryToken />
             <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-            <button type="submit" class="nav-link">
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
                 <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Login
             </button>
         </form>
