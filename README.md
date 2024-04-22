@@ -28,6 +28,7 @@ To get started with the OnlyBalds application, follow these steps:
 - [.NET 8](https://dotnet.microsoft.com/en-us/)
 - [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
 - [.NET Core Web API](https://dotnet.microsoft.com/en-us/apps/aspnet/apis)
+- [Auth0](https://auth0.com/)
 
 ## :handshake: Contributing
 
