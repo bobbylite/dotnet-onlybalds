@@ -25,20 +25,47 @@ main {
     align-items: center;
 }
 
-    .top-row ::deep a, .top-row ::deep .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-        text-decoration: none;
-    }
+.top-row ::deep a, .top-row ::deep .btn-link {
+    white-space: nowrap;
+    margin-left: 1.5rem;
+    text-decoration: none;
+}
 
-    .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
-        text-decoration: underline;
-    }
+.top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
+    text-decoration: underline;
+}
 
-    .top-row ::deep a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+.top-row ::deep a:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Define keyframes for opening and closing the navbar */
+@keyframes openNav {
+    0% { max-height: 0; }
+    100% { max-height: 100vh; }
+}
+
+@keyframes closeNav {
+    0% { max-height: 100vh; }
+    100% { max-height: 0; }
+}
+
+/* Start with the navbar collapsed */
+.navbar-collapse {
+    max-height: 0;
+    overflow: hidden;
+}
+
+/* When the navbar is expanded, animate the max-height */
+.navbar-toggler[aria-expanded="true"] ~ .navbar-collapse {
+    animation: openNav 0.3s ease-in forwards;
+}
+
+/* When the navbar is collapsed, animate the max-height */
+.navbar-toggler[aria-expanded="false"] ~ .navbar-collapse {
+    animation: closeNav 0.3s ease-out forwards;
+}
 
 @media (max-width: 640.98px) {
     .top-row {
@@ -92,9 +119,9 @@ main {
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

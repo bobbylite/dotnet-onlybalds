@@ -1,0 +1,51 @@
+﻿@page "/Thread-posts/{ThreadId}"
+
+<h1 class="mb-4">@threadTitle</h1>
+
+@if (posts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    foreach (var post in posts)
+    {
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">@post.Title</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Posted by @post.Author on @post.PostedOn.ToShortDateString()</h6>
+                <p class="card-text">@post.Content</p>
+                <a href="/Post-Details/@post.Id" class="btn btn-primary">Read more</a>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public string ThreadId { get; set; }
+
+    private string threadTitle = "Thread Title"; // Typically loaded along with the posts
+    private List<Post> posts; // Normally loaded from a service or API
+
+    // Dummy data initialization
+    protected override Task OnInitializedAsync()
+    {
+        posts = new List<Post>
+        {
+            new Post { Id = 1, Title = "First Post", Author = "User1", PostedOn = DateTime.Now.AddDays(-1), Content = "Welcome to the new forum thread!" }
+            // More posts could be added here
+        };
+
+        return base.OnInitializedAsync();
+    }
+
+    private class Post
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public DateTime PostedOn { get; set; }
+        public string Content { get; set; }
+    }
+}

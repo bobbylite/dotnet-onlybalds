@@ -1,0 +1,67 @@
+﻿@page "/Post-Details/{PostId}"
+
+<div class="container mt-4">
+    <h2>@post.Title</h2>
+    <p class="text-muted">Posted by @post.Author on @post.PostedOn.ToString("MM/dd/yyyy")</p>
+    <p>@post.Content</p>
+
+    <h4>Comments:</h4>
+
+    @if (comments == null || comments.Count == 0)
+    {
+        <p><em>No comments yet. Be the first to comment!</em></p>
+    }
+    else
+    {
+        foreach (var comment in comments)
+        {
+            <div class="p-2 border-bottom">
+                <strong>@comment.Author</strong> says: "@comment.Content"
+                <br>
+                <small class="text-muted">@comment.PostedOn.ToString("MM/dd/yyyy HH:mm")</small>
+            </div>
+        }
+    }
+
+    <div class="mt-4">
+        <h5>Add a Comment</h5>
+        <textarea class="form-control mb-2" rows="3"></textarea>
+        <button class="btn btn-primary">Post Comment</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string PostId { get; set; }
+
+    private Post post; // This should be loaded from an API or service
+    private List<Comment> comments; // Dummy data or loaded from an API
+
+    // Dummy initialization
+    protected override Task OnInitializedAsync()
+    {
+        post = new Post { Id = 1, Title = "Sample Post Title", Author = "User1", PostedOn = DateTime.Now.AddDays(-1), Content = "Here is some content about this post." };
+        comments = new List<Comment>
+        {
+            new Comment { Author = "User2", Content = "Great post!", PostedOn = DateTime.Now }
+        };
+
+        return base.OnInitializedAsync();
+    }
+
+    private class Post
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public DateTime PostedOn { get; set; }
+        public string Content { get; set; }
+    }
+
+    private class Comment
+    {
+        public string Author { get; set; }
+        public string Content { get; set; }
+        public DateTime PostedOn { get; set; }
+    }
+}

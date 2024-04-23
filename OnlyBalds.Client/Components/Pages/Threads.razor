@@ -1,0 +1,35 @@
+﻿@page "/Threads"
+
+<h1 class="mb-4">Forum Threads</h1>
+
+<div class="list-group">
+    @foreach (var thread in threads)
+    {
+        <a href="thread-posts/@thread.Id" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">@thread.Title</h5>
+                <small class="text-muted">Posts: @thread.PostsCount</small>
+            </div>
+            <p class="mb-1">@thread.Summary</p>
+            <small class="text-muted">Started by @thread.Creator on @thread.StartDate.ToShortDateString()</small>
+        </a>
+    }
+</div>
+
+@code {
+    private List<Thread> threads = new List<Thread>
+    {
+        new Thread { Id = 1, Title = "General Discussion", PostsCount = 10, Summary = "Talk about anything related to baldness.", Creator = "Admin", StartDate = DateTime.Now.AddDays(-10) },
+        // Additional threads can be added here
+    };
+
+    private class Thread
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public int PostsCount { get; set; }
+        public string Summary { get; set; }
+        public string Creator { get; set; }
+        public DateTime StartDate { get; set; }
+    }
+}

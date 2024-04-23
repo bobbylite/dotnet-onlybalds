@@ -1,16 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar navbar-dark bg-dark fixed-top">
+    <div class="navbar-dark bg-dark fixed-top">
         <NavMenu />
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <Login @rendermode="InteractiveServer" />
-        </div>
-
-        <article class="content px-4">
+        <article class="content px-4 mt-5">
             @Body
         </article>
     </main>
