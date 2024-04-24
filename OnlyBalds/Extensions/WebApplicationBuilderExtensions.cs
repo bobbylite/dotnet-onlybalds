@@ -29,7 +29,7 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
-    /// Add an HttpClient for the Tasks REST API. Includes handling authentication for the API by passing the access
+    /// Add an HttpClient for the Threads REST API. Includes handling authentication for the API by passing the access
     /// token for the currently logged in user as a JWT bearer token to the API.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
@@ -38,23 +38,23 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
         
-        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<TasksApiOptions>()
-            .BindConfiguration(TasksApiOptions.SectionKey);
+        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<ThreadsApiOptions>()
+            .BindConfiguration(ThreadsApiOptions.SectionKey);
 
-        webApplicationBuilder.Services.AddTransient<TasksApiAuthenticationHandler>();
+        webApplicationBuilder.Services.AddTransient<ThreadsApiAuthenticationHandler>();
         webApplicationBuilder.Services.AddHttpClient(HttpClientNames.TasksApi, (provider, client) =>
         {
-            var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<TasksApiOptions>>();
+            var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<ThreadsApiOptions>>();
             var apiOptions = apiOptionsSnapshot.CurrentValue;
             client.BaseAddress = new Uri(apiOptions.BaseUrl);
         })
-            .AddHttpMessageHandler<TasksApiAuthenticationHandler>();
+            .AddHttpMessageHandler<ThreadsApiAuthenticationHandler>();
         
         return webApplicationBuilder;
     }
 
     /// <summary>
-    /// Add an HttpClient for the Tasks REST API. Includes handling authentication for the API by passing the access
+    /// Add an HttpClient for the OnlyBalds REST API. Includes handling authentication for the API by passing the access
     /// token for the currently logged in user as a JWT bearer token to the API.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>

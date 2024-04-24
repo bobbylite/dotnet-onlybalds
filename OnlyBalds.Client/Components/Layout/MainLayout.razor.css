@@ -1,3 +1,6 @@
+.navbar-spacer { 
+    height: 3.5rem; 
+}
 .page {
     position: relative;
     display: flex;

@@ -1,35 +1,113 @@
 ﻿@page "/Threads"
 
-<h1 class="mb-4">Forum Threads</h1>
+@attribute [Authorize]
 
-<div class="list-group">
-    @foreach (var thread in threads)
-    {
-        <a href="thread-posts/@thread.Id" class="list-group-item list-group-item-action p-3">
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">@thread.Title</h5>
-                <small class="text-muted">Posts: @thread.PostsCount</small>
-            </div>
-            <p class="mb-1">@thread.Summary</p>
-            <small class="text-muted">Started by @thread.Creator on @thread.StartDate.ToShortDateString()</small>
-        </a>
-    }
-</div>
+@inject IHttpClientFactory httpClientFactory
+@inject ILogger<Threads> logger;
+
+@if (_threads is null)
+{
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only"></span>
+        </div>
+    </div>
+}
+else
+{
+    <h1 class="mb-4">Threads</h1>
+
+    <div class="list-group">
+        @foreach (ThreadItem thread in _threads)
+        {
+            <a href="thread-posts/@thread.Id" class="list-group-item list-group-item-action p-3 mt-2">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">@thread.Title</h5>
+                    <small class="text-muted">Posts: @thread.PostsCount</small>
+                </div>
+                <p class="mb-1">@thread.Summary</p>
+                <small class="text-muted">Started by @thread.Creator on @thread.StartDate.ToShortDateString()</small>
+            </a>
+        }
+    </div>
+
+    <NavLink class="btn btn-primary mt-3" href="CreateThread">
+        Create Thread
+    </NavLink>
+}
 
 @code {
-    private List<Thread> threads = new List<Thread>
-    {
-        new Thread { Id = 1, Title = "General Discussion", PostsCount = 10, Summary = "Talk about anything related to baldness.", Creator = "Admin", StartDate = DateTime.Now.AddDays(-10) },
-        // Additional threads can be added here
-    };
 
-    private class Thread
+    private List<ThreadItem>? _threads;
+
+    private string _newThread = String.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public int PostsCount { get; set; }
-        public string Summary { get; set; }
-        public string Creator { get; set; }
-        public DateTime StartDate { get; set; }
+        if (firstRender)
+        {
+            var httpClient = httpClientFactory.CreateClient("threads-api");
+            logger.LogInformation("Getting threads from API");
+
+            // Don't include leading slash - see https://stackoverflow.com/a/23438417
+            _threads = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
+            logger.LogInformation("Threads retrieved from API: {Threads}", JsonSerializer.Serialize(_threads));
+            
+            StateHasChanged();
+        }
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private string Username = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is not null)
+        {
+            var state = await authenticationState;
+
+            Username = state?.User?.Identity?.Name ?? string.Empty;
+        }
+        await base.OnInitializedAsync();
+
+        await AddThreadAsync();
+    }
+
+    private async Task AddThreadAsync()
+    {
+        if (String.IsNullOrEmpty(_newThread))
+        {
+            return;
+        }
+
+        var threadItem = new ThreadItem()
+        {
+            Name = "test",
+            Creator = Username,
+            StartDate = DateTime.Now,
+            Id = Guid.NewGuid(),
+            Title = _newThread,
+            Summary = "This is a test thread",
+            PostsCount = 0
+        };
+        
+        var httpClient = httpClientFactory.CreateClient("threads-api");
+
+        var responseMessage = await httpClient.PostAsJsonAsync("threads", threadItem);
+
+        responseMessage.EnsureSuccessStatusCode();
+
+        if (_threads is null)
+        {
+            return;
+        }
+
+        _threads.Add(threadItem);
+
+        _newThread = String.Empty;
+
+        StateHasChanged();
     }
 }

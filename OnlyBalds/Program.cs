@@ -44,8 +44,8 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(OnlyBalds.Client.Components._Imports).Assembly);
 
-// Maps endpoints for proxying requests from WASM to the Tasks API.
-app.MapTasksApiProxy();
+// Maps endpoints for proxying requests from WASM to the Threads API.
+app.MapThreadsApiProxy();
 
 app.MapGroup("/authentication")
     .MapLoginAndLogout();

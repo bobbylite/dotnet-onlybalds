@@ -6,18 +6,18 @@ namespace OnlyBalds.Http;
 /// <summary>
 /// Represents a type that is used to handle API authentication by delegating the HTTP requests.
 /// </summary>
-public class TasksApiAuthenticationHandler : DelegatingHandler
+public class ThreadsApiAuthenticationHandler : DelegatingHandler
 {
-    private ILogger<TasksApiAuthenticationHandler> _logger;
+    private ILogger<ThreadsApiAuthenticationHandler> _logger;
     private ITokenService _tokenService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TasksApiAuthenticationHandler"/> class.
+    /// Initializes a new instance of the <see cref="ThreadsApiAuthenticationHandler"/> class.
     /// </summary>
     /// <param name="logger">The logger to be used for logging information.</param>
     /// <param name="tokenService">The service to be used for token operations.</param>
-    public TasksApiAuthenticationHandler(
-        ILogger<TasksApiAuthenticationHandler> logger,
+    public ThreadsApiAuthenticationHandler(
+        ILogger<ThreadsApiAuthenticationHandler> logger,
         ITokenService tokenService)
     {
         _logger = logger;

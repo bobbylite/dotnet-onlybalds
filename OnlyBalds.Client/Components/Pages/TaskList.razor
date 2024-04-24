@@ -6,39 +6,39 @@
 
 <h3>Tasks</h3>
 
-@if (_tasks is null)
+@if (_threads is null)
 {
     <p>Loading...</p>
 }
 else
 {
     <ul>
-        @foreach (TaskItem taskItem in _tasks)
+        @foreach (ThreadItem threadItem in _threads)
         {
             <li>
-                @taskItem.Name
+                @threadItem.Name
             </li>
         }
     </ul>
 }
 
-<input @bind="_newTask" />
-<button @onclick="AddTaskAsync">Add Task</button>
+<input @bind="_newThread" />
+<button @onclick="AddThreadAsync">Add Thread</button>
 
 @code {
 
-    private List<TaskItem>? _tasks;
+    private List<ThreadItem>? _threads;
 
-    private string _newTask = String.Empty;
+    private string _newThread = String.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            var httpClient = HttpClientFactory.CreateClient("tasks-api");
+            var httpClient = HttpClientFactory.CreateClient("threads-api");
             
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            _tasks = await httpClient.GetFromJsonAsync<List<TaskItem>>("tasks") ?? new();
+            _threads = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
             
             StateHasChanged();
         }
@@ -60,32 +60,32 @@ else
         await base.OnInitializedAsync();
     }
 
-    private async Task AddTaskAsync()
+    private async Task AddThreadAsync()
     {
-        if (String.IsNullOrEmpty(_newTask))
+        if (String.IsNullOrEmpty(_newThread))
         {
             return;
         }
 
-        var taskItem = new TaskItem()
+        var threadItem = new ThreadItem()
         {
-            Name = _newTask
+            Name = _newThread
         };
         
-        var httpClient = HttpClientFactory.CreateClient("tasks-api");
+        var httpClient = HttpClientFactory.CreateClient("threads-api");
 
-        var responseMessage = await httpClient.PostAsJsonAsync("tasks", taskItem);
+        var responseMessage = await httpClient.PostAsJsonAsync("threads", threadItem);
 
         responseMessage.EnsureSuccessStatusCode();
 
-        if (_tasks is null)
+        if (_threads is null)
         {
             return;
         }
 
-        _tasks.Add(taskItem);
+        _threads.Add(threadItem);
 
-        _newTask = String.Empty;
+        _newThread = String.Empty;
 
         StateHasChanged();
     }

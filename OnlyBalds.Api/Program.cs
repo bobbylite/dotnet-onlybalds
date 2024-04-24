@@ -27,6 +27,6 @@ app.UseApiDocumentation();
 app.UseHttpsRedirection();
 
 // Maps endpoints for the exposed API.
-app.MapApi();
+app.MapThreadsApi();
 
 app.Run();

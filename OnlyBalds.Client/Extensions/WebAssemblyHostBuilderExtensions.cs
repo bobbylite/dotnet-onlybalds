@@ -11,18 +11,18 @@ namespace OnlyBalds.Client.Extensions;
 public static class WebAssemblyHostBuilderExtensions
 {
     /// <summary>
-    /// Add an HttpClient for the Tasks REST API.
+    /// Add an HttpClient for the Threads REST API.
     /// </summary>
     /// <param name="webAssemblyHostBuilder">A builder for WebAssembly applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
-    public static WebAssemblyHostBuilder AddTasksApiClient(this WebAssemblyHostBuilder webAssemblyHostBuilder)
+    public static WebAssemblyHostBuilder AddThreadsApiClient(this WebAssemblyHostBuilder webAssemblyHostBuilder)
     {
         ArgumentNullException.ThrowIfNull(webAssemblyHostBuilder);
 
-        webAssemblyHostBuilder.Services.AddHttpClient("tasks-api", client =>
+        webAssemblyHostBuilder.Services.AddHttpClient("threads-api", client =>
             {
                 // Do include trailing slash - see https://stackoverflow.com/a/23438417
-                client.BaseAddress = new Uri($"{webAssemblyHostBuilder.HostEnvironment.BaseAddress}tasks-api/");
+                client.BaseAddress = new Uri($"{webAssemblyHostBuilder.HostEnvironment.BaseAddress}threads-api/");
                 Console.WriteLine("BaseAddress = " + client.BaseAddress);
             });
         

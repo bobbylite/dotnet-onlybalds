@@ -16,26 +16,22 @@ namespace OnlyBalds.Extensions;
 public static class WebApplicationExtensions
 {
     /// <summary>
-    /// Maps endpoints for proxying requests from WASM to the Tasks API.
-    ///
-    /// This is based on the example found here:
-    ///
-    /// * https://github.com/dotnet/blazor-samples/tree/main/8.0/BlazorWebAppOidcBff
+    /// Maps endpoints for proxying requests from WASM to the Threads API.
+    /// 
+    /// https://github.com/dotnet/blazor-samples/tree/main/8.0/BlazorWebAppOidcBff
     /// </summary>
     /// <param name="webApplication">The web application used to configure the HTTP pipeline, and routes.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
-    public static WebApplication MapTasksApiProxy(this WebApplication webApplication)
+    public static WebApplication MapThreadsApiProxy(this WebApplication webApplication)
     {
         ArgumentNullException.ThrowIfNull(webApplication);
 
         // Enable support for proxying / forwarding requests from the WebAssembly client to the Tasks API.
-        var apiOptionsMonitor = webApplication.Services.GetRequiredService<IOptionsMonitor<TasksApiOptions>>();
+        var apiOptionsMonitor = webApplication.Services.GetRequiredService<IOptionsMonitor<ThreadsApiOptions>>();
 
-        // The original example from MS depends on Aspire for service discovery. The following is based on the MS docs
-        // for doing direct proxying with Yarp.
-        //
-        // * https://microsoft.github.io/reverse-proxy/articles/direct-forwarding.html
-        // * https://satish1v.medium.com/yarp-based-direct-forwarding-pattern-f3f7d556be4b
+        // The following is for doing direct proxying with Yarp.
+        // https://microsoft.github.io/reverse-proxy/articles/direct-forwarding.html
+        // https://satish1v.medium.com/yarp-based-direct-forwarding-pattern-f3f7d556be4b
         var httpClient = new HttpMessageInvoker(new SocketsHttpHandler
         {
             UseProxy = false,
@@ -46,7 +42,7 @@ public static class WebApplicationExtensions
         });
 
         var requestOptions = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(100) };
-        webApplication.Map("/tasks-api/{**catch-all}",
+        webApplication.Map("/threads-api/{**catch-all}",
                 async (HttpContext context, IHttpForwarder httpForwarder, ITransformBuilder transform) =>
                 {
                     var transformer = transform.Create((builderContext) =>
@@ -58,7 +54,7 @@ public static class WebApplicationExtensions
                                 transformContext.ProxyRequest.Headers.Authorization =
                                     new AuthenticationHeaderValue("Bearer", accessToken);
                             })
-                            .AddPathRemovePrefix(prefix: "/tasks-api");
+                            .AddPathRemovePrefix(prefix: "/threads-api");
                     });
                     
                     var error = await httpForwarder.SendAsync(context, apiOptionsMonitor.CurrentValue.BaseUrl,
