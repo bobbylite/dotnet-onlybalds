@@ -21,7 +21,9 @@ public static class WebApplicationBuilderExtensions
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
         webApplicationBuilder.Services.AddDbContext<ThreadDataContext>(opt => 
-            opt.UseInMemoryDatabase("TaskList"));
+            opt.UseInMemoryDatabase("ThreadData"));
+        webApplicationBuilder.Services.AddDbContext<PostDataContext>(opt => 
+            opt.UseInMemoryDatabase("PostData"));
         webApplicationBuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
         
         return webApplicationBuilder;

@@ -15,16 +15,18 @@ public static class WebAssemblyHostBuilderExtensions
     /// </summary>
     /// <param name="webAssemblyHostBuilder">A builder for WebAssembly applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
-    public static WebAssemblyHostBuilder AddThreadsApiClient(this WebAssemblyHostBuilder webAssemblyHostBuilder)
+    public static WebAssemblyHostBuilder AddOnlyBaldsApiClients(this WebAssemblyHostBuilder webAssemblyHostBuilder)
     {
         ArgumentNullException.ThrowIfNull(webAssemblyHostBuilder);
 
-        webAssemblyHostBuilder.Services.AddHttpClient("threads-api", client =>
-            {
-                // Do include trailing slash - see https://stackoverflow.com/a/23438417
-                client.BaseAddress = new Uri($"{webAssemblyHostBuilder.HostEnvironment.BaseAddress}threads-api/");
-                Console.WriteLine("BaseAddress = " + client.BaseAddress);
-            });
+        webAssemblyHostBuilder
+        .Services
+        .AddHttpClient(HttpClientNames.OnlyBalds, client =>
+        {
+            // Do include trailing slash - see https://stackoverflow.com/a/23438417
+            client.BaseAddress = new Uri($"{webAssemblyHostBuilder.HostEnvironment.BaseAddress}onlybalds-api/");
+            Console.WriteLine("BaseAddress = " + client.BaseAddress);
+        });
         
         return webAssemblyHostBuilder;
     }

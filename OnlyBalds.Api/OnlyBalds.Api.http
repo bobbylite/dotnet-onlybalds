@@ -7,3 +7,9 @@ Accept: application/json
 Authorization: Bearer {{ACCESS_JWT}}
 
 ###
+
+GET {{OnlyBalds.Api.Api_HostAddress}}/posts/
+Accept: application/json
+Authorization: Bearer {{ACCESS_JWT}}
+
+###

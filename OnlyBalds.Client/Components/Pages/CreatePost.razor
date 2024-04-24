@@ -1,4 +1,4 @@
-﻿@page "/CreateThread"
+﻿@page "/CreatePost/{ThreadId}"
 
 @attribute [Authorize]
 
@@ -17,7 +17,7 @@
 else
 {
     <div class="container mt-5">
-        <h3 class="mb-4">Create Thread</h3>
+        <h3 class="mb-4">Create Post</h3>
 
         <div class="mb-3">
             <label for="Title" class="form-label">Title</label>
@@ -25,18 +25,21 @@ else
         </div>
 
         <div class="mb-3">
-            <label for="Summary" class="form-label">Summary</label>
-            <textarea @bind=@_summary id="Summary" class="form-control" rows="3"></textarea>
+            <label for="Summary" class="form-label">Content</label>
+            <textarea @bind=@_content id="Summary" class="form-control" rows="3"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3" @onclick="AddThreadAsync">Submit</button>
+        <button type="submit" class="btn btn-primary mt-3" @onclick="AddPostAsync">Submit</button>
     </div>
 }
 
 @code {
+    [Parameter]
+    public string ThreadId { get; set; } = string.Empty;
+
     private bool _isInitialized = false;
     private string _title = string.Empty;
-    private string _summary = string.Empty;
+    private string _content = string.Empty;
     private string _username = string.Empty;
 
     [CascadingParameter]
@@ -56,36 +59,52 @@ else
         StateHasChanged();
     }
 
-    private async Task AddThreadAsync()
+    private async Task AddPostAsync()
     {
-        if (string.IsNullOrEmpty(_title) || string.IsNullOrEmpty(_summary))
+        if (string.IsNullOrEmpty(_title) || string.IsNullOrEmpty(_content))
         {
             logger.LogWarning("Title or summary is empty");
             return;
         }
 
-        var threadItem = new ThreadItem()
+        var postItem = new PostItem()
         {
-            Name = "development",
-            Creator = _username,
-            StartDate = DateTime.Now,
             Id = Guid.NewGuid(),
             Title = _title,
-            Summary = _summary,
-            PostsCount = 0
+            Content = _content,
+            PostedOn = DateTime.Now,
+            Author = _username
+            // TODO: Add the ThreadId.
         };
         
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
 
-        var responseMessage = await httpClient.PostAsJsonAsync("threads", threadItem);
+        var responseMessage = await httpClient.PostAsJsonAsync("posts", postItem);
 
         responseMessage.EnsureSuccessStatusCode();
 
+        var threadsResponse = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
+        var currentThread = threadsResponse.Find(t => t.Id == Guid.Parse(ThreadId));
+
+        if (currentThread is null)
+        {
+            logger.LogWarning("Thread not found");
+            return;
+        }
+
+        var putThreadsResponse = await httpClient.PutAsJsonAsync($"threads/{ThreadId}", new ThreadItem
+        {
+            Id = Guid.Parse(ThreadId),
+            PostsCount = currentThread.PostsCount++
+        });
+
+        putThreadsResponse.EnsureSuccessStatusCode();
+
         _title = String.Empty;
-        _summary = String.Empty;
+        _content = String.Empty;
 
         StateHasChanged();
 
-        NavigationManager.NavigateTo("/Threads");
+        NavigationManager.NavigateTo("/Posts");
     }
 }

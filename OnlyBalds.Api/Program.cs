@@ -28,5 +28,6 @@ app.UseHttpsRedirection();
 
 // Maps endpoints for the exposed API.
 app.MapThreadsApi();
+app.MapPostsApi();
 
 app.Run();

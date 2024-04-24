@@ -1,4 +1,4 @@
-﻿namespace OnlyBalds;
+﻿namespace OnlyBalds.Client;
 
 /// <summary>
 /// Constants representing the names of HTTP clients.

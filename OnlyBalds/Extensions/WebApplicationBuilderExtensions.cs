@@ -34,21 +34,21 @@ public static class WebApplicationBuilderExtensions
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
-    public static WebApplicationBuilder AddTasksApiClient(this WebApplicationBuilder webApplicationBuilder)
+    public static WebApplicationBuilder AddOnlyBaldsApiClients(this WebApplicationBuilder webApplicationBuilder)
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
         
-        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<ThreadsApiOptions>()
-            .BindConfiguration(ThreadsApiOptions.SectionKey);
+        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<ApiOptions>()
+            .BindConfiguration(ApiOptions.SectionKey);
 
-        webApplicationBuilder.Services.AddTransient<ThreadsApiAuthenticationHandler>();
-        webApplicationBuilder.Services.AddHttpClient(HttpClientNames.TasksApi, (provider, client) =>
+        webApplicationBuilder.Services.AddTransient<OnlyBaldsApiAuthenticationHandler>()
+        .AddHttpClient(HttpClientNames.OnlyBalds, (provider, client) =>
         {
-            var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<ThreadsApiOptions>>();
+            var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<ApiOptions>>();
             var apiOptions = apiOptionsSnapshot.CurrentValue;
             client.BaseAddress = new Uri(apiOptions.BaseUrl);
         })
-            .AddHttpMessageHandler<ThreadsApiAuthenticationHandler>();
+        .AddHttpMessageHandler<OnlyBaldsApiAuthenticationHandler>();
         
         return webApplicationBuilder;
     }

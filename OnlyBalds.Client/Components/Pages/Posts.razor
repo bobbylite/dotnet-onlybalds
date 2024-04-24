@@ -1,11 +1,10 @@
-﻿@page "/Threads"
-
+﻿@page "/Posts/{ThreadId}"
 @attribute [Authorize]
 
 @inject IHttpClientFactory httpClientFactory
 @inject ILogger<Threads> logger;
 
-@if (_threads is null)
+@if (_posts is null)
 {
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
@@ -15,31 +14,32 @@
 }
 else
 {
-    <h1 class="mb-4">Threads</h1>
+    <h1 class="mb-4">Posts</h1>
 
-    <div class="list-group">
-        @foreach (ThreadItem thread in _threads)
-        {
-            <a href="Posts/@thread.Id" class="list-group-item list-group-item-action p-3 mt-2">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">@thread.Title</h5>
-                    <small class="text-muted">Posts: @thread.PostsCount</small>
-                </div>
-                <p class="mb-1">@thread.Summary</p>
-                <small class="text-muted">Started by @thread.Creator on @thread.StartDate.ToShortDateString()</small>
-            </a>
-        }
-    </div>
+    foreach (var post in _posts)
+    {
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">@post.Title</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Posted by @post.Author on @post.PostedOn.ToShortDateString()</h6>
+                <p class="card-text">@post.Content</p>
+                <a href="/Post-Details/@post.Id" class="btn btn-primary">Read more</a>
+            </div>
+        </div>
+    }
 
-    <NavLink class="btn btn-primary mt-3" href="CreateThread">
-        Create Thread
-    </NavLink>
+    <a class="btn btn-primary mt-3" href="CreatePost/@ThreadId">
+        Create Post
+    </a>
 }
 
 @code {
+    [Parameter]
+    public string ThreadId { get; set; } = string.Empty;
+    
     private string _username = string.Empty;
     
-    private List<ThreadItem>? _threads;
+    private List<PostItem>? _posts;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -49,11 +49,12 @@ else
         if (firstRender)
         {
             var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
-            logger.LogInformation("Getting threads from API");
+            logger.LogInformation("Getting posts from API");
 
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            _threads = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
-            logger.LogInformation("Threads retrieved from API: {Threads}", JsonSerializer.Serialize(_threads));
+            _posts = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
+            // TODO: Filter for posts associated with the current thread.
+            logger.LogInformation("Posts retrieved from API: {Posts}", JsonSerializer.Serialize(_posts));
             
             StateHasChanged();
         }

@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServices();
 
 builder.AddTokenClient();
-builder.AddTasksApiClient();
+builder.AddOnlyBaldsApiClients();
 
 // Add authentication and authorization.
 builder.AddAccessControl();

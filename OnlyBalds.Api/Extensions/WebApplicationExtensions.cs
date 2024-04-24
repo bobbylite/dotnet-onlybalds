@@ -96,17 +96,17 @@ public static class WebApplicationExtensions
             .WithOpenApi()
             .RequireAuthorization("Thread.ReadWrite");
 
-        webApplication.MapPut("/threads/{id}", async (Guid id, ThreadItem inputTodo, ThreadDataContext dataContext) =>
+        webApplication.MapPut("/threads/{id}", async (Guid id, ThreadItem content, ThreadDataContext dataContext) =>
             {
                 var threadItem = await dataContext.ThreadItems.FindAsync(id);
 
                 if (threadItem is null) return Results.NotFound();
 
-                threadItem.Name = inputTodo.Name;
-                threadItem.Title = inputTodo.Title;
-                threadItem.Summary = inputTodo.Summary;
-                threadItem.Creator = inputTodo.Creator;
-                threadItem.StartDate = inputTodo.StartDate;
+                threadItem.Name = content.Name;
+                threadItem.Title = content.Title;
+                threadItem.Summary = content.Summary;
+                threadItem.Creator = content.Creator;
+                threadItem.StartDate = content.StartDate;
 
 
 
@@ -130,6 +130,85 @@ public static class WebApplicationExtensions
                 return Results.NotFound();
             })
             .WithName("DeleteThread")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        return webApplication;
+    }
+
+    /// <summary>
+    /// Maps endpoints for the exposed API.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    public static WebApplication MapPostsApi(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapGet("/posts", async (PostDataContext dataContext) =>
+                await dataContext.PostItems.ToListAsync())
+            .WithName("GetPosts")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+            webApplication.MapGet("/posts/{id}", async (Guid id, PostDataContext dataContext) =>
+                await dataContext.PostItems.FindAsync(id)
+                    is { } taskItem
+                    ? Results.Ok(taskItem)
+                    : Results.NotFound())
+            .WithName("GetPostById")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+        
+        webApplication.MapPost("/posts", async (PostItem postItem, PostDataContext dataContext) =>
+            {
+                if (postItem.Id == Guid.Empty)
+                {
+                    postItem.Id = Guid.NewGuid();
+                }
+
+                dataContext.PostItems.Add(postItem);
+                await dataContext.SaveChangesAsync();
+
+                return Results.Created($"/posts/{postItem.Id}", postItem);
+            })
+            .WithName("CreatePost")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapPut("/posts/{id}", async (Guid id, PostItem content, PostDataContext dataContext) =>
+            {
+                var postItem = await dataContext.PostItems.FindAsync(id);
+
+                if (postItem is null)
+                {
+                    return Results.NotFound();
+                }
+
+                postItem.Title = content.Title;
+                postItem.Author = content.Author;
+                postItem.PostedOn = content.PostedOn;
+                postItem.Content = content.Content;
+
+                await dataContext.SaveChangesAsync();
+
+                return Results.NoContent();
+            })
+            .WithName("UpdatePost")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapDelete("/posts/{id}", async (Guid id, PostDataContext dataContext) =>
+            {
+                if (await dataContext.PostItems.FindAsync(id) is { } taskItem)
+                {
+                    dataContext.PostItems.Remove(taskItem);
+                    await dataContext.SaveChangesAsync();
+                    return Results.NoContent();
+                }
+
+                return Results.NotFound();
+            })
+            .WithName("DeletePost")
             .WithOpenApi()
             .RequireAuthorization("Thread.ReadWrite");
 

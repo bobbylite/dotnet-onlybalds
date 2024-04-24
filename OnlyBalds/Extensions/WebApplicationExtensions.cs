@@ -27,7 +27,7 @@ public static class WebApplicationExtensions
         ArgumentNullException.ThrowIfNull(webApplication);
 
         // Enable support for proxying / forwarding requests from the WebAssembly client to the Tasks API.
-        var apiOptionsMonitor = webApplication.Services.GetRequiredService<IOptionsMonitor<ThreadsApiOptions>>();
+        var apiOptionsMonitor = webApplication.Services.GetRequiredService<IOptionsMonitor<ApiOptions>>();
 
         // The following is for doing direct proxying with Yarp.
         // https://microsoft.github.io/reverse-proxy/articles/direct-forwarding.html
@@ -42,7 +42,7 @@ public static class WebApplicationExtensions
         });
 
         var requestOptions = new ForwarderRequestConfig { ActivityTimeout = TimeSpan.FromSeconds(100) };
-        webApplication.Map("/threads-api/{**catch-all}",
+        webApplication.Map("/onlybalds-api/{**catch-all}",
                 async (HttpContext context, IHttpForwarder httpForwarder, ITransformBuilder transform) =>
                 {
                     var transformer = transform.Create((builderContext) =>
@@ -54,7 +54,7 @@ public static class WebApplicationExtensions
                                 transformContext.ProxyRequest.Headers.Authorization =
                                     new AuthenticationHeaderValue("Bearer", accessToken);
                             })
-                            .AddPathRemovePrefix(prefix: "/threads-api");
+                            .AddPathRemovePrefix(prefix: "/onlybalds-api");
                     });
                     
                     var error = await httpForwarder.SendAsync(context, apiOptionsMonitor.CurrentValue.BaseUrl,
