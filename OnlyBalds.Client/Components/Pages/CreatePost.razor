@@ -51,7 +51,7 @@ else
         {
             var state = await authenticationState;
 
-            _username = state?.User?.Identity?.Name ?? string.Empty;
+            _username = state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
         }
         await base.OnInitializedAsync();
         _isInitialized = true;
@@ -73,8 +73,8 @@ else
             Title = _title,
             Content = _content,
             PostedOn = DateTime.Now,
-            Author = _username
-            // TODO: Add the ThreadId.
+            Author = _username,
+            ThreadId = Guid.Parse(ThreadId)
         };
         
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
@@ -94,8 +94,12 @@ else
 
         var putThreadsResponse = await httpClient.PutAsJsonAsync($"threads/{ThreadId}", new ThreadItem
         {
-            Id = Guid.Parse(ThreadId),
-            PostsCount = currentThread.PostsCount++
+            PostsCount = currentThread.PostsCount + 1,
+            Id = currentThread.Id,
+            Title = currentThread.Title,
+            Summary = currentThread.Summary,
+            StartDate = currentThread.StartDate,
+            Creator = currentThread.Creator
         });
 
         putThreadsResponse.EnsureSuccessStatusCode();
@@ -105,6 +109,6 @@ else
 
         StateHasChanged();
 
-        NavigationManager.NavigateTo("/Posts");
+        NavigationManager.NavigateTo($"/Posts/{ThreadId}");
     }
 }

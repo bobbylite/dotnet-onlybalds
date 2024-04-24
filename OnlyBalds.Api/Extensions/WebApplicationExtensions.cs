@@ -107,8 +107,7 @@ public static class WebApplicationExtensions
                 threadItem.Summary = content.Summary;
                 threadItem.Creator = content.Creator;
                 threadItem.StartDate = content.StartDate;
-
-
+                threadItem.PostsCount = content.PostsCount;
 
                 await dataContext.SaveChangesAsync();
 

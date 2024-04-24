@@ -29,4 +29,9 @@ public class PostItem
     /// Gets or sets the content of the post. This field is initialized to an empty string.
     /// </summary>
     public string Content { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the unique identifier for the thread the post belongs to.
+    /// </summary>
+    public Guid ThreadId { get; set; }
 }

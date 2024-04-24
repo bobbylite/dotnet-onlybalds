@@ -52,8 +52,8 @@ else
             logger.LogInformation("Getting posts from API");
 
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            _posts = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
-            // TODO: Filter for posts associated with the current thread.
+            var posts = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
+            _posts = posts.Where(p => p.ThreadId == Guid.Parse(ThreadId)).ToList();
             logger.LogInformation("Posts retrieved from API: {Posts}", JsonSerializer.Serialize(_posts));
             
             StateHasChanged();

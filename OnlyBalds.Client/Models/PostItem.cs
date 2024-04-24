@@ -30,5 +30,8 @@ public class PostItem
     /// </summary>
     public string Content { get; set; } = string.Empty;
 
-    // TODO: Add a property for the thread the post belongs to.
+    /// <summary>
+    /// Gets or sets the unique identifier for the thread the post belongs to.
+    /// </summary>
+    public Guid ThreadId { get; set; }
 }
