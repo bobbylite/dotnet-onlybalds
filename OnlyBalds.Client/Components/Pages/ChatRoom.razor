@@ -1,0 +1,109 @@
+﻿@page "/ChatRoom"
+
+@implements IAsyncDisposable
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <h3 class="text-center mt-5">ChatRoom</h3>
+            <div class="vh-50 overflow-auto mb-4" style="max-height: calc(100vh - 200px);">
+                <ul class="list-group">
+                    @foreach (var msg in messages)
+                    {
+                        <li class="list-group-item">@msg</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if(IsConnected)
+{ 
+    <div class="fixed-bottom p-3 bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" @bind="message" placeholder="Message" />
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" @onclick="Send">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{ 
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+
+@code {
+    public string name = string.Empty;
+    public HubConnection? hubConnection;
+    private List<string> messages = new();
+    private string user = string.Empty;
+    private string message = string.Empty;
+
+    private DotNetObjectReference<ChatRoom>? objRef;
+
+
+    private Task Send() => hubConnection?.SendAsync("SendMessage", user, message) ?? throw new ApplicationException("Connection is not started");
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    protected override void OnInitialized()
+    {
+        objRef = DotNetObjectReference.Create(this);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {   var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/ChatRoom.razor.js");
+            await jsModule.InvokeVoidAsync("initializeChatroomReferences", objRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task Connect()
+    {
+        var username = "Bobby"; //state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri($"/chathub?username={username}"))
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            var encodedMsg = $"{username}: {message}";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            hubConnection.StopAsync();
+            hubConnection.DisposeAsync();
+        }
+
+        return ValueTask.CompletedTask;
+    }
+
+    [JSInvokable]
+    public void CleanupResources()
+    {
+        DisposeAsync();
+    }
+}

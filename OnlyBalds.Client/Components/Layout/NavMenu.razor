@@ -24,7 +24,7 @@
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="user-claims" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="ChatRoom" Match="NavLinkMatch.All">
                         <span class="bi bi-chat-fill icon-large" aria-hidden="true"></span> Chat Room
                     </NavLink>
                 </li>
@@ -40,11 +40,11 @@
                 </li>
             </ul>
             <div class="top-row px-4 d-flex justify-content-end d-sm-none">
-                <Login @rendermode="InteractiveServer" />
+                <Login @rendermode="InteractiveWebAssembly" />
             </div>
         </div>
         <div class="top-row px-4 d-flex justify-content-end d-none d-sm-flex">
-            <Login @rendermode="InteractiveServer" />
+            <Login @rendermode="InteractiveWebAssembly" />
         </div>
     </div>
 </nav>

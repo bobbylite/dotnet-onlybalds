@@ -4,6 +4,8 @@ using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Configuration;
+using OnlyBalds.Hubs;
+using OnlyBalds.Services.Token;
 using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.Transforms;
 using Yarp.ReverseProxy.Transforms.Builder;
@@ -50,7 +52,9 @@ public static class WebApplicationExtensions
                         builderContext
                             .AddRequestTransform(async transformContext =>
                             {
-                                var accessToken = await transformContext.HttpContext.GetTokenAsync("access_token");
+                                var apiTokenService = webApplication.Services.GetRequiredService<ITokenService>();
+                                await apiTokenService.AuthenticateAsync();
+                                var accessToken = apiTokenService.Token;
                                 transformContext.ProxyRequest.Headers.Authorization =
                                     new AuthenticationHeaderValue("Bearer", accessToken);
                             })
@@ -69,6 +73,15 @@ public static class WebApplicationExtensions
                     }
                 })
             .RequireAuthorization();
+
+        return webApplication;
+    }
+
+    public static WebApplication MapChatHub(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapHub<ChatHub>("/chathub");
 
         return webApplication;
     }

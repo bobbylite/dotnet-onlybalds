@@ -47,6 +47,9 @@ app.MapRazorComponents<App>()
 // Maps endpoints for proxying requests from WASM to the Threads API.
 app.MapThreadsApiProxy();
 
+// Maps SignalR hub for chat room.
+app.MapChatHub();
+
 app.MapGroup("/authentication")
     .MapLoginAndLogout();
 
