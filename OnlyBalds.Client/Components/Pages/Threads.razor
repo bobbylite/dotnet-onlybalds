@@ -5,7 +5,7 @@
 @inject IHttpClientFactory httpClientFactory
 @inject ILogger<Threads> logger;
 
-@if (_threads is null)
+@if (threads is null)
 {
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
@@ -18,7 +18,7 @@ else
     <h1 class="mb-4">Threads</h1>
 
     <div class="list-group">
-        @foreach (ThreadItem thread in _threads)
+        @foreach (ThreadItem thread in threads)
         {
             <a href="Posts/@thread.Id" class="list-group-item list-group-item-action p-3 mt-2">
                 <div class="d-flex w-100 justify-content-between">
@@ -37,9 +37,9 @@ else
 }
 
 @code {
-    private string _username = string.Empty;
+    private string username = string.Empty;
     
-    private List<ThreadItem>? _threads;
+    private List<ThreadItem>? threads;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -52,8 +52,8 @@ else
             logger.LogInformation("Getting threads from API");
 
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            _threads = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
-            logger.LogInformation("Threads retrieved from API: {Threads}", JsonSerializer.Serialize(_threads));
+            threads = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
+            logger.LogInformation("Threads retrieved from API: {Threads}", JsonSerializer.Serialize(threads));
             
             StateHasChanged();
         }
@@ -64,7 +64,7 @@ else
         {
             var state = await authenticationState;
 
-            _username = state?.User?.Identity?.Name ?? string.Empty;
+            username = state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
         }
         await base.OnInitializedAsync();
     }

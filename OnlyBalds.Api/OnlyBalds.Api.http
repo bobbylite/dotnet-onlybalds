@@ -13,3 +13,9 @@ Accept: application/json
 Authorization: Bearer {{ACCESS_JWT}}
 
 ###
+
+GET {{OnlyBalds.Api.Api_HostAddress}}/comments/
+Accept: application/json
+Authorization: Bearer {{ACCESS_JWT}}.
+
+###

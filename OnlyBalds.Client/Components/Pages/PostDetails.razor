@@ -1,67 +1,130 @@
-﻿@page "/Post-Details/{PostId}"
+﻿@page "/PostDetails/{PostId}"
+@attribute [Authorize]
 
-<div class="container mt-4">
-    <h2>@post.Title</h2>
-    <p class="text-muted">Posted by @post.Author on @post.PostedOn.ToString("MM/dd/yyyy")</p>
-    <p>@post.Content</p>
+@inject IHttpClientFactory httpClientFactory
+@inject ILogger<Threads> logger;
 
-    <h4>Comments:</h4>
 
-    @if (comments == null || comments.Count == 0)
-    {
-        <p><em>No comments yet. Be the first to comment!</em></p>
-    }
-    else
-    {
-        foreach (var comment in comments)
-        {
-            <div class="p-2 border-bottom">
-                <strong>@comment.Author</strong> says: "@comment.Content"
-                <br>
-                <small class="text-muted">@comment.PostedOn.ToString("MM/dd/yyyy HH:mm")</small>
-            </div>
-        }
-    }
-
-    <div class="mt-4">
-        <h5>Add a Comment</h5>
-        <textarea class="form-control mb-2" rows="3"></textarea>
-        <button class="btn btn-primary">Post Comment</button>
+@if (post is null)
+{
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only"></span>
+        </div>
     </div>
-</div>
+}
+else
+{
+
+    <div class="container mt-4">
+        <h2>@post.Title</h2>
+        <p class="text-muted">Posted by @post.Author on @post.PostedOn.ToString("MM/dd/yyyy")</p>
+        <p>@post.Content</p>
+
+        <h4>Comments:</h4>
+
+        @if (comments == null || comments.Count == 0)
+        {
+            <p><em>No comments yet. Be the first to comment!</em></p>
+        }
+        else
+        {
+            foreach (var comment in comments)
+            {
+                <div class="p-2 border-bottom">
+                    <strong>@comment.Author</strong> says: "@comment.Content"
+                    <br>
+                    <small class="text-muted">@comment.PostedOn.ToString("MM/dd/yyyy HH:mm")</small>
+                </div>
+            }
+        }
+
+        <div class="mt-5">
+            <h5>Add a Comment</h5>
+            <textarea class="form-control mb-2" rows="3" @bind=@content></textarea>
+            <button class="btn btn-primary rounded-pill shadow-sm" @onclick="AddComment">Add Comment</button>
+        </div>
+    </div>
+}
 
 @code {
     [Parameter]
-    public string PostId { get; set; }
+    public string PostId { get; set; } = string.Empty;
+    private string username = string.Empty;
+    private string content = string.Empty;
+    private PostItem? post;
+    private List<CommentItem>? comments;
 
-    private Post post; // This should be loaded from an API or service
-    private List<Comment> comments; // Dummy data or loaded from an API
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
 
-    // Dummy initialization
-    protected override Task OnInitializedAsync()
+    private HttpClient? httpClient;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        post = new Post { Id = 1, Title = "Sample Post Title", Author = "User1", PostedOn = DateTime.Now.AddDays(-1), Content = "Here is some content about this post." };
-        comments = new List<Comment>
+        if (firstRender)
         {
-            new Comment { Author = "User2", Content = "Great post!", PostedOn = DateTime.Now }
+            if (httpClient is null)
+            { 
+                logger.LogError("HTTP client is null");
+                return;
+            }
+
+            comments = new List<CommentItem>();
+
+            // Don't include leading slash - see https://stackoverflow.com/a/23438417
+            var postsClient = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
+            post = postsClient.SingleOrDefault(p => p.Id == Guid.Parse(PostId));
+            logger.LogInformation("Posts retrieved from API: {Posts}", JsonSerializer.Serialize(post));
+
+            var commentsResponse = await httpClient.GetFromJsonAsync<List<CommentItem>>("comments") ?? new();
+            comments = commentsResponse.Where(c => c.PostId == Guid.Parse(PostId)).ToList();
+            
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is not null)
+        {
+            var state = await authenticationState;
+
+            username = state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
+        }
+        await base.OnInitializedAsync();
+
+        httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        logger.LogInformation("Creating HTTP client for API calls.");
+    }
+
+    private async Task AddComment()
+    {
+        if (httpClient is null)
+        { 
+            logger.LogError("HTTP client is null");
+            return;
+        }
+
+        if (comments is null)
+        {
+            comments = new List<CommentItem>();
+        }
+
+        var comment = new CommentItem
+        {
+            Author = username,
+            Content = content,
+            PostedOn = DateTime.Now,
+            PostId = Guid.Parse(PostId)
         };
 
-        return base.OnInitializedAsync();
-    }
+        var commentsResponse = await httpClient.PostAsJsonAsync("comments", comment) ?? new();
 
-    private class Post
-    {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public DateTime PostedOn { get; set; }
-        public string Content { get; set; }
-    }
+        commentsResponse.EnsureSuccessStatusCode();
 
-    private class Comment
-    {
-        public string Author { get; set; }
-        public string Content { get; set; }
-        public DateTime PostedOn { get; set; }
+        comments.Add(comment);
+
+        StateHasChanged();
     }
 }

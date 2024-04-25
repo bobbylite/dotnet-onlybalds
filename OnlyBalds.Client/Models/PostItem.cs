@@ -1,4 +1,6 @@
-﻿namespace OnlyBalds.Client;
+﻿using System.Text.Json.Serialization;
+
+namespace OnlyBalds.Client.Models;
 
 /// <summary>
 /// Represents a post in the application.

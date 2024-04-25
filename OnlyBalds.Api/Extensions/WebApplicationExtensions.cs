@@ -184,8 +184,6 @@ public static class WebApplicationExtensions
                 }
 
                 postItem.Title = content.Title;
-                postItem.Author = content.Author;
-                postItem.PostedOn = content.PostedOn;
                 postItem.Content = content.Content;
 
                 await dataContext.SaveChangesAsync();
@@ -208,6 +206,82 @@ public static class WebApplicationExtensions
                 return Results.NotFound();
             })
             .WithName("DeletePost")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        return webApplication;
+    }
+
+    /// <summary>
+    /// Maps endpoints for the exposed API.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    public static WebApplication MapCommentsApi(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapGet("/comments", async (CommentDataContext dataContext) =>
+                await dataContext.CommentItems.ToListAsync())
+            .WithName("GetComment")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+            webApplication.MapGet("/comments/{id}", async (Guid id, CommentDataContext dataContext) =>
+                await dataContext.CommentItems.FindAsync(id)
+                    is { } commentItem
+                    ? Results.Ok(commentItem)
+                    : Results.NotFound())
+            .WithName("GetCommentById")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+        
+        webApplication.MapPost("/comments", async (CommentItem commentItem, CommentDataContext dataContext) =>
+            {
+                if (commentItem.Id == Guid.Empty)
+                {
+                    commentItem.Id = Guid.NewGuid();
+                }
+
+                dataContext.CommentItems.Add(commentItem);
+                await dataContext.SaveChangesAsync();
+
+                return Results.Created($"/comments/{commentItem.Id}", commentItem);
+            })
+            .WithName("CreateComment")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapPut("/comments/{id}", async (Guid id, PostItem content, CommentDataContext dataContext) =>
+            {
+                var commentItem = await dataContext.CommentItems.FindAsync(id);
+
+                if (commentItem is null)
+                {
+                    return Results.NotFound();
+                }
+
+                commentItem.Content = content.Content;
+
+                await dataContext.SaveChangesAsync();
+
+                return Results.NoContent();
+            })
+            .WithName("UpdateComment")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapDelete("/comments/{id}", async (Guid id, CommentDataContext dataContext) =>
+            {
+                if (await dataContext.CommentItems.FindAsync(id) is { } taskItem)
+                {
+                    dataContext.CommentItems.Remove(taskItem);
+                    await dataContext.SaveChangesAsync();
+                    return Results.NoContent();
+                }
+
+                return Results.NotFound();
+            })
+            .WithName("DeleteComment")
             .WithOpenApi()
             .RequireAuthorization("Thread.ReadWrite");
 

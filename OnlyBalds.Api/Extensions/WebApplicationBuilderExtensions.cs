@@ -24,6 +24,8 @@ public static class WebApplicationBuilderExtensions
             opt.UseInMemoryDatabase("ThreadData"));
         webApplicationBuilder.Services.AddDbContext<PostDataContext>(opt => 
             opt.UseInMemoryDatabase("PostData"));
+        webApplicationBuilder.Services.AddDbContext<CommentDataContext>(opt => 
+            opt.UseInMemoryDatabase("CommentData"));
         webApplicationBuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
         
         return webApplicationBuilder;

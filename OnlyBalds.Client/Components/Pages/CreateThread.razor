@@ -6,7 +6,7 @@
 @inject IHttpClientFactory httpClientFactory
 @inject ILogger<Threads> logger;
 
-@if (_isInitialized is false)
+@if (isInitialized is false)
 {
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
@@ -21,12 +21,12 @@ else
 
         <div class="mb-3">
             <label for="Title" class="form-label">Title</label>
-            <input @bind=@_title type ="text" id="Title" class="form-control" />
+            <input @bind=@title type ="text" id="Title" class="form-control" />
         </div>
 
         <div class="mb-3">
             <label for="Summary" class="form-label">Summary</label>
-            <textarea @bind=@_summary id="Summary" class="form-control" rows="3"></textarea>
+            <textarea @bind=@summary id="Summary" class="form-control" rows="3"></textarea>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3" @onclick="AddThreadAsync">Submit</button>
@@ -34,10 +34,10 @@ else
 }
 
 @code {
-    private bool _isInitialized = false;
-    private string _title = string.Empty;
-    private string _summary = string.Empty;
-    private string _username = string.Empty;
+    private bool isInitialized = false;
+    private string title = string.Empty;
+    private string summary = string.Empty;
+    private string username = string.Empty;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -48,17 +48,17 @@ else
         {
             var state = await authenticationState;
 
-            _username = state?.User?.Identity?.Name ?? string.Empty;
+            username = state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
         }
         await base.OnInitializedAsync();
-        _isInitialized = true;
+        isInitialized = true;
 
         StateHasChanged();
     }
 
     private async Task AddThreadAsync()
     {
-        if (string.IsNullOrEmpty(_title) || string.IsNullOrEmpty(_summary))
+        if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(summary))
         {
             logger.LogWarning("Title or summary is empty");
             return;
@@ -67,11 +67,11 @@ else
         var threadItem = new ThreadItem()
         {
             Name = "development",
-            Creator = _username,
+            Creator = username,
             StartDate = DateTime.Now,
             Id = Guid.NewGuid(),
-            Title = _title,
-            Summary = _summary,
+            Title = title,
+            Summary = summary,
             PostsCount = 0
         };
         
@@ -81,8 +81,8 @@ else
 
         responseMessage.EnsureSuccessStatusCode();
 
-        _title = String.Empty;
-        _summary = String.Empty;
+        title = String.Empty;
+        summary = String.Empty;
 
         StateHasChanged();
 

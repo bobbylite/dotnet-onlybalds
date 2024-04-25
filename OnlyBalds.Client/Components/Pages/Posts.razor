@@ -4,7 +4,7 @@
 @inject IHttpClientFactory httpClientFactory
 @inject ILogger<Threads> logger;
 
-@if (_posts is null)
+@if (posts is null)
 {
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
@@ -16,14 +16,14 @@ else
 {
     <h1 class="mb-4">Posts</h1>
 
-    foreach (var post in _posts)
+    foreach (var post in posts)
     {
         <div class="card mb-3 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">@post.Title</h5>
                 <h6 class="card-subtitle mb-2 text-muted">Posted by @post.Author on @post.PostedOn.ToShortDateString()</h6>
                 <p class="card-text">@post.Content</p>
-                <a href="/Post-Details/@post.Id" class="btn btn-primary">Read more</a>
+                <a href="/PostDetails/@post.Id" class="btn btn-primary">Read more</a>
             </div>
         </div>
     }
@@ -36,10 +36,8 @@ else
 @code {
     [Parameter]
     public string ThreadId { get; set; } = string.Empty;
-    
-    private string _username = string.Empty;
-    
-    private List<PostItem>? _posts;
+    private string username = string.Empty;
+    private List<PostItem>? posts;
 
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
@@ -52,9 +50,9 @@ else
             logger.LogInformation("Getting posts from API");
 
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            var posts = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
-            _posts = posts.Where(p => p.ThreadId == Guid.Parse(ThreadId)).ToList();
-            logger.LogInformation("Posts retrieved from API: {Posts}", JsonSerializer.Serialize(_posts));
+            var postsClient = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
+            posts = postsClient.Where(p => p.ThreadId == Guid.Parse(ThreadId)).ToList();
+            logger.LogInformation("Posts retrieved from API: {Posts}", JsonSerializer.Serialize(posts));
             
             StateHasChanged();
         }
@@ -65,7 +63,7 @@ else
         {
             var state = await authenticationState;
 
-            _username = state?.User?.Identity?.Name ?? string.Empty;
+            username = state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
         }
         await base.OnInitializedAsync();
     }
