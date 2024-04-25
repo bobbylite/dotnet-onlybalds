@@ -2,15 +2,18 @@
 
 namespace OnlyBalds.Configuration;
 
-public class TasksApiOptions
+/// <summary>
+/// Options for configuring the API.
+/// </summary>
+public class ApiOptions
 {
     /// <summary>
-    /// The section key used to define the options bound to this class (e.g. in appsettings.json).
+    /// The section key used to define the options bound to this class.
     /// </summary>
-    public const string SectionKey = "TasksAPI";
+    public const string SectionKey = "OnlyBaldsAPI";
     
     /// <summary>
-    /// The base URL of the Tasks API.
+    /// The base URL of the Threads API.
     /// </summary>
     [Required]
     [Url]

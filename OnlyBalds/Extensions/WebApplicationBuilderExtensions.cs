@@ -29,32 +29,32 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
-    /// Add an HttpClient for the Tasks REST API. Includes handling authentication for the API by passing the access
+    /// Add an HttpClient for the Threads REST API. Includes handling authentication for the API by passing the access
     /// token for the currently logged in user as a JWT bearer token to the API.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
-    public static WebApplicationBuilder AddTasksApiClient(this WebApplicationBuilder webApplicationBuilder)
+    public static WebApplicationBuilder AddOnlyBaldsApiClients(this WebApplicationBuilder webApplicationBuilder)
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
         
-        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<TasksApiOptions>()
-            .BindConfiguration(TasksApiOptions.SectionKey);
+        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<ApiOptions>()
+            .BindConfiguration(ApiOptions.SectionKey);
 
-        webApplicationBuilder.Services.AddTransient<TasksApiAuthenticationHandler>();
-        webApplicationBuilder.Services.AddHttpClient(HttpClientNames.TasksApi, (provider, client) =>
+        webApplicationBuilder.Services.AddTransient<OnlyBaldsApiAuthenticationHandler>()
+        .AddHttpClient(HttpClientNames.OnlyBalds, (provider, client) =>
         {
-            var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<TasksApiOptions>>();
+            var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<ApiOptions>>();
             var apiOptions = apiOptionsSnapshot.CurrentValue;
             client.BaseAddress = new Uri(apiOptions.BaseUrl);
         })
-            .AddHttpMessageHandler<TasksApiAuthenticationHandler>();
+        .AddHttpMessageHandler<OnlyBaldsApiAuthenticationHandler>();
         
         return webApplicationBuilder;
     }
 
     /// <summary>
-    /// Add an HttpClient for the Tasks REST API. Includes handling authentication for the API by passing the access
+    /// Add an HttpClient for the OnlyBalds REST API. Includes handling authentication for the API by passing the access
     /// token for the currently logged in user as a JWT bearer token to the API.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>

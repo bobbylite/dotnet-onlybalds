@@ -20,8 +20,12 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
-        webApplicationBuilder.Services.AddDbContext<TaskDataContext>(opt => 
-            opt.UseInMemoryDatabase("TaskList"));
+        webApplicationBuilder.Services.AddDbContext<ThreadDataContext>(opt => 
+            opt.UseInMemoryDatabase("ThreadData"));
+        webApplicationBuilder.Services.AddDbContext<PostDataContext>(opt => 
+            opt.UseInMemoryDatabase("PostData"));
+        webApplicationBuilder.Services.AddDbContext<CommentDataContext>(opt => 
+            opt.UseInMemoryDatabase("CommentData"));
         webApplicationBuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
         
         return webApplicationBuilder;
@@ -59,9 +63,26 @@ public static class WebApplicationBuilderExtensions
                     Implicit = new OpenApiOAuthFlow
                     {
                         AuthorizationUrl = new Uri(swaggerOptions?.CurrentValue.AuthorizationUrl!),
+                        Scopes = new Dictionary<string, string>
+                        {
+                            { "api://onlybalds/Threads.Read", "Read access to threads api." },
+                            { "api://onlybalds/Threads.Write", "Write access to threads api." }
+                        }
+                    },
+                    /*
+                    *
+                    * Need to figure out how to get this working with the client credentials flow
+                    *
+                    ClientCredentials = new OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = new Uri(swaggerOptions?.CurrentValue.AuthorizationUrl!),
                         TokenUrl = new Uri(swaggerOptions?.CurrentValue.TokenUrl!),
-                        Scopes = swaggerOptions?.CurrentValue.Scopes
-                    }
+                        //Scopes = swaggerOptions?.CurrentValue.Scopes
+                        Scopes = new Dictionary<string, string>
+                        {
+                            { "api://onlybalds", "Read access to threads api." },
+                        }
+                    }*/
                 }
             });
 
@@ -104,9 +125,9 @@ public static class WebApplicationBuilderExtensions
             .AddJwtBearer();
         webApplicationBuilder.Services.AddAuthorization(o =>
         {
-            o.AddPolicy("Tasks.Read", p => p.
+            o.AddPolicy("Thread.ReadWrite", p => p.
                 RequireAuthenticatedUser().
-                RequireClaim("scope", "Tasks.Read"));
+                RequireClaim("scope", "Threads.Read Threads.Write"));
         });
         
         return webApplicationBuilder;

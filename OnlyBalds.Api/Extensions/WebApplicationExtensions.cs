@@ -61,78 +61,229 @@ public static class WebApplicationExtensions
     /// Maps endpoints for the exposed API.
     /// </summary>
     /// <param name="webApplication"></param>
-    public static WebApplication MapApi(this WebApplication webApplication)
+    public static WebApplication MapThreadsApi(this WebApplication webApplication)
     {
         ArgumentNullException.ThrowIfNull(webApplication);
 
-        webApplication.MapGet("/tasks", async (TaskDataContext dataContext) =>
-                await dataContext.TaskItems.ToListAsync())
-            .WithName("GetTasks")
+        webApplication.MapGet("/threads", async (ThreadDataContext dataContext) =>
+                await dataContext.ThreadItems.ToListAsync())
+            .WithName("GetThreads")
             .WithOpenApi()
-            .RequireAuthorization("Tasks.Read");
+            .RequireAuthorization("Thread.ReadWrite");
 
-        webApplication.MapGet("/tasks/complete", async (TaskDataContext dataContext) =>
-                await dataContext.TaskItems.Where(t => t.IsComplete).ToListAsync())
-            .WithName("GetCompletedTasks")
-            .WithOpenApi()
-            .RequireAuthorization("Tasks.Read");
-
-        webApplication.MapGet("/tasks/{id}", async (Guid id, TaskDataContext dataContext) =>
-                await dataContext.TaskItems.FindAsync(id)
+            webApplication.MapGet("/threads/{id}", async (Guid id, ThreadDataContext dataContext) =>
+                await dataContext.ThreadItems.FindAsync(id)
                     is { } taskItem
                     ? Results.Ok(taskItem)
                     : Results.NotFound())
-            .WithName("GetTaskById")
+            .WithName("GetThreadById")
             .WithOpenApi()
-            .RequireAuthorization("Tasks.Read");
-
-        webApplication.MapPost("/tasks", async (TaskItem taskItem, TaskDataContext dataContext) =>
+            .RequireAuthorization("Thread.ReadWrite");
+        
+        webApplication.MapPost("/threads", async (ThreadItem threadItem, ThreadDataContext dataContext) =>
             {
-                if (taskItem.Id == Guid.Empty)
+                if (threadItem.Id == Guid.Empty)
                 {
-                    taskItem.Id = Guid.NewGuid();
+                    threadItem.Id = Guid.NewGuid();
                 }
 
-                dataContext.TaskItems.Add(taskItem);
+                dataContext.ThreadItems.Add(threadItem);
                 await dataContext.SaveChangesAsync();
 
-                return Results.Created($"/tasks/{taskItem.Id}", taskItem);
+                return Results.Created($"/threads/{threadItem.Id}", threadItem);
             })
-            .WithName("CreateTask")
+            .WithName("CreateThread")
             .WithOpenApi()
-            .RequireAuthorization("Tasks.Read");
+            .RequireAuthorization("Thread.ReadWrite");
 
-        webApplication.MapPut("/tasks/{id}", async (Guid id, TaskItem inputTodo, TaskDataContext dataContext) =>
+        webApplication.MapPut("/threads/{id}", async (Guid id, ThreadItem content, ThreadDataContext dataContext) =>
             {
-                var taskItem = await dataContext.TaskItems.FindAsync(id);
+                var threadItem = await dataContext.ThreadItems.FindAsync(id);
 
-                if (taskItem is null) return Results.NotFound();
+                if (threadItem is null) return Results.NotFound();
 
-                taskItem.Name = inputTodo.Name;
-                taskItem.IsComplete = inputTodo.IsComplete;
+                threadItem.Name = content.Name;
+                threadItem.Title = content.Title;
+                threadItem.Summary = content.Summary;
+                threadItem.Creator = content.Creator;
+                threadItem.StartDate = content.StartDate;
+                threadItem.PostsCount = content.PostsCount;
 
                 await dataContext.SaveChangesAsync();
 
                 return Results.NoContent();
             })
-            .WithName("UpdateTask")
+            .WithName("UpdateThread")
             .WithOpenApi()
-            .RequireAuthorization("Tasks.Read");
+            .RequireAuthorization("Thread.ReadWrite");
 
-        webApplication.MapDelete("/tasks/{id}", async (Guid id, TaskDataContext dataContext) =>
+        webApplication.MapDelete("/threads/{id}", async (Guid id, ThreadDataContext dataContext) =>
             {
-                if (await dataContext.TaskItems.FindAsync(id) is { } taskItem)
+                if (await dataContext.ThreadItems.FindAsync(id) is { } taskItem)
                 {
-                    dataContext.TaskItems.Remove(taskItem);
+                    dataContext.ThreadItems.Remove(taskItem);
                     await dataContext.SaveChangesAsync();
                     return Results.NoContent();
                 }
 
                 return Results.NotFound();
             })
-            .WithName("DeleteTask")
+            .WithName("DeleteThread")
             .WithOpenApi()
-            .RequireAuthorization("Tasks.Read");
+            .RequireAuthorization("Thread.ReadWrite");
+
+        return webApplication;
+    }
+
+    /// <summary>
+    /// Maps endpoints for the exposed API.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    public static WebApplication MapPostsApi(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapGet("/posts", async (PostDataContext dataContext) =>
+                await dataContext.PostItems.ToListAsync())
+            .WithName("GetPosts")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+            webApplication.MapGet("/posts/{id}", async (Guid id, PostDataContext dataContext) =>
+                await dataContext.PostItems.FindAsync(id)
+                    is { } taskItem
+                    ? Results.Ok(taskItem)
+                    : Results.NotFound())
+            .WithName("GetPostById")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+        
+        webApplication.MapPost("/posts", async (PostItem postItem, PostDataContext dataContext) =>
+            {
+                if (postItem.Id == Guid.Empty)
+                {
+                    postItem.Id = Guid.NewGuid();
+                }
+
+                dataContext.PostItems.Add(postItem);
+                await dataContext.SaveChangesAsync();
+
+                return Results.Created($"/posts/{postItem.Id}", postItem);
+            })
+            .WithName("CreatePost")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapPut("/posts/{id}", async (Guid id, PostItem content, PostDataContext dataContext) =>
+            {
+                var postItem = await dataContext.PostItems.FindAsync(id);
+
+                if (postItem is null)
+                {
+                    return Results.NotFound();
+                }
+
+                postItem.Title = content.Title;
+                postItem.Content = content.Content;
+
+                await dataContext.SaveChangesAsync();
+
+                return Results.NoContent();
+            })
+            .WithName("UpdatePost")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapDelete("/posts/{id}", async (Guid id, PostDataContext dataContext) =>
+            {
+                if (await dataContext.PostItems.FindAsync(id) is { } taskItem)
+                {
+                    dataContext.PostItems.Remove(taskItem);
+                    await dataContext.SaveChangesAsync();
+                    return Results.NoContent();
+                }
+
+                return Results.NotFound();
+            })
+            .WithName("DeletePost")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        return webApplication;
+    }
+
+    /// <summary>
+    /// Maps endpoints for the exposed API.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    public static WebApplication MapCommentsApi(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapGet("/comments", async (CommentDataContext dataContext) =>
+                await dataContext.CommentItems.ToListAsync())
+            .WithName("GetComment")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+            webApplication.MapGet("/comments/{id}", async (Guid id, CommentDataContext dataContext) =>
+                await dataContext.CommentItems.FindAsync(id)
+                    is { } commentItem
+                    ? Results.Ok(commentItem)
+                    : Results.NotFound())
+            .WithName("GetCommentById")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+        
+        webApplication.MapPost("/comments", async (CommentItem commentItem, CommentDataContext dataContext) =>
+            {
+                if (commentItem.Id == Guid.Empty)
+                {
+                    commentItem.Id = Guid.NewGuid();
+                }
+
+                dataContext.CommentItems.Add(commentItem);
+                await dataContext.SaveChangesAsync();
+
+                return Results.Created($"/comments/{commentItem.Id}", commentItem);
+            })
+            .WithName("CreateComment")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapPut("/comments/{id}", async (Guid id, PostItem content, CommentDataContext dataContext) =>
+            {
+                var commentItem = await dataContext.CommentItems.FindAsync(id);
+
+                if (commentItem is null)
+                {
+                    return Results.NotFound();
+                }
+
+                commentItem.Content = content.Content;
+
+                await dataContext.SaveChangesAsync();
+
+                return Results.NoContent();
+            })
+            .WithName("UpdateComment")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
+
+        webApplication.MapDelete("/comments/{id}", async (Guid id, CommentDataContext dataContext) =>
+            {
+                if (await dataContext.CommentItems.FindAsync(id) is { } taskItem)
+                {
+                    dataContext.CommentItems.Remove(taskItem);
+                    await dataContext.SaveChangesAsync();
+                    return Results.NoContent();
+                }
+
+                return Results.NotFound();
+            })
+            .WithName("DeleteComment")
+            .WithOpenApi()
+            .RequireAuthorization("Thread.ReadWrite");
 
         return webApplication;
     }

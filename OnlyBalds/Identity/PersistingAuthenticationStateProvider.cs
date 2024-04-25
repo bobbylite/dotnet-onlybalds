@@ -25,6 +25,13 @@ internal sealed class PersistingAuthenticationStateProvider : RevalidatingServer
 
   private Task<AuthenticationState>? _authenticationStateTask;
 
+  /// <summary>
+  /// Initializes a new instance of the <see cref="PersistingAuthenticationStateProvider"/> class.
+  /// </summary>
+  /// <param name="loggerFactory">The logger factory.</param>
+  /// <param name="scopeFactory">The service scope factory.</param>
+  /// <param name="state">The persistent component state.</param>
+  /// <param name="options">The identity options.</param>
   public PersistingAuthenticationStateProvider(
       ILoggerFactory loggerFactory,
       IServiceScopeFactory scopeFactory,
@@ -40,8 +47,17 @@ internal sealed class PersistingAuthenticationStateProvider : RevalidatingServer
     _subscription = state.RegisterOnPersisting(OnPersistingAsync, RenderMode.InteractiveWebAssembly);
   }
 
+  /// <summary>
+  /// Gets the revalidation interval.
+  /// </summary>
   protected override TimeSpan RevalidationInterval => TimeSpan.FromMinutes(30);
 
+  /// <summary>
+  /// Validates the authentication state asynchronously.
+  /// </summary>
+  /// <param name="authenticationState">The authentication state.</param>
+  /// <param name="cancellationToken">The cancellation token.</param>
+  /// <returns>A value indicating whether the authentication state is valid.</returns>
   protected override async Task<bool> ValidateAuthenticationStateAsync(
       AuthenticationState authenticationState, CancellationToken cancellationToken)
   {
@@ -50,6 +66,11 @@ internal sealed class PersistingAuthenticationStateProvider : RevalidatingServer
     return ValidateSecurityStampAsync(authenticationState.User);
   }
 
+  /// <summary>
+  /// Validates the security stamp of the claims principal.
+  /// </summary>
+  /// <param name="principal">The claims principal.</param>
+  /// <returns>A value indicating whether the claims principal is authenticated.</returns>
   private bool ValidateSecurityStampAsync(ClaimsPrincipal principal)
   {
     if (principal.Identity?.IsAuthenticated is false)
@@ -59,11 +80,19 @@ internal sealed class PersistingAuthenticationStateProvider : RevalidatingServer
     return true;
   }
 
+  /// <summary>
+  /// Handles the authentication state changed event.
+  /// </summary>
+  /// <param name="authenticationStateTask">The authentication state task.</param>
   private void OnAuthenticationStateChanged(Task<AuthenticationState> authenticationStateTask)
   {
     _authenticationStateTask = authenticationStateTask;
   }
 
+  /// <summary>
+  /// Handles the persisting event asynchronously.
+  /// </summary>
+  /// <returns>A task that represents the asynchronous operation.</returns>
   private async Task OnPersistingAsync()
   {
     if (_authenticationStateTask is null)
@@ -90,6 +119,10 @@ internal sealed class PersistingAuthenticationStateProvider : RevalidatingServer
     }
   }
 
+  /// <summary>
+  /// Disposes the resources used by this instance.
+  /// </summary>
+  /// <param name="disposing">A value indicating whether disposal of managed resources should be performed.</param>
   protected override void Dispose(bool disposing)
   {
     _subscription.Dispose();
