@@ -1,0 +1,30 @@
+﻿@page "/Marketplace"
+
+@inject IJSRuntime JSRuntime
+
+<div class="container">
+    <h1>Coming Soon</h1>
+    <p class="lead">Our website is under construction. We'll be here soon with our new awesome site.</p>
+    <div id="timer" class="countdown">
+        <div><span id="days"></span> days</div>
+        <div><span id="hours"></span> hours</div>
+        <div><span id="minutes"></span> minutes</div>
+        <div><span id="seconds"></span> seconds</div>
+    </div>
+    <div class="social-links">
+        <a href="https://facebook.com/" target="_blank">Facebook</a>
+        <a href="https://twitter.com/" target="_blank">Twitter</a>
+        <a href="https://instagram.com/" target="_blank">Instagram</a>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Home.razor.js");
+            await jsModule.InvokeVoidAsync("onLoad");
+        }
+    }
+}
