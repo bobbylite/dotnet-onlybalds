@@ -12,6 +12,8 @@ public class ChatHub : Hub
     /// </summary>
     private readonly IHubContext<ChatHub> _hubContext;
 
+
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ChatHub"/> class.
     /// </summary>
@@ -29,20 +31,21 @@ public class ChatHub : Hub
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task SendMessage(string user, string message)
     {
-        await _hubContext.Clients.All.SendAsync("ReceiveMessage", user, message);
+        var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", username, message);
     }
 
     public override async Task OnConnectedAsync()
     {
-        await _hubContext.Clients.All.SendAsync("ReceiveMessage", "OnlyBalds Chat AI", "Welcome to the OnlyBalds chat room!");
+        var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Empty, $"{username} joined the OnlyBalds chat room.");
         await base.OnConnectedAsync();
     }
 
-    public override async Task OnDisconnectedAsync(Exception exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        // Handle the disconnection here
-        // For example, you might want to send a message to all clients to let them know that a user has disconnected
-
+        var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Empty, $"{username} has left the chat room.");
         await base.OnDisconnectedAsync(exception);
     }
 }

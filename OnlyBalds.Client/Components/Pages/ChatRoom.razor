@@ -1,4 +1,5 @@
 ﻿@page "/ChatRoom"
+@attribute [Authorize]
 
 @implements IAsyncDisposable
 @inject NavigationManager NavigationManager
@@ -7,7 +8,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
-            <h3 class="text-center mt-5">ChatRoom</h3>
+            <h3 class="text-center mt-5">Chat Room</h3>
             <div class="vh-50 overflow-auto mb-4" style="max-height: calc(100vh - 200px);">
                 <ul class="list-group">
                     @foreach (var msg in messages)
@@ -41,13 +42,13 @@ else
 { 
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only">Loading...</span>
         </div>
     </div>
 }
 
 @code {
-    public string name = string.Empty;
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
     public HubConnection? hubConnection;
     private List<string> messages = new();
     private string user = string.Empty;
@@ -56,14 +57,36 @@ else
     private DotNetObjectReference<ChatRoom>? objRef;
 
 
-    private Task Send() => hubConnection?.SendAsync("SendMessage", user, message) ?? throw new ApplicationException("Connection is not started");
+    private async Task Send()
+    {
+        if (hubConnection is null)
+        {
+            return;
+        }  
+
+        await hubConnection.SendAsync("SendMessage", user, message);
+        message = string.Empty;
+        StateHasChanged();
+    }
 
     public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
 
     protected override void OnInitialized()
     {
         objRef = DotNetObjectReference.Create(this);
+        base.OnInitialized();
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is not null)
+        {
+            var state = await authenticationState;
+            user = state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
+        }
+        await base.OnInitializedAsync();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -75,19 +98,31 @@ else
     [JSInvokable]
     public async Task Connect()
     {
-        var username = "Bobby"; //state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavigationManager.ToAbsoluteUri($"/chathub?username={username}"))
+            .WithUrl(NavigationManager.ToAbsoluteUri($"/chathub?username={user}"))
             .Build();
 
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        hubConnection.On<string, string>("ReceiveMessage", (username, message) =>
         {
-            var encodedMsg = $"{username}: {message}";
-            messages.Add(encodedMsg);
+            string broacastMessage = string.Empty;
+
+            if (string.IsNullOrEmpty(username))
+            {
+                broacastMessage = $"{message}";
+            }
+            else
+            {
+                broacastMessage = $"{username}: {message}";
+            }
+
+            messages.Add(broacastMessage);
             StateHasChanged();
         });
 
-        await hubConnection.StartAsync();
+        if (hubConnection.State is not HubConnectionState.Connected)
+        {
+            await hubConnection.StartAsync();
+        }
     }
 
     public ValueTask DisposeAsync()
