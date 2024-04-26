@@ -3,6 +3,7 @@
 
 @inject IHttpClientFactory httpClientFactory
 @inject ILogger<Threads> logger;
+@inject IJSRuntime JSRuntime;
 
 @if (posts is null)
 {
@@ -46,6 +47,9 @@ else
     {
         if (firstRender)
         {
+            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Posts.razor.js");
+            await jsModule.InvokeVoidAsync("onLoad");
+
             var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
             logger.LogInformation("Getting posts from API");
 
@@ -56,15 +60,5 @@ else
             
             StateHasChanged();
         }
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        if (authenticationState is not null)
-        {
-            var state = await authenticationState;
-
-            username = state?.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
-        }
-        await base.OnInitializedAsync();
     }
 }
