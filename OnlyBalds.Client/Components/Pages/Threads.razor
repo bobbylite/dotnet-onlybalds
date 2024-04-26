@@ -4,6 +4,7 @@
 
 @inject IHttpClientFactory httpClientFactory
 @inject ILogger<Threads> logger;
+@inject IJSRuntime JSRuntime
 
 @if (threads is null)
 {
@@ -48,6 +49,9 @@ else
     {
         if (firstRender)
         {
+            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Threads.razor.js");
+            await jsModule.InvokeVoidAsync("onLoad");
+
             var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
             logger.LogInformation("Getting threads from API");
 

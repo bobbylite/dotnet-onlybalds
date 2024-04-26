@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Http;
 using OnlyBalds.Identity;
-using Ardalis.GuardClauses;
 using OnlyBalds.Services.Token;
 
 namespace OnlyBalds.Extensions;
@@ -24,6 +23,7 @@ public static class WebApplicationBuilderExtensions
         // Add a singleton service of type ITokenService. The same instance of TokenService will be used every time ITokenService is requested.
         webApplicationBuilder.Services.AddSingleton<ITokenService, TokenService>();
         webApplicationBuilder.Services.AddHttpContextAccessor();
+        webApplicationBuilder.Services.AddSignalR();
 
         return webApplicationBuilder;
     }
