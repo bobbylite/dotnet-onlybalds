@@ -1,30 +1,78 @@
 ﻿@page "/Marketplace"
+@implements IDisposable
+
+@attribute [Authorize]
 
 @inject IJSRuntime JSRuntime
+@inject NavigationManager NavManager
 
-<div class="container">
-    <h1>Coming Soon</h1>
-    <p class="lead">Our website is under construction. We'll be here soon with our new awesome site.</p>
-    <div id="timer" class="countdown">
-        <div><span id="days"></span> days</div>
-        <div><span id="hours"></span> hours</div>
-        <div><span id="minutes"></span> minutes</div>
-        <div><span id="seconds"></span> seconds</div>
+
+<body>
+    @if(IsDownloading) {
+        <div class="d-flex justify-content-center align-items-center vh-100">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            </div>
+        </div>
+    }
+    <div>
+        <div id="my-store-103074754"></div>
     </div>
-    <div class="social-links">
-        <a href="https://facebook.com/" target="_blank">Facebook</a>
-        <a href="https://twitter.com/" target="_blank">Twitter</a>
-        <a href="https://instagram.com/" target="_blank">Instagram</a>
-    </div>
-</div>
+</body>
 
 @code {
+    private bool IsDownloading = true;
+    private IJSObjectReference? jsModule;
+    private DotNetObjectReference<Marketplace>? objRef;
+
+
+    protected override void OnInitialized()
+    {
+        NavManager.LocationChanged += HandleLocationChanged;
+        objRef = DotNetObjectReference.Create(this);
+        base.OnInitialized();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (jsModule is not null)
+        {
+            return;
+        }
+
+        jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Marketplace.razor.js");
+
         if (firstRender)
         {
-            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Home.razor.js");
             await jsModule.InvokeVoidAsync("onLoad");
+            await jsModule.InvokeVoidAsync("downloadMarketplace","my-store-103074754", objRef);
+
+            StateHasChanged();
         }
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (jsModule is not null)
+        {
+            return;
+        }
+
+        var uri = new Uri(e.Location);
+
+        if (uri.Fragment.Contains("#!/")) {
+            NavManager.NavigateTo("/Marketplace" + uri.Fragment);
+        }
+        
+    }
+
+    [JSInvokable]
+    public void CompleteDownloading() { 
+        IsDownloading = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavManager.LocationChanged -= HandleLocationChanged;
     }
 }

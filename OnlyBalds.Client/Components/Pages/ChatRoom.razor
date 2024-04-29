@@ -1,7 +1,8 @@
 ﻿@page "/ChatRoom"
+@implements IAsyncDisposable
+
 @attribute [Authorize]
 
-@implements IAsyncDisposable
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
