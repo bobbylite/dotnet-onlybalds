@@ -1,14 +1,30 @@
 export const onLoad = () => {
     $('.navbar-collapse').collapse('hide');
-    
-    setTimeout(() => {
-        let messages = $('.ecwid-productBrowser-OrderConfirmationPage');
-        console.log("messages");
-        console.log(messages);
-        if (messages.length > 1) {
-            $('.ecwid-productBrowser-OrderConfirmationPage:gt(0)').remove(); // selects all elements with index greater than 0
-        }
-    }, 5000);
+
+    const config = {
+        childList: true,
+        subtree: true
+    };
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                let classList = node.classList;
+
+                if (classList === undefined) {
+                    return;
+                }
+
+                $('.ec-store.ec-store__confirmation-page:gt(0)').remove();
+            });
+        });
+    });
+
+    observer.observe(document.body, config);
+
+    return {
+        disconnect: () => observer.disconnect()
+    };
 }
 
 export const downloadMarketplace = (elementId, dotnetHelper) => {
@@ -26,7 +42,6 @@ export const downloadMarketplace = (elementId, dotnetHelper) => {
         
         script.onload = function() {
             xProductBrowser("id=my-store-103074754");
-            onLoad();
             dotnetHelper.invokeMethod('CompleteDownloading');
         };
     } else {
