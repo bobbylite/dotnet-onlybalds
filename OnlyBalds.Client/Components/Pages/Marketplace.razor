@@ -7,17 +7,14 @@
 @inject NavigationManager NavManager
 
 
-<body>
-    @if(IsDownloading) {
-        <div class="d-flex justify-content-center align-items-center vh-100">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-            </div>
+@if(IsDownloading) {
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
         </div>
-    }
-    <div>
-        <div id="my-store-103074754"></div>
     </div>
-</body>
+}
+
+<div id="my-store-103074754"></div>
 
 @code {
     private bool IsDownloading = true;
@@ -52,17 +49,11 @@
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        if (jsModule is not null)
-        {
-            return;
-        }
-
         var uri = new Uri(e.Location);
 
         if (uri.Fragment.Contains("#!/")) {
-            NavManager.NavigateTo("/Marketplace" + uri.Fragment);
+            NavManager.NavigateTo($"/Marketplace/{uri.Fragment}");
         }
-        
     }
 
     [JSInvokable]
