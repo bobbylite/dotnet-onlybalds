@@ -1,11 +1,14 @@
 export const onLoad = () => {
     $('.navbar-collapse').collapse('hide');
-
-    let messages = $('.ecwid-productBrowser-OrderConfirmationPage');
-
-    if (messages.length > 1) {
-        $('.ecwid-productBrowser-OrderConfirmationPage:gt(0)').remove(); // selects all elements with index greater than 0
-    }
+    
+    setTimeout(() => {
+        let messages = $('.ecwid-productBrowser-OrderConfirmationPage');
+        console.log("messages");
+        console.log(messages);
+        if (messages.length > 1) {
+            $('.ecwid-productBrowser-OrderConfirmationPage:gt(0)').remove(); // selects all elements with index greater than 0
+        }
+    }, 5000);
 }
 
 export const downloadMarketplace = (elementId, dotnetHelper) => {
@@ -23,13 +26,23 @@ export const downloadMarketplace = (elementId, dotnetHelper) => {
         
         script.onload = function() {
             xProductBrowser("id=my-store-103074754");
-            //xProductBrowser("categoriesPerRow=3","views=grid(20,3) list(60) table(60)","categoryView=grid","searchView=list","id=my-store-103074754");
+            onLoad();
             dotnetHelper.invokeMethod('CompleteDownloading');
         };
     } else {
-        //xProductBrowser("categoriesPerRow=3","views=grid(20,3) list(60) table(60)","categoryView=grid","searchView=list","id=my-store-103074754");
         dotnetHelper.invokeMethod('CompleteDownloading');
     }
 
     console.log("Marketplace downloaded.");
+}
+
+export const dispose = () => {
+    var scripts = Array.from(document.getElementsByTagName('script'));
+    var scriptUrl = 'https://app.ecwid.com/script.js?103074754&data_platform=code&data_date=2024-04-29';
+    var scriptElement = scripts.find(s => s.src === scriptUrl);
+
+    if (scriptElement) {
+        scriptElement.remove();
+        console.log("Marketplace disposed.");
+    }
 }

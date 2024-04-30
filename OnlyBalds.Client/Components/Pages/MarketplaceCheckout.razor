@@ -1,5 +1,5 @@
-﻿@page "/Marketplace"
-@implements IDisposable
+﻿@page "/MarketplaceCheckout/{CheckoutOptions}"
+@implements IAsyncDisposable
 
 @attribute [Authorize]
 
@@ -17,9 +17,11 @@
 <div id="my-store-103074754"></div>
 
 @code {
+    [Parameter]
+    public string CheckoutOptions { get; set; } = string.Empty;
     private bool IsDownloading = true;
     private IJSObjectReference? jsModule;
-    private DotNetObjectReference<Marketplace>? objRef;
+    private DotNetObjectReference<MarketplaceCheckout>? objRef;
 
 
     protected override void OnInitialized()
@@ -36,12 +38,16 @@
             return;
         }
 
-        jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Marketplace.razor.js");
+        jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/MarketplaceCheckout.razor.js");
 
         if (firstRender)
         {
             await jsModule.InvokeVoidAsync("onLoad");
             await jsModule.InvokeVoidAsync("downloadMarketplace","my-store-103074754", objRef);
+
+            if (CheckoutOptions == "ThankYou")
+            {
+            }
 
             StateHasChanged();
         }
@@ -52,7 +58,7 @@
         var uri = new Uri(e.Location);
 
         if (uri.Fragment.Contains("#!/")) {
-            NavManager.NavigateTo($"/MarketplaceCheckout/Default/{uri.Fragment}");
+            NavManager.NavigateTo($"/MarketplaceCheckout/ThankYou/{uri.Fragment}");
         }
     }
 
@@ -62,8 +68,16 @@
         StateHasChanged();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         NavManager.LocationChanged -= HandleLocationChanged;
+
+        if (jsModule is null)
+        {
+            return;
+        }
+
+        await jsModule.InvokeVoidAsync("dispose");
+        await jsModule.DisposeAsync();
     }
 }
