@@ -124,6 +124,7 @@ else
         commentsResponse.EnsureSuccessStatusCode();
 
         comments.Add(comment);
+        content = string.Empty;
 
         StateHasChanged();
     }
