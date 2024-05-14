@@ -1,0 +1,29 @@
+﻿@page "/About"
+
+@inject IJSRuntime JSRuntime
+
+<div class="container py-5">
+    <h1 class="text-center mb-4">About OnlyBalds</h1>
+    <div class="row">
+        <div class="col-lg-6">
+            <img src="img/OnlyBalds-Sitting.webp" alt="OnlyBalds" class="img-fluid rounded-circle mb-3">
+        </div>
+        <div class="col-lg-6">
+            <h3 class="mb-3">Connecting Bald People Around the World</h3>
+            <p>OnlyBalds is a startup company dedicated to connecting bald people around the world. We believe in the power of community and the unique bond that comes from shared experiences.</p>
+            <p>With our cutting-edge technology and industry-leading solutions, we aim to create a platform where bald individuals can connect, share, and grow together.</p>
+            <p>Join us as we revolutionize the way bald people connect and interact!</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/About.razor.js");
+            await jsModule.InvokeVoidAsync("onLoad");
+        }
+    }
+}

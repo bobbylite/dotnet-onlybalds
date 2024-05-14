@@ -21,6 +21,18 @@ internal sealed class AccessTokenRefresher(IOptionsMonitor<OpenIdConnectOptions>
         RequireNonce = false,
     };
 
+    /// <summary>
+    /// Asynchronously refreshes the access token.
+    /// </summary>
+    /// <param name="validateContext">The context for validating a cookie principal.</param>
+    /// <param name="oidcScheme">The OpenID Connect scheme.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <remarks>
+    /// This method first checks if the access token is about to expire. If not, it returns immediately.
+    /// If the token is about to expire, it sends a request to the token endpoint to refresh the access token.
+    /// If the response is successful, it validates the ID token. If the validation is successful, it replaces the principal with a new one that includes the claims from the ID token and stores the new tokens.
+    /// If the response is not successful or the validation is not successful, it rejects the principal.
+    /// </remarks>
     public async Task RefreshAccessTokenAsync(CookieValidatePrincipalContext validateContext, string oidcScheme)
     {
         var accessTokenExpirationText = validateContext.Properties.GetTokenValue("expires_at");

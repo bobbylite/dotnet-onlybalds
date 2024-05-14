@@ -1,10 +1,12 @@
 ﻿@page "/"
 
+@inject IJSRuntime JSRuntime
+
 <PageTitle>Home</PageTitle>
 
 <div class="container py-5">
     <div class="text-center">
-        <img src="img/OnlyBalds-Center-1.png" alt="OnlyBalds Logo" class="img-fluid mb-4" style="max-width: 300px;">
+        <img src="img/OnlyBalds-CircleLogo.webp" alt="OnlyBalds Logo" class="img-fluid mb-4" style="max-width: 300px;">
     </div>
     
     <AuthorizeView>
@@ -13,7 +15,7 @@
     
             <div class="row row-cols-1 row-cols-md-2 g-4">
                 <div class="col">
-                    <div class="card h-100 rounded shadow">
+                    <div class="card h-100 rounded">
                         <div class="card-body">
                             <h5 class="card-title">Marketplace</h5>
                             <img src="img/OnlyBalds-Marketplace.webp" alt="Marketplace" class="img-fluid mb-3 bg-light">
@@ -23,7 +25,7 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card h-100 rounded shadow">
+                    <div class="card h-100 rounded">
                         <div class="card-body">
                             <h5 class="card-title">Chat Room</h5>
                             <img src="img/OnlyBalds-Chatroom.webp" alt="Chat Room" class="img-fluid mb-3 bg-light">
@@ -33,7 +35,7 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card h-100 rounded shadow">
+                    <div class="card h-100 rounded">
                         <div class="card-body">
                             <h5 class="card-title">Forums</h5>
                             <p class="card-text">Engage in discussions, ask questions, and get answers.</p>
@@ -42,7 +44,7 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card h-100 rounded shadow">
+                    <div class="card h-100 rounded">
                         <div class="card-body">
                             <h5 class="card-title">More Services</h5>
                             <p class="card-text">Discover additional services and features exclusively for you.</p>
@@ -57,3 +59,14 @@
         </NotAuthorized>
     </AuthorizeView>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Home.razor.js");
+            await jsModule.InvokeVoidAsync("onLoad");
+        }
+    }
+}

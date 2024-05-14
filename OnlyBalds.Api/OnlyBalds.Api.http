@@ -2,8 +2,20 @@
 
 @ACCESS_JWT=*********************************
 
-GET {{OnlyBalds.Api.Api_HostAddress}}/tasks/
+GET {{OnlyBalds.Api.Api_HostAddress}}/threads/
 Accept: application/json
 Authorization: Bearer {{ACCESS_JWT}}
+
+###
+
+GET {{OnlyBalds.Api.Api_HostAddress}}/posts/
+Accept: application/json
+Authorization: Bearer {{ACCESS_JWT}}
+
+###
+
+GET {{OnlyBalds.Api.Api_HostAddress}}/comments/
+Accept: application/json
+Authorization: Bearer {{ACCESS_JWT}}.
 
 ###

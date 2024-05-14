@@ -1,9 +1,9 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-light-onlybalds sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
-            <img src="img/onlybalds-nav-1.png" alt="OnlyBalds Logo" width="200" height="40" />
+            <img src="img/OnlyBalds-Head.webp" class="bg-dark" alt="OnlyBalds Logo" width="50" height="50" />
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button id="navbar-button" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -24,27 +24,27 @@
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="user-claims" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="ChatRoom" Match="NavLinkMatch.All">
                         <span class="bi bi-chat-fill icon-large" aria-hidden="true"></span> Chat Room
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="weather" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="Marketplace" Match="NavLinkMatch.All">
                         <span class="bi bi-shop icon-large" aria-hidden="true"></span> Marketplace
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="tasks" Match="NavLinkMatch.All">
+                    <NavLink class="nav-link" href="About" Match="NavLinkMatch.All">
                         <span class="bi bi-patch-question-fill icon-large" aria-hidden="true"></span> About
                     </NavLink>
                 </li>
             </ul>
             <div class="top-row px-4 d-flex justify-content-end d-sm-none">
-                <Login @rendermode="InteractiveServer" />
+                <Login @rendermode="InteractiveWebAssembly" />
             </div>
         </div>
         <div class="top-row px-4 d-flex justify-content-end d-none d-sm-flex">
-            <Login @rendermode="InteractiveServer" />
+            <Login @rendermode="InteractiveWebAssembly" />
         </div>
     </div>
 </nav>
