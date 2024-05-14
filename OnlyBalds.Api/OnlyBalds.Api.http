@@ -1,4 +1,4 @@
-@OnlyBalds.Api.Api_HostAddress = https://localhost:7204
+@OnlyBalds.Api.Api_HostAddress = https://onlybaldsapi.azurewebsites.net/
 
 @ACCESS_JWT=*********************************
 
