@@ -76,6 +76,9 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
+      - name: Navigating to api directory
+        run: cd OnlyBalds.Api
+
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
