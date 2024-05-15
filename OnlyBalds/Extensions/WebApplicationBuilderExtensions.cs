@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using OnlyBalds.Http;
 using OnlyBalds.Identity;
 using OnlyBalds.Services.Token;
+using Yarp.ReverseProxy.Forwarder;
 
 namespace OnlyBalds.Extensions;
 
@@ -20,6 +21,14 @@ public static class WebApplicationBuilderExtensions
     { 
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
+        webApplicationBuilder.Services.AddServiceDiscovery();
+
+        webApplicationBuilder.Services.ConfigureHttpClientDefaults(http =>
+        {
+            // Turn on service discovery by default
+            http.AddServiceDiscovery();
+        });
+        
         // Add a singleton service of type ITokenService. The same instance of TokenService will be used every time ITokenService is requested.
         webApplicationBuilder.Services.AddSingleton<ITokenService, TokenService>();
         webApplicationBuilder.Services.AddHttpContextAccessor();
@@ -49,6 +58,8 @@ public static class WebApplicationBuilderExtensions
             client.BaseAddress = new Uri(apiOptions.BaseUrl);
         })
         .AddHttpMessageHandler<OnlyBaldsApiAuthenticationHandler>();
+
+        webApplicationBuilder.Services.AddKeyedSingleton<IForwarderHttpClientFactory, ApiForwarderFactory>(nameof(ApiForwarderFactory));
         
         return webApplicationBuilder;
     }
