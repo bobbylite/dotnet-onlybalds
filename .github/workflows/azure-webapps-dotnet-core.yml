@@ -80,7 +80,7 @@ jobs:
         run: cd OnlyBalds.Api
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: cd OnlyBalds.Api;dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapi
