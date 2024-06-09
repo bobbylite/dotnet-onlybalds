@@ -24,7 +24,6 @@
 
     protected override void OnInitialized()
     {
-        NavManager.LocationChanged += HandleLocationChanged;
         objRef = DotNetObjectReference.Create(this);
         base.OnInitialized();
     }
@@ -47,15 +46,6 @@
         }
     }
 
-    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        var uri = new Uri(e.Location);
-
-        if (uri.Fragment.Contains("#!/")) {
-            //NavManager.NavigateTo($"/MarketplaceCheckout/Default/{uri.Fragment}");
-        }
-    }
-
     [JSInvokable]
     public void CompleteDownloading() { 
         IsDownloading = false;
@@ -65,6 +55,5 @@
 
     public void Dispose()
     {
-        NavManager.LocationChanged -= HandleLocationChanged;
     }
 }
