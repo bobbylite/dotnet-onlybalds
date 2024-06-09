@@ -1,5 +1,5 @@
 ﻿@page "/Marketplace"
-@implements IDisposable
+@implements IAsyncDisposable
 
 @attribute [Authorize]
 
@@ -60,8 +60,12 @@
             NavManager.NavigateTo("/Marketplace/#!/", forceLoad: true);
         }
     }
-
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        if (jsModule is  null)
+        {
+            return;
+        }
+        await jsModule.InvokeVoidAsync("dispose");
     }
 }
