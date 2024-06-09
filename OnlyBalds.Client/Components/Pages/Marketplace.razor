@@ -49,8 +49,16 @@
     [JSInvokable]
     public void CompleteDownloading() { 
         IsDownloading = false;
-        NavManager.NavigateTo("/Marketplace/#!/", forceLoad: true);
         StateHasChanged();
+
+        if (NavManager.Uri.Contains("/Marketplace/#!/"))
+        {
+            return;
+        }
+        else if (NavManager.Uri.Contains("/Marketplace"))
+        {
+            NavManager.NavigateTo("/Marketplace/#!/", forceLoad: true);
+        }
     }
 
     public void Dispose()
