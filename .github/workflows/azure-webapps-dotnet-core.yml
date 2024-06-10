@@ -23,10 +23,10 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: cd OnlyBalds;dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: cd OnlyBalds;dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -66,6 +66,7 @@ jobs:
 
   build-api:
     runs-on: ubuntu-latest
+    needs: deploy-onlybalds
 
     steps:
       - uses: actions/checkout@v4
@@ -75,9 +76,6 @@ jobs:
         with:
           dotnet-version: '8.x'
           include-prerelease: true
-
-      - name: Navigating to api directory
-        run: cd OnlyBalds.Api
 
       - name: Build with dotnet
         run: cd OnlyBalds.Api;dotnet build --configuration Release
