@@ -21,13 +21,13 @@
     private IJSObjectReference? jsModule;
     private DotNetObjectReference<Marketplace>? objRef;
 
-
     protected override void OnInitialized()
     {
+        NavManager.LocationChanged += OnLocationChanged;
         objRef = DotNetObjectReference.Create(this);
         base.OnInitialized();
     }
-
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (jsModule is not null)
@@ -67,5 +67,16 @@
             return;
         }
         await jsModule.InvokeVoidAsync("dispose");
+        NavManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (jsModule is null)
+        {
+            return;
+        }
+
+        await jsModule.InvokeVoidAsync("unloadEcwidAccountComponents", e.Location, objRef);
     }
 }
