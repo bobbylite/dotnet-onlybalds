@@ -46,7 +46,7 @@ public static class WebApplicationExtensions
 
                     // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
                     // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-                    await httpForwarder.SendAsync(context, optionsSnapshot.Value.BaseUrl,
+                    await httpForwarder.SendAsync(context, $"https+http://{optionsSnapshot.Value.BaseUrl}", 
                         httpClient, ForwarderRequestConfig.Empty, transformer);
                 })
             .RequireAuthorization();
