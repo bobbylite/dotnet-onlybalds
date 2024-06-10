@@ -55,7 +55,7 @@ public static class WebApplicationBuilderExtensions
         {
             var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<ApiOptions>>();
             var apiOptions = apiOptionsSnapshot.CurrentValue;
-            client.BaseAddress = new Uri(apiOptions.BaseUrl);
+            client.BaseAddress = new Uri($"https+http://{apiOptions.BaseUrl}"); 
         })
         .AddHttpMessageHandler<OnlyBaldsApiAuthenticationHandler>();
 
