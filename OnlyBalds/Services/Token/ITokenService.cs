@@ -7,7 +7,6 @@ public interface ITokenService : IDisposable
 {
     /// <summary>
     /// The bearer token returned by a previously successful authentication operation.
-    /// This property is thread-safe.
     /// </summary>
     string Token { get; set; }
     

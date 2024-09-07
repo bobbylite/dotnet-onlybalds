@@ -3,18 +3,29 @@
 namespace OnlyBalds.Configuration;
 
 /// <summary>
-/// Options for configuring the API.
+/// Represents the configuration options for the OnlyBalds API.
 /// </summary>
+/// <remarks>
+/// This class represents the configuration options for the OnlyBalds API.
+/// </remarks>
 public class ApiOptions
 {
     /// <summary>
-    /// The section key used to define the options bound to this class.
+    /// The configuration section key for the OnlyBalds API.
     /// </summary>
+    /// <value>The configuration section key for the OnlyBalds API.</value>
+    /// <remarks>
+    /// This value is used to identify the configuration section for the OnlyBalds API.
+    /// </remarks>
     public const string SectionKey = "OnlyBaldsAPI";
     
     /// <summary>
-    /// The base URL of the Threads API.
+    /// Gets or sets the base URL for the OnlyBalds API.
     /// </summary>
+    /// <value>The base URL for the OnlyBalds API.</value>
+    /// <remarks>
+    /// This value is used to identify the base URL for the OnlyBalds API.
+    /// </remarks>
     [Required]
     [Url]
     public string BaseUrl { get; set; } = String.Empty;

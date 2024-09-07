@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.Extensions.Options;
-using OnlyBalds.Api;
 using OnlyBalds.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

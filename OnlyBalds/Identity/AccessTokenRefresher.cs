@@ -11,9 +11,13 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace OnlyBalds.Identity;
 
-// Provide support for refreshing an Access Token using a Refresh Token.
-// See: https://github.com/dotnet/aspnetcore/issues/8175
-// See: https://github.com/dotnet/blazor-samples
+// <summary>
+// https://github.com/dotnet/aspnetcore/issues/8175
+// https://github.com/dotnet/blazor-samples
+// </summary>
+// <remarks>
+// This class is used to refresh the access token.
+// </remarks>
 internal sealed class AccessTokenRefresher(IOptionsMonitor<OpenIdConnectOptions> oidcOptionsMonitor)
 {
     private readonly OpenIdConnectProtocolValidator _oidcTokenValidator = new()
@@ -21,18 +25,11 @@ internal sealed class AccessTokenRefresher(IOptionsMonitor<OpenIdConnectOptions>
         RequireNonce = false,
     };
 
-    /// <summary>
-    /// Asynchronously refreshes the access token.
-    /// </summary>
-    /// <param name="validateContext">The context for validating a cookie principal.</param>
-    /// <param name="oidcScheme">The OpenID Connect scheme.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    /// <remarks>
-    /// This method first checks if the access token is about to expire. If not, it returns immediately.
-    /// If the token is about to expire, it sends a request to the token endpoint to refresh the access token.
-    /// If the response is successful, it validates the ID token. If the validation is successful, it replaces the principal with a new one that includes the claims from the ID token and stores the new tokens.
-    /// If the response is not successful or the validation is not successful, it rejects the principal.
-    /// </remarks>
+    // <summary>
+    // Initializes a new instance of the <see cref="AccessTokenRefresher"/> class.
+    // </summary>
+    // <param name="oidcScheme">The OIDC options monitor.</param>
+    // <param name="validateContext">The OIDC token validator.</param>
     public async Task RefreshAccessTokenAsync(CookieValidatePrincipalContext validateContext, string oidcScheme)
     {
         var accessTokenExpirationText = validateContext.Properties.GetTokenValue("expires_at");
@@ -49,7 +46,7 @@ internal sealed class AccessTokenRefresher(IOptionsMonitor<OpenIdConnectOptions>
         }
 
         var oidcConfiguration = await oidcOptions.ConfigurationManager!.GetConfigurationAsync(validateContext.HttpContext.RequestAborted);
-        var tokenEndpoint = oidcConfiguration.TokenEndpoint ?? throw new InvalidOperationException("Cannot refresh cookie. TokenEndpoint missing!");
+        var tokenEndpoint = oidcConfiguration.TokenEndpoint ?? throw new InvalidOperationException("Cannot refresh cookie. TokenEndpoint missing.");
 
         using var refreshResponse = await oidcOptions.Backchannel.PostAsync(tokenEndpoint,
             new FormUrlEncodedContent(new Dictionary<string, string?>()

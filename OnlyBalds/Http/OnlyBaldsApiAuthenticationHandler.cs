@@ -4,8 +4,12 @@ using OnlyBalds.Services.Token;
 namespace OnlyBalds.Http;
 
 /// <summary>
-/// Represents a type that is used to handle API authentication by delegating the HTTP requests.
+/// Represents a handler responsible for authenticating HTTP requests.
 /// </summary>
+/// <remarks>
+/// This class is used to authenticate HTTP requests.
+/// </remarks>
+/// <seealso cref="DelegatingHandler" />
 public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
 {
     private ILogger<OnlyBaldsApiAuthenticationHandler> _logger;
@@ -14,8 +18,11 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
     /// <summary>
     /// Initializes a new instance of the <see cref="OnlyBaldsApiAuthenticationHandler"/> class.
     /// </summary>
-    /// <param name="logger">The logger to be used for logging information.</param>
-    /// <param name="tokenService">The service to be used for token operations.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="tokenService">The token service.</param>
+    /// <remarks>
+    /// This constructor initializes a new instance of the <see cref="OnlyBaldsApiAuthenticationHandler"/> class.
+    /// </remarks>
     public OnlyBaldsApiAuthenticationHandler(
         ILogger<OnlyBaldsApiAuthenticationHandler> logger,
         ITokenService tokenService)
@@ -25,11 +32,14 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
     }
 
     /// <summary>
-    /// Sends an HTTP request to the inner handler to send to the server as an asynchronous operation, adding authentication header if necessary.
+    /// Sends an HTTP request.
     /// </summary>
-    /// <param name="request">The HTTP request message to send to the server.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel operation.</param>
-    /// <returns>The HTTP response message that the server sends back.</returns>
+    /// <param name="request">The HTTP request message.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// This method sends an HTTP request.
+    /// </remarks>
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(_tokenService.Token))

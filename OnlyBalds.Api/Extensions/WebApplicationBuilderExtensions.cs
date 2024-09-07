@@ -32,29 +32,28 @@ public static class WebApplicationBuilderExtensions
     }
     
     /// <summary>
-    /// Add support for exposing API documentation.
+    /// Add support for API documentation to the application.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <remarks>
+    /// This method adds support for API documentation to the application.
+    /// </remarks>
     public static WebApplicationBuilder AddApiDocumentation(this WebApplicationBuilder webApplicationBuilder)
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
-        // Bind the Swagger options to the configuration
         webApplicationBuilder.Services.AddOptionsWithValidateOnStart<SwaggerOptions>()
             .BindConfiguration(SwaggerOptions.SectionKey);
 
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
         webApplicationBuilder.Services.AddSwaggerGen(c =>
         {            
-            // Get Swagger options from the configuration
             var serviceProvider = webApplicationBuilder.Services.BuildServiceProvider();
             var swaggerOptions = serviceProvider.GetService<IOptionsMonitor<SwaggerOptions>>();
 
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "Only Balds API", Version = "v1" });
 
-            // Define the OAuth2 scheme that's in use (i.e. Implicit Flow)
             c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
             {
                 Type = SecuritySchemeType.OAuth2,
@@ -111,8 +110,7 @@ public static class WebApplicationBuilderExtensions
 
     /// <summary>
     /// Add support for authentication and authorization to the application.
-    ///
-    /// With .NET 8, the configuration for this can be controled completely from 'appsettings.json'.
+    /// With .NET 8, the configuration for this can be controled completely from appsettings.json.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>

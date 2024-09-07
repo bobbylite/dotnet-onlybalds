@@ -35,5 +35,11 @@ public class ThreadItem
     /// </summary>
     public DateTime StartDate { get; set; }
 
-    public string Name { get; set; } = string.Empty; // TODO: delete me
+    /// <summary>
+    /// Gets or sets the end date of the thread item.
+    /// </summary>
+    /// <remarks>
+    /// This field is optional.
+    /// </remarks>
+    public string Name { get; set; } = string.Empty;
 }
