@@ -6,15 +6,21 @@ using Microsoft.Extensions.Options;
 namespace OnlyBalds.Extensions;
 
 /// <summary>
-/// Extension methods for <see cref="IEndpointRouteBuilder"/>.
+/// Provides extension methods for <see cref="IEndpointRouteBuilder"/>.
 /// </summary>
+/// <remarks>
+/// This class provides extension methods for <see cref="IEndpointRouteBuilder"/>.
+/// </remarks>
 public static class EndpointRouteBuilderExtensions
 {
     /// <summary>
-    /// Maps endpoints for login and logout.
+    /// Maps the login and logout endpoints.
     /// </summary>
-    /// <param name="endpointRouteBuilder">Defines a contract for a route builder in an application.</param>
-    /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <param name="endpointRouteBuilder">The endpoint route builder.</param>
+    /// <returns>The endpoint convention builder.</returns>
+    /// <remarks>
+    /// This method maps the login and logout endpoints.
+    /// </remarks>
     public static IEndpointConventionBuilder MapLoginAndLogout(this IEndpointRouteBuilder endpointRouteBuilder)
     {
         ArgumentNullException.ThrowIfNull(endpointRouteBuilder);

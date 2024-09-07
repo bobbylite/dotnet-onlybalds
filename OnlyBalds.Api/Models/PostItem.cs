@@ -11,13 +11,19 @@ public class PostItem
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the title of the post. This field is initialized to an empty string.
+    /// Gets or sets the title of the post.
     /// </summary>
+    /// <remarks>
+    /// This field is initialized to an empty string.
+    /// </remarks>
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the author of the post. This field is initialized to an empty string.
+    /// Gets or sets the author of the post.
     /// </summary>
+    /// <remarks>
+    /// This field is initialized to an empty string.
+    /// </remarks>
     public string Author { get; set; } = string.Empty;
 
     /// <summary>
@@ -26,8 +32,11 @@ public class PostItem
     public DateTime PostedOn { get; set; }
 
     /// <summary>
-    /// Gets or sets the content of the post. This field is initialized to an empty string.
+    /// Gets or sets the content of the post.
     /// </summary>
+    /// <remarks>
+    /// This field is initialized to an empty string.
+    /// </remarks>
     public string Content { get; set; } = string.Empty;
 
     /// <summary>

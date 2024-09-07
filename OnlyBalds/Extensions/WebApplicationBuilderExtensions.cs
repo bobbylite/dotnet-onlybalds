@@ -12,11 +12,13 @@ namespace OnlyBalds.Extensions;
 public static class WebApplicationBuilderExtensions
 {   
     /// <summary>
-    /// Adds services to the specified <see cref="WebApplicationBuilder"/>.
+    /// Add services to the application.
     /// </summary>
-    /// <param name="webApplicationBuilder">The <see cref="WebApplicationBuilder"/> to add services to.</param>
-    /// <returns>The same <see cref="WebApplicationBuilder"/> so that multiple calls can be chained.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the <see cref="WebApplicationBuilder"/> is null.</exception>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <remarks>
+    /// This method adds services to the application.
+    /// </remarks>
     public static WebApplicationBuilder AddServices(this WebApplicationBuilder webApplicationBuilder)
     { 
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
@@ -38,11 +40,14 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
-    /// Add an HttpClient for the Threads REST API. Includes handling authentication for the API by passing the access
+    /// Add an HttpClient for the OnlyBalds REST API. Includes handling authentication for the API by passing the access
     /// token for the currently logged in user as a JWT bearer token to the API.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
-    /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <returns>A reference to this instance after the operation has completed of type <see cref="WebApplicationBuilder"/></returns>
+    /// <remarks>
+    /// This method adds an HttpClient for the OnlyBalds REST API.
+    /// </remarks>
     public static WebApplicationBuilder AddOnlyBaldsApiClients(this WebApplicationBuilder webApplicationBuilder)
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
@@ -90,12 +95,14 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
-    /// Add support for authentication and authorization to the application.
-    ///
+    /// Add support for refreshing access tokens using refresh tokens.
     /// With .NET 8, the configuration for this can be controled completely from 'appsettings.json'.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <remarks>
+    /// This method adds support for refreshing access tokens using refresh tokens.
+    /// </remarks>
     public static WebApplicationBuilder AddAccessControl(this WebApplicationBuilder webApplicationBuilder)
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);

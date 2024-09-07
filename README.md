@@ -23,6 +23,31 @@ To get started with the OnlyBalds application, follow these steps:
 3. Restore the packages: `dotnet restore`
 4. Run the application: `dotnet run`
 
+## :computer: Running the Project Locally
+
+To run the OnlyBalds application locally, follow these steps:
+
+### Step 1: Run the BFF Backend
+
+First, you need to run the Backend for Frontend (BFF) which is the Web API project. This project handles the backend operations and serves as the bridge between the Blazor application and the database.
+
+1. Open a terminal or command prompt.
+2. Navigate to the project directory: `cd OnlyBalds`
+3. Run the BFF backend with the following command:
+```sh
+dotnet run --project OnlyBalds.Api --launch-profile https
+```
+
+
+
+### Step 2: Run the BFF Backend
+
+First, you need to run the Backend for Frontend (BFF) which is the Web API project. This project handles the backend operations and serves as the bridge between the Blazor application and the database.
+
+To run the OnlyBalds application locally, follow these steps:
+1. Create a launch profile in the properties directory.
+3. Use VS Code's debug section to run the profile created in the previous steps.
+
 ## :gear: Built With
 
 - [.NET 8](https://dotnet.microsoft.com/en-us/)

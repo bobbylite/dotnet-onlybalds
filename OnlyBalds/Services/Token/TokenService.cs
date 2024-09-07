@@ -22,45 +22,43 @@ public class TokenService : ITokenService
     {
         get
         {
-            _logger.LogDebug("Getting token");
-            _logger.LogTrace("Entering read lock");
+            _logger.LogDebug("Entering read lock");
             _tokenLock.EnterReadLock();
             try
             {
-                _logger.LogTrace("Reading token");
+                _logger.LogDebug("Reading token");
                 return _token;
             }
             finally
             {
-                _logger.LogTrace("Exiting read lock");
+                _logger.LogDebug("Exiting read lock");
                 _tokenLock.ExitReadLock();
             }
         }
         set
         {
-            _logger.LogDebug("Setting token");
-            _logger.LogTrace("Entering write lock");
+            _logger.LogDebug("Entering write lock");
             _tokenLock.EnterWriteLock();
             try
             {
-                _logger.LogTrace("Writing token");
+                _logger.LogDebug("Writing token");
                 _token = value;
             }
             finally
             {
-                _logger.LogTrace("Exiting write lock");
+                _logger.LogDebug("Exiting write lock");
                 _tokenLock.ExitWriteLock();
             }
         }
     }
 
     /// <summary>
-    /// Creates an instance of AuthenticationService.
+    /// Initializes a new instance of the <see cref="TokenService"/> class.
     /// </summary>
-    /// <param name="logger">The ILoggerAdapter implementation used for logging messages.</param>
-    /// <param name="httpClientFactory">The factory used to create instances of HttpClient.</param>
-    /// <param name="pingIdentityOptions">The configuration options for PingIdentity integration.</param>
-    /// <exception cref="ArgumentNullException">Thrown if any arguments are null.</exception>
+    /// <param name="logger">The logger.</param>
+    /// <param name="httpClientFactory">The HTTP client factory.</param>
+    /// <param name="optionsMonitor">The options monitor.</param>
+    /// <exception cref="ArgumentNullException">Thrown if any of the arguments are null.</exception>
     public TokenService(
         ILogger<TokenService> logger,
         IHttpClientFactory httpClientFactory,

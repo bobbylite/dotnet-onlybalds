@@ -3,16 +3,21 @@
 namespace OnlyBalds.Api.Data;
 
 /// <summary>
-/// Represents the database context for the application, which is used to manage the entity objects during run time, 
-/// which includes populating objects with data from a database, change tracking, and persisting data to the database.
+/// Represents the data context for the comments.
 /// </summary>
+/// <remarks>
+/// This class represents the data context for the comments.
+/// </remarks>
+/// <seealso cref="Microsoft.EntityFrameworkCore.DbContext" />
 public class CommentDataContext : DbContext
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="CommentDataContext"/> class using the specified options.
-    /// The <see cref="DbContextOptions"/> can be used to configure certain behaviors of the context.
     /// </summary>
     /// <param name="options">The options for this context.</param>
+    /// <remarks>
+    /// This constructor initializes a new instance of the <see cref="CommentDataContext"/> class using the specified options.
+    /// </remarks>
     public CommentDataContext(DbContextOptions<CommentDataContext> options)
         : base(options) { }
 

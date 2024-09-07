@@ -11,19 +11,23 @@ using Yarp.ReverseProxy.Transforms.Builder;
 namespace OnlyBalds.Extensions;
 
 /// <summary>
-/// Extension methods for <see cref="WebApplication"/>.
+/// Provides extension methods for <see cref="WebApplication"/>.
 /// </summary>
+/// <remarks>
+/// This class provides extension methods for <see cref="WebApplication"/>.
+/// </remarks>
 public static class WebApplicationExtensions
 {
     /// <summary>
-    /// Maps endpoints for proxying requests from WASM to the Threads REST API.
-    ///
+    /// Maps the threads API proxy.
     /// This is based on the example found here:
-    ///
     /// * https://github.com/dotnet/blazor-samples/tree/main/8.0/BlazorWebAppOidcBff
     /// </summary>
     /// <param name="webApplication">The web application used to configure the HTTP pipeline, and routes.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <remarks>
+    /// This method maps the threads API proxy.
+    /// </remarks>
     public static WebApplication MapThreadsApiProxy(this WebApplication webApplication)
     {
         ArgumentNullException.ThrowIfNull(webApplication);
@@ -54,6 +58,14 @@ public static class WebApplicationExtensions
         return webApplication;
     }
 
+    /// <summary>
+    /// Maps the chat hub.
+    /// </summary>
+    /// <param name="webApplication">The web application used to configure the HTTP pipeline, and routes.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <remarks>
+    /// This method maps the chat hub.
+    /// </remarks>
     public static WebApplication MapChatHub(this WebApplication webApplication)
     {
         ArgumentNullException.ThrowIfNull(webApplication);
