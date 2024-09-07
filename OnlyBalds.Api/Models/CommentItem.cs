@@ -11,8 +11,11 @@ public class CommentItem
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the author of the comment. This field is initialized to an empty string.
+    /// Gets or sets the author of the comment.
     /// </summary>
+    /// <remarks>
+    /// This field is initialized to an empty string.
+    /// </remarks>
     public string Author { get; set; } = string.Empty;
 
     /// <summary>
@@ -21,8 +24,11 @@ public class CommentItem
     public DateTime PostedOn { get; set; }
 
     /// <summary>
-    /// Gets or sets the content of the comment. This field is initialized to an empty string.
+    /// Gets or sets the content of the comment.
     /// </summary>
+    /// <remarks>
+    /// This field is initialized to an empty string.
+    /// </remarks>
     public string Content { get; set; } = string.Empty;
 
     /// <summary>

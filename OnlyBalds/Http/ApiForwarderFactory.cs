@@ -1,12 +1,16 @@
 ﻿using Microsoft.Extensions.ServiceDiscovery.Http;
-using OnlyBalds.Services.Token;
 using Yarp.ReverseProxy.Forwarder;
 
 namespace OnlyBalds.Http;
 
 /// <summary>
-/// Factory for creating instances of <see cref="ForwarderHttpClient"/>.
+/// Represents a factory for creating instances of <see cref="ForwarderHttpClient"/>.
 /// </summary>
+/// <remarks>
+/// This class is used to create instances of <see cref="ForwarderHttpClient"/>.
+/// </remarks>
+/// <seealso cref="ForwarderHttpClientFactory" />
+/// <seealso cref="IForwarderHttpClientFactory" />
 internal sealed class ApiForwarderFactory : ForwarderHttpClientFactory
 {
     private readonly IServiceProvider _serviceProvider;
@@ -15,8 +19,11 @@ internal sealed class ApiForwarderFactory : ForwarderHttpClientFactory
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiForwarderFactory"/> class.
     /// </summary>
-    /// <param name="serviceProvider">The service provider to resolve services.</param>
-    /// <param name="handlerFactory">The factory to create instances of <see cref="HttpMessageHandler"/>.</param>
+    /// <param name="serviceProvider">The service provider.</param>
+    /// <param name="handlerFactory">The handler factory.</param>
+    /// <remarks>
+    /// This constructor initializes a new instance of the <see cref="ApiForwarderFactory"/> class.
+    /// </remarks>
     public ApiForwarderFactory(
         IServiceProvider serviceProvider,
         IServiceDiscoveryHttpMessageHandlerFactory handlerFactory)
@@ -29,11 +36,15 @@ internal sealed class ApiForwarderFactory : ForwarderHttpClientFactory
     }
     
     /// <summary>
-    /// Wraps the provided <see cref="HttpMessageHandler"/> with a handler that adds OAuth token to requests.
+    /// Wraps the handler with the specified context.
     /// </summary>
-    /// <param name="context">The context of the HttpClient being created.</param>
-    /// <param name="handler">The primary handler to send HTTP requests.</param>
-    /// <returns>The wrapped handler.</returns>
+    /// <param name="context">The forwarder HTTP client context.</param>
+    /// <param name="handler">The HTTP message handler.</param>
+    /// <returns>The wrapped HTTP message handler.</returns>
+    /// <remarks>
+    /// This method wraps the handler with the specified context.
+    /// </remarks>
+    /// <seealso cref="ForwarderHttpClientFactory.WrapHandler" />
     protected override HttpMessageHandler WrapHandler(ForwarderHttpClientContext context, HttpMessageHandler handler)
     {
         var oAuthHandler = _serviceProvider.GetRequiredService<AuthenticationHandler>();
