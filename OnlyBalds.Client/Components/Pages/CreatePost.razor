@@ -78,11 +78,11 @@ else
         
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
 
-        var responseMessage = await httpClient.PostAsJsonAsync("posts", postItem);
+        var responseMessage = await httpClient.PostAsJsonAsync("api/v2/posts/posts", postItem);
 
         responseMessage.EnsureSuccessStatusCode();
 
-        var threadsResponse = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
+        var threadsResponse = await httpClient.GetFromJsonAsync<List<ThreadItem>>("api/v2/threads/threads") ?? new();
         var currentThread = threadsResponse.Find(t => t.Id == Guid.Parse(ThreadId));
 
         if (currentThread is null)
@@ -91,7 +91,7 @@ else
             return;
         }
 
-        var putThreadsResponse = await httpClient.PutAsJsonAsync($"threads/{ThreadId}", new ThreadItem
+        var putThreadsResponse = await httpClient.PutAsJsonAsync($"api/v2/threads/threads/{ThreadId}", new ThreadItem
         {
             PostsCount = currentThread.PostsCount + 1,
             Id = currentThread.Id,

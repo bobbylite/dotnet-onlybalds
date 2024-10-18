@@ -73,11 +73,11 @@ else
             comments = new List<CommentItem>();
 
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            var postsClient = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
+            var postsClient = await httpClient.GetFromJsonAsync<List<PostItem>>("api/v2/posts/posts") ?? new();
             post = postsClient.SingleOrDefault(p => p.Id == Guid.Parse(PostId));
             logger.LogInformation("Posts retrieved from API: {Posts}", JsonSerializer.Serialize(post));
 
-            var commentsResponse = await httpClient.GetFromJsonAsync<List<CommentItem>>("comments") ?? new();
+            var commentsResponse = await httpClient.GetFromJsonAsync<List<CommentItem>>("api/v2/comments/comments") ?? new();
             comments = commentsResponse.Where(c => c.PostId == Guid.Parse(PostId)).ToList();
             
             StateHasChanged();
@@ -119,7 +119,7 @@ else
             PostId = Guid.Parse(PostId)
         };
 
-        var commentsResponse = await httpClient.PostAsJsonAsync("comments", comment) ?? new();
+        var commentsResponse = await httpClient.PostAsJsonAsync("api/v2/comments/comments", comment) ?? new();
 
         commentsResponse.EnsureSuccessStatusCode();
 

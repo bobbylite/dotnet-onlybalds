@@ -55,7 +55,7 @@ else
             logger.LogInformation("Getting threads from API");
 
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            threads = await httpClient.GetFromJsonAsync<List<ThreadItem>>("threads") ?? new();
+            threads = await httpClient.GetFromJsonAsync<List<ThreadItem>>("api/v2/Threads/threads") ?? new();
             logger.LogInformation("Threads retrieved from API: {Threads}", JsonSerializer.Serialize(threads));
             
             StateHasChanged();

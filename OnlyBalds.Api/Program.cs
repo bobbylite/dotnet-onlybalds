@@ -19,6 +19,9 @@ builder.Services.Configure<HttpsRedirectionOptions>(options =>
     options.HttpsPort = 443; // Set the port to which HTTPS should redirect
 });
 
+// Configure Controllers
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Enable support for persisting data to a database.
@@ -36,9 +39,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 // Add middleware for redirecting HTTP Requests to HTTPS.
 app.UseHttpsRedirection();
 
-// Maps endpoints for the exposed API.
-app.MapThreadsApi();
-app.MapPostsApi();
-app.MapCommentsApi();
+// Maps controllers.
+app.MapControllers();
 
 app.Run();

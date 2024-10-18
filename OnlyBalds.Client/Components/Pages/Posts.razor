@@ -54,7 +54,7 @@ else
             logger.LogInformation("Getting posts from API");
 
             // Don't include leading slash - see https://stackoverflow.com/a/23438417
-            var postsClient = await httpClient.GetFromJsonAsync<List<PostItem>>("posts") ?? new();
+            var postsClient = await httpClient.GetFromJsonAsync<List<PostItem>>("api/v2/posts/posts") ?? new();
             posts = postsClient.Where(p => p.ThreadId == Guid.Parse(ThreadId)).ToList();
             logger.LogInformation("Posts retrieved from API: {Posts}", JsonSerializer.Serialize(posts));
             

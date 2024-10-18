@@ -77,7 +77,7 @@ else
         
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
 
-        var responseMessage = await httpClient.PostAsJsonAsync("threads", threadItem);
+        var responseMessage = await httpClient.PostAsJsonAsync("api/v2/threads/threads", threadItem);
 
         responseMessage.EnsureSuccessStatusCode();
 
