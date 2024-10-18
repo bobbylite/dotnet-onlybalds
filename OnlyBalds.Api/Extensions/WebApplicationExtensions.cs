@@ -71,7 +71,7 @@ public static class WebApplicationExtensions
             .WithOpenApi()
             .RequireAuthorization("Thread.ReadWrite");
 
-            webApplication.MapGet("/threads/{id}", async (Guid id, ThreadDataContext dataContext) =>
+        webApplication.MapGet("/threads/{id}", async (Guid id, ThreadDataContext dataContext) =>
                 await dataContext.ThreadItems.FindAsync(id)
                     is { } taskItem
                     ? Results.Ok(taskItem)
@@ -149,7 +149,7 @@ public static class WebApplicationExtensions
             .WithOpenApi()
             .RequireAuthorization("Thread.ReadWrite");
 
-            webApplication.MapGet("/posts/{id}", async (Guid id, PostDataContext dataContext) =>
+        webApplication.MapGet("/posts/{id}", async (Guid id, PostDataContext dataContext) =>
                 await dataContext.PostItems.FindAsync(id)
                     is { } taskItem
                     ? Results.Ok(taskItem)
