@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using OnlyBalds.Api.Data;
-using OnlyBalds.Api.Models;
+﻿using Microsoft.Extensions.Options;
 
 namespace OnlyBalds.Api.Extensions;
 
