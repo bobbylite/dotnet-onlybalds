@@ -13,14 +13,14 @@ builder.AddDataPersistence();
 // Add support for authentication and authorization to the application.
 builder.AddAccessControl();
 
+// Configure Controllers
+builder.Services.AddControllers();
+
 // Configure HTTPS Redirection
 builder.Services.Configure<HttpsRedirectionOptions>(options =>
 {
     options.HttpsPort = 443; // Set the port to which HTTPS should redirect
 });
-
-// Configure Controllers
-builder.Services.AddControllers();
 
 var app = builder.Build();
 
