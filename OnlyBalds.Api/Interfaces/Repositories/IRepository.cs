@@ -1,5 +1,3 @@
-using System;
-
 namespace OnlyBalds.Api.Interfaces.Repositories;
 
 public interface IRepository<T> where T : class
