@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace OnlyBalds.Api.Models;
+﻿namespace OnlyBalds.Api.Models;
 
 /// <summary>
 /// Represents a thread item.

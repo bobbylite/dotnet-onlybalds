@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OnlyBalds.Api.Data;
+using OnlyBalds.Api.Interfaces.Repositories;
+using OnlyBalds.Api.Models;
+using OnlyBalds.Api.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace OnlyBalds.Api.Extensions;
@@ -48,47 +51,34 @@ public static class WebApplicationBuilderExtensions
 
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
         webApplicationBuilder.Services.AddSwaggerGen(c =>
-        {            
+        {
             var serviceProvider = webApplicationBuilder.Services.BuildServiceProvider();
             var swaggerOptions = serviceProvider.GetService<IOptionsMonitor<SwaggerOptions>>();
 
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "Only Balds API", Version = "v1" });
 
+            // Configure OAuth2 with Authorization Code Flow (PKCE)
             c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
             {
                 Type = SecuritySchemeType.OAuth2,
                 Flows = new OpenApiOAuthFlows
                 {
-                    Implicit = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri(swaggerOptions?.CurrentValue.AuthorizationUrl!),
-                        Scopes = new Dictionary<string, string>
-                        {
-                            { "api://onlybalds/Threads.Read", "Read access to threads api." },
-                            { "api://onlybalds/Threads.Write", "Write access to threads api." }
-                        }
-                    },
-                    /*
-                    *
-                    * Need to figure out how to get this working with the client credentials flow
-                    *
-                    ClientCredentials = new OpenApiOAuthFlow
+                    AuthorizationCode = new OpenApiOAuthFlow
                     {
                         AuthorizationUrl = new Uri(swaggerOptions?.CurrentValue.AuthorizationUrl!),
                         TokenUrl = new Uri(swaggerOptions?.CurrentValue.TokenUrl!),
-                        //Scopes = swaggerOptions?.CurrentValue.Scopes
                         Scopes = new Dictionary<string, string>
                         {
-                            { "api://onlybalds", "Read access to threads api." },
-                        }
-                    }*/
-                }
+                            { "api://onlybalds/Threads.Read", "Read access to threads API" },
+                            { "api://onlybalds/Threads.Write", "Write access to threads API" }
+                        },
+                    }
+                },
             });
 
-            // Assign the security requirements to the operations
             c.OperationFilter<SecurityRequirementsOperationFilter>();
         });
-        
+
         return webApplicationBuilder;
     }
 
@@ -96,13 +86,21 @@ public static class WebApplicationBuilderExtensions
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
+            // Ensure the security requirements are added to each operation
             operation.Security = new List<OpenApiSecurityRequirement>
             {
                 new OpenApiSecurityRequirement
                 {
                     [
-                        new OpenApiSecurityScheme {Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "oauth2"}}
-                    ] = new[] {"api://onlybalds"}
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "oauth2"
+                            }
+                        }
+                    ] = new[] { "api://onlybalds/Threads.Read", "api://onlybalds/Threads.Write" }
                 }
             };
         }
@@ -128,6 +126,22 @@ public static class WebApplicationBuilderExtensions
                 RequireClaim("scope", "Threads.Read Threads.Write"));
         });
         
+        return webApplicationBuilder;
+    }
+
+    /// <summary>
+    /// Add support for repository pattern services.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    public static WebApplicationBuilder AddRepositories(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        webApplicationBuilder.Services.AddScoped<IThreadsRepository<ThreadItem>, ThreadsRepository<ThreadItem>>();
+        webApplicationBuilder.Services.AddScoped<IPostsRepository<PostItem>, PostsRepository<PostItem>>();
+        webApplicationBuilder.Services.AddScoped<ICommentsRepository<CommentItem>, CommentsRepository<CommentItem>>();
+
         return webApplicationBuilder;
     }
 }

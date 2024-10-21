@@ -1,4 +1,4 @@
-﻿namespace OnlyBalds.Api;
+﻿namespace OnlyBalds.Api.Models;
 
 /// <summary>
 /// Represents a comment in the application.
