@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OnlyBalds.Api.Models;
 
 namespace OnlyBalds.Api.Data;
 

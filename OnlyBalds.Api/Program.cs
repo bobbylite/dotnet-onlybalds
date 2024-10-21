@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
+using OnlyBalds.Api.Endpoints;
 using OnlyBalds.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,9 @@ builder.AddDataPersistence();
 
 // Add support for authentication and authorization to the application.
 builder.AddAccessControl();
+
+// Add support for repository pattern services.
+builder.AddRepositories();
 
 // Configure HTTPS Redirection
 builder.Services.Configure<HttpsRedirectionOptions>(options =>
@@ -37,8 +41,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 app.UseHttpsRedirection();
 
 // Maps endpoints for the exposed API.
-app.MapThreadsApi();
-app.MapPostsApi();
-app.MapCommentsApi();
+app.MapThreadsEndpoints();
+app.MapPostsEndpoints();
+app.MapCommentsEndpoints();
 
 app.Run();
