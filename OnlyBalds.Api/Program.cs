@@ -32,7 +32,10 @@ var app = builder.Build();
 app.UseAccessControl();
 
 // Enable support for exposing API documentation.
-app.UseApiDocumentation();
+if (app.Environment.IsDevelopment())
+{
+    app.UseApiDocumentation();
+}
 
 // Use forwarded headers if behind a reverse proxy
 app.UseForwardedHeaders(new ForwardedHeadersOptions
