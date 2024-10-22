@@ -55,3 +55,48 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_46F7A700961D45CCB240B33A82FAC382 }}
           package: .
+          
+  build-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Build with dotnet
+        run: cd OnlyBalds.Api;dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: cd OnlyBalds.Api;dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapi
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-api
+          path: ${{env.DOTNET_ROOT}}/myapi
+
+  deploy-api:
+    runs-on: ubuntu-latest
+    needs: build-api
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-api
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'onlybaldsapi-dev'
+          slot-name: 'Production'
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_635A11C3A4ED4727A4FDEBBFCD34E46B }}
