@@ -6,10 +6,7 @@ using OnlyBalds.Api.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add support for exposing API documentation.
-if (builder.Environment.IsDevelopment())
-{
-    builder.AddApiDocumentation();
-}
+builder.AddApiDocumentation();
 
 // Add support for persisting data to a database.
 builder.AddDataPersistence();
@@ -32,10 +29,7 @@ var app = builder.Build();
 app.UseAccessControl();
 
 // Enable support for exposing API documentation.
-if (app.Environment.IsDevelopment())
-{
-    app.UseApiDocumentation();
-}
+app.UseApiDocumentation();
 
 // Use forwarded headers if behind a reverse proxy
 app.UseForwardedHeaders(new ForwardedHeadersOptions
