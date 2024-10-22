@@ -69,8 +69,8 @@ public static class WebApplicationBuilderExtensions
                         TokenUrl = new Uri(swaggerOptions?.CurrentValue.TokenUrl!),
                         Scopes = new Dictionary<string, string>
                         {
-                            { "api://onlybalds/Threads.Read", "Read access to threads API" },
-                            { "api://onlybalds/Threads.Write", "Write access to threads API" }
+                            { "Threads.Read", "Read access to threads API" },
+                            { "Threads.Write", "Write access to threads API" }
                         },
                     }
                 },

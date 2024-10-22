@@ -53,6 +53,10 @@
         }
 
         console.debug(`Setting Blazor environment to ${environment}`);
+
+        blazor.start({
+            environment: environment
+        });
     </script>
 </body>
 
