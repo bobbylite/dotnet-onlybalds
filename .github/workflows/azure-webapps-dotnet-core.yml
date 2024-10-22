@@ -110,7 +110,7 @@ jobs:
 
       - name: Deploy to another Azure Web App
         id: deploy-to-api
-        uses: azure/webapps-deploy@v4
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'OnlyBaldsApi'  # Replace 'AnotherApp' with the actual name of the second Azure App Service
           slot-name: 'Production'    # Adjust the slot name if needed
