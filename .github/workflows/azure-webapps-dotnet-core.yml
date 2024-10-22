@@ -21,6 +21,20 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: Generate build-info.html
+        run: |
+          pwd
+          ls
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+          echo "<html>" > wwwroot/build-info.html
+          echo "<head><title>Build Info</title></head>" >> wwwroot/build-info.html
+          echo "<body>" >> wwwroot/build-info.html
+          echo "<h1>Build Info</h1>" >> wwwroot/build-info.html
+          echo "<p><strong>Version:</strong> $COMMIT_HASH</p>" >> wwwroot/build-info.html
+          echo "<p><strong>Date:</strong> $BUILD_DATE</p>" >> wwwroot/build-info.html
+          echo "</body></html>" >> wwwroot/build-info.html
+
       - name: Build with dotnet
         run: dotnet build -c Release
 
