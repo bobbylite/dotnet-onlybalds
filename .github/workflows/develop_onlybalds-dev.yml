@@ -22,6 +22,18 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
+      - name: Generate build-info.html
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+          echo "<html>" > ./OnlyBalds/wwwroot/build-info.html
+          echo "<head><title>Build Info</title></head>" >> ./OnlyBalds/wwwroot/build-info.html
+          echo "<body>" >> ./OnlyBalds/wwwroot/build-info.html
+          echo "<h1>Build Info</h1>" >> ./OnlyBalds/wwwroot/build-info.html
+          echo "<p><strong>Version:</strong> $COMMIT_HASH</p>" >> ./OnlyBalds/wwwroot/build-info.html
+          echo "<p><strong>Date:</strong> $BUILD_DATE</p>" >> ./OnlyBalds/wwwroot/build-info.html
+          echo "</body></html>" >> ./OnlyBalds/wwwroot/build-info.html
+
       - name: Build with dotnet
         run: cd OnlyBalds;dotnet build --configuration Release
 
