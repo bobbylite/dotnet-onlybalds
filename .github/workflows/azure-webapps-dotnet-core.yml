@@ -12,6 +12,7 @@ on:
 jobs:
   build-onlybalds:
     runs-on: ubuntu-latest
+    needs: deploy-api
 
     steps:
       - uses: actions/checkout@v4
