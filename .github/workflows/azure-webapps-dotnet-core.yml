@@ -92,15 +92,15 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: cd OnlyBalds.Api;dotnet build --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: cd OnlyBalds.Api;dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapi
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapi
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-api
+          name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapi
 
   deploy-api:
@@ -108,27 +108,27 @@ jobs:
     needs: build-api
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-api.outputs.webapp-url }}
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-api
-
-      - name: Login to Azure (reusing session)
+          name: .net-app
+      
+      - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_23CA590FF6A04077A5D9272C7E6F32EF }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_430298B848E94F68AD048388BAD7E01F }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D59F3A26C4074B6593C0E3F3EA4B8768 }}
+          client-id: ${{ secrets.__clientidsecretname__ }}
+          tenant-id: ${{ secrets.__tenantidsecretname__ }}
+          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
 
-      - name: Deploy to another Azure Web App
-        id: deploy-to-api
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'OnlyBaldsApi'  # Replace 'AnotherApp' with the actual name of the second Azure App Service
-          slot-name: 'Production'    # Adjust the slot name if needed
+          app-name: 'OnlyBaldsApi'
+          slot-name: 'Production'
           package: .
