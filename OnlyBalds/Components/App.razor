@@ -18,6 +18,42 @@
     <script src="_framework/blazor.web.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        // Set the Blazor environment to Development if the hostname is a dev, test, stage, or local environment.
+        // Note that this includes settings 'autostart="false"' on the blazor.webassembly.js script tag.
+        // See: https://learn.microsoft.com/en-us/aspnet/core/blazor/fundamentals/environments#set-the-client-side-environment-via-blazor-startup-configuration
+        const localHostSubStrings = [
+            "127.0.0.1",
+            "localhost",
+            "no-ip",
+            "local."
+        ];
+        
+        const devEnvSubStrings = [
+            "admindashboard-dev"
+        ];
+        
+        const testHostSubStrings = [
+            "admindashboard-test"
+        ];
+        
+        const stageHostSubStrings = [
+            "admindashboard-stage"
+        ];
+        
+        var environment = 'Production';
+        if (localHostSubStrings.some(subString => window.location.hostname.includes(subString))) {
+            environment = 'Local';
+        } else if (devEnvSubStrings.some(subString => window.location.hostname.includes(subString))) {
+            environment = 'Development';
+        } else if (testHostSubStrings.some(subString => window.location.hostname.includes(subString))) {
+            environment = 'Test';
+        } else if (stageHostSubStrings.some(subString => window.location.hostname.includes(subString))) {
+            environment = 'Stage';
+        }
+
+        console.debug(`Setting Blazor environment to ${environment}`);
+    </script>
 </body>
 
 </html>

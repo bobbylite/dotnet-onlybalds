@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Api.Data;
+using OnlyBalds.Api.Endpoints;
 using OnlyBalds.Api.Models;
 
 namespace OnlyBalds.Api.Extensions;
@@ -53,6 +54,22 @@ public static class WebApplicationExtensions
             });
         }
         
+        return webApplication;
+    }
+
+    /// <summary>
+    /// Maps OnlyBalds endpoints.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    /// <returns><see cref="WebApplication"/></returns>
+    public static WebApplication MapOnlyBaldsEndpoints(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapThreadsEndpoints();
+        webApplication.MapPostsEndpoints();
+        webApplication.MapCommentsEndpoints();
+
         return webApplication;
     }
 }
