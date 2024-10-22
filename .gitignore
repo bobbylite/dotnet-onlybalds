@@ -485,3 +485,6 @@ $RECYCLE.BIN/
 
 # Ignored Notes
 notes.txt
+
+# Local appsettings
+appsettings.Local.json
