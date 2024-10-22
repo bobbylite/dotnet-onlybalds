@@ -80,7 +80,7 @@ jobs:
           slot-name: 'Production'
           package: .
 
-  build-api:
+    build-api:
     runs-on: ubuntu-latest
 
     steps:
@@ -121,9 +121,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.__clientidsecretname__ }}
-          tenant-id: ${{ secrets.__tenantidsecretname__ }}
-          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0AD3B34606BB423880D62D055EB9FFF7 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B04AFB8FB69C4B78908DDBB2B7DA56BC }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C7E00FA36F4C400D9290A92543D8B4DB }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
