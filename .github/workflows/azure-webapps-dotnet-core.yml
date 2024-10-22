@@ -17,18 +17,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
+          include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build -c Release
+        run: cd OnlyBalds;dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: cd OnlyBalds;dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
@@ -40,14 +41,14 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: .net-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,9 +56,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6E95F735D1BF46E6B33F9CEDFEB94768 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E89DCEE49AAF45FDBDE4EAFD65ED6148 }}
 
-      - name: Deploy to Azure Web App
+      - name: Deploy to Azure Web App - OnlyBalds
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'OnlyBalds'
           slot-name: 'Production'
@@ -71,19 +72,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
           include-prerelease: true
 
       - name: Build with dotnet
-        run: cd OnlyBalds.Api;dotnet build -c Release
+        run: cd OnlyBalds.Api;dotnet build --configuration Release
 
       - name: dotnet publish
         run: cd OnlyBalds.Api;dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapi
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: .net-api
           path: ${{env.DOTNET_ROOT}}/myapi
@@ -99,7 +100,7 @@ jobs:
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: .net-api
 
@@ -112,7 +113,7 @@ jobs:
 
       - name: Deploy to another Azure Web App
         id: deploy-to-api
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
           app-name: 'OnlyBaldsApi'  # Replace 'AnotherApp' with the actual name of the second Azure App Service
           slot-name: 'Production'    # Adjust the slot name if needed
