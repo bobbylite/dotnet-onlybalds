@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-onlybalds:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +33,7 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
 
-  deploy:
+  deploy-onlybalds:
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -61,5 +61,58 @@ jobs:
         with:
           app-name: 'OnlyBalds'
           slot-name: 'Production'
+          package: .
+  build-api:
+    runs-on: ubuntu-latest
+    needs: deploy-onlybalds
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        run: cd OnlyBalds.Api;dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: cd OnlyBalds.Api;dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapi
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-api
+          path: ${{env.DOTNET_ROOT}}/myapi
+  deploy-api:
+    runs-on: ubuntu-latest
+    needs: build-api
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-api.outputs.webapp-url }}
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-api
+
+      - name: Login to Azure (reusing session)
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_23CA590FF6A04077A5D9272C7E6F32EF }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_430298B848E94F68AD048388BAD7E01F }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D59F3A26C4074B6593C0E3F3EA4B8768 }}
+
+      - name: Deploy to another Azure Web App
+        id: deploy-to-api
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'OnlyBaldsApi'  # Replace 'AnotherApp' with the actual name of the second Azure App Service
+          slot-name: 'Production'    # Adjust the slot name if needed
           package: .
           
