@@ -36,10 +36,10 @@ jobs:
           echo "</body></html>" >> ./OnlyBalds/wwwroot/build-info.html
 
       - name: Build with dotnet
-        run: dotnet build --project OnlyBalds/OnlyBalds.csproj -c Release
+        run: dotnet build -c Release
 
       - name: Build with dotnet
-        run: dotnet build --project OnlyBalds.Client/OnlyBalds.Client.csproj -c Release
+        run: dotnet build -c Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
@@ -82,7 +82,7 @@ jobs:
 
   build-api:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
 
