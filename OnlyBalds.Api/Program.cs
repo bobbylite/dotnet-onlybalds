@@ -6,7 +6,10 @@ using OnlyBalds.Api.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add support for exposing API documentation.
-builder.AddApiDocumentation();
+if (builder.Environment.IsDevelopment())
+{
+    builder.AddApiDocumentation();
+}
 
 // Add support for persisting data to a database.
 builder.AddDataPersistence();
