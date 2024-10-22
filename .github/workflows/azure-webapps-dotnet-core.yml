@@ -80,7 +80,7 @@ jobs:
           slot-name: 'Production'
           package: .
 
-    build-api:
+  build-api:
     runs-on: ubuntu-latest
 
     steps:
