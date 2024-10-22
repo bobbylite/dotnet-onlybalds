@@ -5,6 +5,11 @@ using OnlyBalds.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add logging for diagnostics
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
 // Add support for exposing API documentation.
 builder.AddApiDocumentation();
 
