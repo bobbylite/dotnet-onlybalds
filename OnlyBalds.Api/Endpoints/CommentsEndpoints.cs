@@ -93,6 +93,8 @@ public static class CommentsEndpoints
             commentItem.Id = Guid.NewGuid();
         }
 
+        commentItem.PostedOn = DateTime.UtcNow.ToUniversalTime();
+        
         await commentsRepository.Add(commentItem);
 
         return Results.Created($"/threads/{commentItem.Id}", commentItem);

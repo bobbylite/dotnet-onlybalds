@@ -60,7 +60,7 @@ public class ThreadItem
     /// <remarks>
     /// This field is required.
     /// </remarks>
-    public DateTime StartDate { get; set; }
+    public DateTime StartDate { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Gets or sets the end date of the thread item.
@@ -69,5 +69,5 @@ public class ThreadItem
     /// <remarks>
     /// This field is required.
     /// </remarks>
-    public string Name { get; set; } = string.Empty; // TODO: delete me
+    public string Name { get; set; } = string.Empty;
 }

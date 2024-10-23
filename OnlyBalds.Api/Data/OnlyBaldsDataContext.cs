@@ -35,4 +35,30 @@ public class OnlyBaldsDataContext : DbContext
     /// Gets the set of all <see cref="CommentItem"/> entities in the context.
     /// </summary>
     public DbSet<CommentItem> CommentItems => Set<CommentItem>();
+
+    /// <summary>
+    /// Configures the model for the context.
+    /// </summary>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ThreadItem>()
+            .Property(t => t.StartDate)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<PostItem>()
+            .Property(t => t.PostedOn)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<CommentItem>()
+            .Property(t => t.PostedOn)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        base.OnModelCreating(modelBuilder);
+    }
 }
