@@ -79,6 +79,18 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: Inject build info into index.html
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+          # Injecting data into existing index.html
+          sed -i "s|<div id='build-version'></div>|<div id='build-version'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/index.html
+          sed -i "s|<div id='build-date'></div>|<div id='build-date'>$BUILD_DATE</div>|g" ./OnlyBalds/wwwroot/index.html
+          sed -i "s|<div id='commit-hash'></div>|<div id='commit-hash'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/index.html
+          sed -i "s|<div id='branch'></div>|<div id='branch'>$BRANCH</div>|g" ./OnlyBalds/wwwroot/index.html
+
       - name: Build with dotnet
         run: cd OnlyBalds.Api;dotnet build --configuration Release
 

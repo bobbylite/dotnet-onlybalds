@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Developer Info</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            background-color: white;
+            width: 80%;
+            max-width: 800px;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        h1 {
+            color: rgb(30, 156, 130);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .build-info {
+            background-color: rgb(30, 156, 130);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .build-info span {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .swagger-blurb {
+            background-color: #e9f5f2;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .swagger-blurb a {
+            color: rgb(30, 156, 130);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .swagger-blurb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Developer Information</h1>
+        <p>Welcome to the developer information page! Here, you'll find all the relevant details about the current build and version of this application.</p>
+
+        <div class="build-info">
+            <span><strong>Build Version:</strong><div id="build-version"></div></span>
+            <span><strong>Build Date:</strong><div id="build-date"></div></span>
+            <span><strong>Commit Hash:</strong><div id="commit-hash"></div></span>
+            <span><strong>Branch:</strong><div id="branch"></div></span>
+        </div>
+
+        <div class="swagger-blurb">
+            <p>For API documentation and testing, check out the <a href="swagger/index.html">Swagger UI</a>.</p>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -45,6 +45,9 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 // Add middleware for redirecting HTTP Requests to HTTPS.
 app.UseHttpsRedirection();
 
+// Maps the index endpoint for the exposed OnlyBalds API.
+app.MapIndexEndpoint();
+
 // Maps endpoints for the exposed OnlyBalds API.
 app.MapOnlyBaldsEndpoints();
 

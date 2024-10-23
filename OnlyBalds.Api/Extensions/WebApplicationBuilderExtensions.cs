@@ -138,6 +138,7 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
+        webApplicationBuilder.Services.AddScoped<IHomeRepository, HomeRepository>();
         webApplicationBuilder.Services.AddScoped<IThreadsRepository<ThreadItem>, ThreadsRepository<ThreadItem>>();
         webApplicationBuilder.Services.AddScoped<IPostsRepository<PostItem>, PostsRepository<PostItem>>();
         webApplicationBuilder.Services.AddScoped<ICommentsRepository<CommentItem>, CommentsRepository<CommentItem>>();
