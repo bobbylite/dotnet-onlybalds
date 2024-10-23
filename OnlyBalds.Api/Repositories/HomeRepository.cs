@@ -10,7 +10,7 @@ public class HomeRepository : IHomeRepository
     public HomeRepository()
     {
         // Define the path where your static HTML file is located
-        _htmlFilePath = Path.Combine(Directory.GetCurrentDirectory(), "OnlyBalds.Api", "wwwroot", "index.html");
+        _htmlFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "index.html");
     }
 
     /// <inheritdoc/>
