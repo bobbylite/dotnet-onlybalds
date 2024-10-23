@@ -1,4 +1,6 @@
-﻿namespace OnlyBalds.Api.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace OnlyBalds.Api.Models;
 
 /// <summary>
 /// Represents a thread item.
@@ -6,6 +8,7 @@
 /// <remarks>
 /// This class represents a thread item.
 /// </remarks>
+[Table("ThreadItems")]
 public class ThreadItem
 {
     /// <summary>
