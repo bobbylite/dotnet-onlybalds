@@ -72,4 +72,28 @@ public static class WebApplicationExtensions
 
         return webApplication;
     }
+
+    /// <summary>
+    /// Run database migrations.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    /// <returns><see cref="WebApplication"/></returns>
+    public static WebApplication RunDatabaseMigrations(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        using (var scope = webApplication.Services.CreateScope())
+        {
+            var threadsDbContext = scope.ServiceProvider.GetRequiredService<ThreadDataContext>();
+            threadsDbContext.Database.Migrate();
+
+            var postDbContext = scope.ServiceProvider.GetRequiredService<PostDataContext>();
+            postDbContext.Database.Migrate();
+
+            var commentsDbContext = scope.ServiceProvider.GetRequiredService<CommentDataContext>();
+            commentsDbContext.Database.Migrate();
+        }
+        
+        return webApplication;
+    }
 }
