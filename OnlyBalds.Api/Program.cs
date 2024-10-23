@@ -31,7 +31,7 @@ builder.Services.Configure<HttpsRedirectionOptions>(options =>
 var app = builder.Build();
 
 // Run Database Migrations
-//app.RunDatabaseMigrations();
+app.RunDatabaseMigrations();
 
 // Enable support for persisting data to a database.
 app.UseAccessControl();
