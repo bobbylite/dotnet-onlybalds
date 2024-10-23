@@ -84,14 +84,8 @@ public static class WebApplicationExtensions
 
         using (var scope = webApplication.Services.CreateScope())
         {
-            var threadsDbContext = scope.ServiceProvider.GetRequiredService<ThreadDataContext>();
+            var threadsDbContext = scope.ServiceProvider.GetRequiredService<OnlyBaldsDataContext>();
             threadsDbContext.Database.Migrate();
-
-            var postDbContext = scope.ServiceProvider.GetRequiredService<PostDataContext>();
-            postDbContext.Database.Migrate();
-
-            var commentsDbContext = scope.ServiceProvider.GetRequiredService<CommentDataContext>();
-            commentsDbContext.Database.Migrate();
         }
         
         return webApplication;

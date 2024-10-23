@@ -9,7 +9,7 @@ namespace OnlyBalds.Api.Data;
 /// <remarks>
 /// This class represents the data context for the comments.
 /// </remarks>
-/// <seealso cref="Microsoft.EntityFrameworkCore.DbContext" />
+/// <seealso cref="DbContext" />
 public class CommentDataContext : DbContext
 {
     /// <summary>

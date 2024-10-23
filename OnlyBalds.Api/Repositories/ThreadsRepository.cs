@@ -12,8 +12,8 @@ public class ThreadsRepository<T> : IThreadsRepository<T> where T : class
     /// <summary>
     /// Initializes a new instance of the <see cref="ThreadsRepository{T}"/> class.
     /// </summary>
-    /// <param name="context"><see cref="ThreadDataContext"/></param>
-    public ThreadsRepository(ThreadDataContext context)
+    /// <param name="context"><see cref="OnlyBaldsDataContext"/></param>
+    public ThreadsRepository(OnlyBaldsDataContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();
