@@ -15,7 +15,7 @@ namespace OnlyBalds.Api.Extensions;
 public static class WebApplicationBuilderExtensions
 {
     /// <summary>
-    /// Add support for persisting data to a database.
+    /// Add support for persisting data to a PostgreSQL database in Azure.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
@@ -23,12 +23,14 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
+        var connectionString = webApplicationBuilder.Configuration.GetConnectionString("PostgreSqlConnection");
+
         webApplicationBuilder.Services.AddDbContext<ThreadDataContext>(opt => 
-            opt.UseInMemoryDatabase("ThreadData"));
+            opt.UseNpgsql(connectionString));
         webApplicationBuilder.Services.AddDbContext<PostDataContext>(opt => 
-            opt.UseInMemoryDatabase("PostData"));
+            opt.UseNpgsql(connectionString));
         webApplicationBuilder.Services.AddDbContext<CommentDataContext>(opt => 
-            opt.UseInMemoryDatabase("CommentData"));
+            opt.UseNpgsql(connectionString));
         webApplicationBuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
         
         return webApplicationBuilder;
