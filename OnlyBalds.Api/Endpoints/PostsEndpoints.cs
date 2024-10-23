@@ -93,6 +93,8 @@ public static class PostsEndpoints
             postItem.Id = Guid.NewGuid();
         }
 
+        postItem.PostedOn = DateTime.UtcNow.ToUniversalTime();
+
         await postsRepository.Add(postItem);
 
         return Results.Created($"/threads/{postItem.Id}", postItem);

@@ -93,6 +93,8 @@ public static class ThreadsEndpoints
             threadItem.Id = Guid.NewGuid();
         }
 
+        threadItem.StartDate = DateTime.UtcNow.ToUniversalTime();
+
         await threadsRepository.Add(threadItem);
 
         return Results.Created($"/threads/{threadItem.Id}", threadItem);
