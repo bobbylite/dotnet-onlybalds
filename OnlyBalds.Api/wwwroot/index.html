@@ -4,28 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Developer Info</title>
+    <title>OnlyBalds Build Information</title>
     <style>
         /* General Styling */
-        html, body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #fefcf0;
-            color: darkslategrey
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1d3557;
+            color: #f1faee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
         }
         
         .container {
-            background-color: white;
+            background-color: #457b9d;
             width: 80%;
             max-width: 800px;
             padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
+            z-index: 1;
+            animation: mission-launch 1s ease-out;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
         }
 
         h1 {
-            color: rgb(30, 156, 130);
-            font-size: 2.5rem;
+            color: #a8dadc;
+            font-size: 3rem;
             margin-bottom: 0.5rem;
         }
 
@@ -36,10 +53,10 @@
         }
 
         .build-info {
-            background-color: rgb(30, 156, 130);
-            color: white;
-            padding: 1rem;
-            border-radius: 10px;
+            background-color: #2a9d8f;
+            color: #f1faee;
+            padding: 1.5rem;
+            border-radius: 15px;
             margin-top: 2rem;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             font-size: 1rem;
@@ -48,20 +65,21 @@
 
         .build-info span {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .swagger-blurb {
-            background-color: #e9f5f2;
+            background-color: #e63946;
+            color: white;
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: 15px;
             margin-top: 2rem;
             font-size: 1.1rem;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .swagger-blurb a {
-            color: rgb(30, 156, 130);
+            color: white;
             text-decoration: none;
             font-weight: bold;
         }
@@ -70,28 +88,97 @@
             text-decoration: underline;
         }
 
-        /* Floating animation */
+        /* Rocketship Styling */
+        .rocket {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            animation: float 3s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .flame {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            width: 40px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(255,165,0,1) 0%, rgba(255,69,0,1) 50%, rgba(139,0,0,1) 100%);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            animation: flame-animation 0.5s ease-in-out infinite;
+        }
+
+        /* Floating rocket-like animation */
         @keyframes float {
             0%, 100% {
-                transform: translateY(0);
+                transform: translateY(0) translateX(-50%);
             }
             50% {
-                transform: translateY(-10px);
+                transform: translateY(-20px) translateX(-50%);
+            }
+        }
+
+        /* Flame animation */
+        @keyframes flame-animation {
+            0% {
+                width: 10px;
+                height: 10px;
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                width: 50px;
+                height: 50px;
+                opacity: 0.7;
+                transform: translateX(-50%) translateY(10px);
+            }
+            100% {
+                width: 10px;
+                height: 10px;
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Container animation as if it's launching into space */
+        @keyframes mission-launch {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
             .container {
-                width: 95%;
+                width: 90%;
             }
 
             h1 {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
 
             p {
                 font-size: 1rem;
+            }
+
+            .rocket {
+                width: 100px;
+            }
+
+            .flame {
+                width: 30px;
+                height: 40px;
+            }
+            lottie-player {
+                margin-top: 50%;
             }
         }
     </style>
@@ -99,8 +186,20 @@
 <body>
 
     <div class="container">
-        <h1>OnlyBalds API Developer Information</h1>
-        <p>Welcome to the developer information page! Here, you'll find all the relevant details about the current build and version of this application.</p>
+        <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+        <lottie-player 
+            src="https://lottie.host/4c77e9db-cde7-488d-bb0d-4c70a0f9daf6/Ynpn8kgofc.json" 
+            background="##FFFFFF" 
+            speed="1" 
+            style="width: 300px; height: 300px" 
+            loop 
+            autoplay 
+            direction="1" 
+            mode="normal">
+        </lottie-player>
+        <h1>OnlyBalds API Deployment</h1>
+        <p>Welcome to the deployment page! Here you'll find all the critical information about the current build and version of the OnlyBalds API.</p>
 
         <div class="build-info">
             <span>
@@ -124,6 +223,12 @@
         <div class="swagger-blurb">
             <p>For API documentation and testing, check out the <a href="swagger/index.html">Swagger UI</a>.</p>
         </div>
+    </div>
+
+    <!-- Rocket and Flame -->
+    <div class="rocket">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/SpaceX_Falcon_9_rocket.svg" alt="Rocket">
+        <div class="flame"></div>
     </div>
 
 </body>
