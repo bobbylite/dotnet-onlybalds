@@ -7,10 +7,17 @@
     <title>Developer Info</title>
     <style>
         /* General Styling */
-        html, body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #fefcf0;
-            color: darkslategrey
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
         
         .container {
@@ -21,6 +28,12 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 1rem;
         }
 
         h1 {
@@ -99,7 +112,8 @@
 <body>
 
     <div class="container">
-        <h1>OnlyBalds API Developer Information</h1>
+        <img src="https://onlybalds-dev.azurewebsites.net/img/OnlyBalds-Head.webp" alt="OnlyBalds Logo" class="logo">
+        <h1>OnlyBalds Build Information</h1>
         <p>Welcome to the developer information page! Here, you'll find all the relevant details about the current build and version of this application.</p>
 
         <div class="build-info">
@@ -122,7 +136,7 @@
         </div>
 
         <div class="swagger-blurb">
-            <p>For API documentation and testing, check out the <a href="swagger/index.html">Swagger UI</a>.</p>
+            <p>For more information, check out the <a href="swagger/index.html">Github</a> project.</p>
         </div>
     </div>
 
