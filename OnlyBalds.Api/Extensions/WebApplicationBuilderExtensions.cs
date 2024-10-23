@@ -22,14 +22,10 @@ public static class WebApplicationBuilderExtensions
     public static WebApplicationBuilder AddDataPersistence(this WebApplicationBuilder webApplicationBuilder)
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
-
+        
         var connectionString = webApplicationBuilder.Configuration.GetConnectionString("PostgreSqlConnection");
 
-        webApplicationBuilder.Services.AddDbContext<ThreadDataContext>(opt => 
-            opt.UseNpgsql(connectionString));
-        webApplicationBuilder.Services.AddDbContext<PostDataContext>(opt => 
-            opt.UseNpgsql(connectionString));
-        webApplicationBuilder.Services.AddDbContext<CommentDataContext>(opt => 
+        webApplicationBuilder.Services.AddDbContext<OnlyBaldsDataContext>(opt => 
             opt.UseNpgsql(connectionString));
         webApplicationBuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
         

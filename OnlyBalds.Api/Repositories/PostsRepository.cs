@@ -12,8 +12,8 @@ public class PostsRepository<T> : IPostsRepository<T> where T : class
     /// <summary>
     /// Initializes a new instance of the <see cref="PostsRepository{T}"/> class.
     /// </summary>
-    /// <param name="context"><see cref="ThreadDataContext"/></param>
-    public PostsRepository(PostDataContext context)
+    /// <param name="context"><see cref="OnlyBaldsDataContext"/></param>
+    public PostsRepository(OnlyBaldsDataContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();

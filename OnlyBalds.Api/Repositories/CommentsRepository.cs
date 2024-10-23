@@ -12,8 +12,8 @@ public class CommentsRepository<T> : ICommentsRepository<T> where T : class
     /// <summary>
     /// Initializes a new instance of the <see cref="CommentsRepository{T}"/> class.
     /// </summary>
-    /// <param name="context"><see cref="ThreadDataContext"/></param>
-    public CommentsRepository(CommentDataContext context)
+    /// <param name="context"><see cref="OnlyBaldsDataContext"/></param>
+    public CommentsRepository(OnlyBaldsDataContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();
