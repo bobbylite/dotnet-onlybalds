@@ -116,7 +116,7 @@ public static class WebApplicationExtensions
         })
         .WithName(nameof(MapHealthChecksEndpoint))
         .WithOpenApi();
-
+        
         return webApplication;
     }
 }
