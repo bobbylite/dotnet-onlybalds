@@ -98,14 +98,16 @@ public static class WebApplicationExtensions
     /// </summary>
     /// <param name="webApplication"></param>
     /// <returns><see cref="WebApplication"/></returns>
-    public static WebApplication MapHealthChecks(this WebApplication webApplication)
+    public static WebApplication MapHealthChecksEndpoint(this WebApplication webApplication)
     {
         ArgumentNullException.ThrowIfNull(webApplication);
 
-        webApplication.MapHealthChecks("health", new HealthCheckOptions
+        webApplication.MapHealthChecks("/health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-        });
+        })
+        .WithName(nameof(MapHealthChecksEndpoint))
+        .WithOpenApi();
 
         return webApplication;
     }

@@ -58,6 +58,6 @@ app.MapIndexEndpoint();
 app.MapOnlyBaldsEndpoints();
 
 // Maps health checks endpoint for the application.
-app.MapHealthChecks();
+app.MapHealthChecksEndpoint();
 
 app.Run();
