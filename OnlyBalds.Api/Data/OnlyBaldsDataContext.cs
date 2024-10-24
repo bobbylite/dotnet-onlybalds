@@ -36,9 +36,7 @@ public class OnlyBaldsDataContext : DbContext
     /// </summary>
     public DbSet<CommentItem> CommentItems => Set<CommentItem>();
 
-    /// <summary>
-    /// Configures the model for the context.
-    /// </summary>
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ThreadItem>()
