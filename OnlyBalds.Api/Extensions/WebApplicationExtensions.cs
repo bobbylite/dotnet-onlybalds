@@ -84,13 +84,21 @@ public static class WebApplicationExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplication);
 
-        using (var scope = webApplication.Services.CreateScope())
+        try
         {
-            var threadsDbContext = scope.ServiceProvider.GetRequiredService<OnlyBaldsDataContext>();
-            threadsDbContext.Database.Migrate();
+            using (var scope = webApplication.Services.CreateScope())
+            {
+                var threadsDbContext = scope.ServiceProvider.GetRequiredService<OnlyBaldsDataContext>();
+                threadsDbContext.Database.Migrate();
+                return webApplication;
+            }
         }
-        
-        return webApplication;
+        catch (Exception ex)
+        {
+            var logger = webApplication.Services.GetRequiredService<ILogger<WebApplication>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+            return webApplication;
+        }
     }
 
     /// <summary>

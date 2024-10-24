@@ -51,10 +51,10 @@ internal sealed class OnlyBaldsDatabaseHealthCheck(
             _logger.LogWarning("The database connection is not healthy.");
             return HealthCheckResult.Unhealthy();
         }
-        catch(Exception ex)
+        catch
         {
-            _logger.LogError(ex, "An error occurred while checking the database connection health.");
-            return HealthCheckResult.Unhealthy(exception: ex);
+            _logger.LogError("An error occurred while checking the database connection health.");
+            return HealthCheckResult.Unhealthy();
         }
     }
 }

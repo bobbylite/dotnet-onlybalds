@@ -43,7 +43,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(OnlyBalds.Client.Components._Imports).Assembly);
 
-app.MapThreadsApiProxy();
+app.MapOnlyBaldsApiProxy();
 
 app.MapChatHub();
 

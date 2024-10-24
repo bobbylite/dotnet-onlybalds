@@ -158,8 +158,8 @@ public static class WebApplicationBuilderExtensions
         var connectionString = webApplicationBuilder.Configuration.GetConnectionString("PostgreSqlConnection");
 
         webApplicationBuilder.Services.AddHealthChecks()
-            .AddCheck<OnlyBaldsDatabaseHealthCheck>("OnlyBalds Database Health Check", HealthStatus.Unhealthy)
-            .AddDbContextCheck<OnlyBaldsDataContext>("NPgSQL DbContext Health Check", HealthStatus.Unhealthy)
+            .AddCheck<OnlyBaldsDatabaseHealthCheck>("OnlyBalds Database Tables Health Check", HealthStatus.Unhealthy)
+            .AddDbContextCheck<OnlyBaldsDataContext>("ADO.NET DbContext Health Check", HealthStatus.Unhealthy)
             .AddNpgSql(connectionString!);
 
         return webApplicationBuilder;
