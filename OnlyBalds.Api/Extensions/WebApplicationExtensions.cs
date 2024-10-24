@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Api.Data;
 using OnlyBalds.Api.Endpoints;
@@ -88,6 +90,23 @@ public static class WebApplicationExtensions
             threadsDbContext.Database.Migrate();
         }
         
+        return webApplication;
+    }
+
+    /// <summary>
+    /// Maps the index endpoint for the exposed OnlyBalds API.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    /// <returns><see cref="WebApplication"/></returns>
+    public static WebApplication MapHealthChecks(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapHealthChecks("health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+
         return webApplication;
     }
 }
