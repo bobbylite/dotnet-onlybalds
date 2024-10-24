@@ -10,6 +10,9 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
+// Add health checks to the application.
+builder.AddHealthChecks();
+
 // Add support for exposing API documentation.
 builder.AddApiDocumentation();
 
@@ -53,5 +56,8 @@ app.MapIndexEndpoint();
 
 // Maps endpoints for the exposed OnlyBalds API.
 app.MapOnlyBaldsEndpoints();
+
+// Maps health checks endpoint for the application.
+app.MapHealthChecksEndpoint();
 
 app.Run();

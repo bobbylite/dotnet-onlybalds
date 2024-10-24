@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OnlyBalds.Api.Data;
+using OnlyBalds.Api.Health;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 using OnlyBalds.Api.Repositories;
@@ -140,6 +142,25 @@ public static class WebApplicationBuilderExtensions
         webApplicationBuilder.Services.AddScoped<IThreadsRepository<ThreadItem>, ThreadsRepository<ThreadItem>>();
         webApplicationBuilder.Services.AddScoped<IPostsRepository<PostItem>, PostsRepository<PostItem>>();
         webApplicationBuilder.Services.AddScoped<ICommentsRepository<CommentItem>, CommentsRepository<CommentItem>>();
+
+        return webApplicationBuilder;
+    }
+
+    /// <summary>
+    /// Add health checks to the application.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    public static WebApplicationBuilder AddHealthChecks(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        var connectionString = webApplicationBuilder.Configuration.GetConnectionString("PostgreSqlConnection");
+
+        webApplicationBuilder.Services.AddHealthChecks()
+            .AddCheck<OnlyBaldsDatabaseHealthCheck>("OnlyBalds Database Tables Health Check", HealthStatus.Unhealthy)
+            .AddDbContextCheck<OnlyBaldsDataContext>("ADO.NET DbContext Health Check", HealthStatus.Unhealthy)
+            .AddNpgSql(connectionString!);
 
         return webApplicationBuilder;
     }

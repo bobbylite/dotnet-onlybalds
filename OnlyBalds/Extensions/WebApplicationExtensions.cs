@@ -19,16 +19,16 @@ namespace OnlyBalds.Extensions;
 public static class WebApplicationExtensions
 {
     /// <summary>
-    /// Maps the threads API proxy.
+    /// Maps the OnlyBalds API proxy.
     /// This is based on the example found here:
     /// * https://github.com/dotnet/blazor-samples/tree/main/8.0/BlazorWebAppOidcBff
     /// </summary>
     /// <param name="webApplication">The web application used to configure the HTTP pipeline, and routes.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
     /// <remarks>
-    /// This method maps the threads API proxy.
+    /// This method maps the OnlyBalds API proxy.
     /// </remarks>
-    public static WebApplication MapThreadsApiProxy(this WebApplication webApplication)
+    public static WebApplication MapOnlyBaldsApiProxy(this WebApplication webApplication)
     {
         ArgumentNullException.ThrowIfNull(webApplication);
         
