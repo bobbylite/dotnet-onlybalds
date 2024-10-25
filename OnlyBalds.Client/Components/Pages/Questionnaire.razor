@@ -19,79 +19,77 @@ else
                 <h2 class="text-center mb-4">Baldie Questionnaire</h2>
                 
                 <!-- General Questions -->
-                <form id="baldie-questionnaire">
-                    <div class="mb-4">
-                        <label for="hearAboutUs" class="form-label">How did you hear about us?</label>
-                        <select class="form-select" id="hearAboutUs">
-                            <option value="social_media">Social Media</option>
-                            <option value="friend">Friend</option>
-                            <option value="facebook">Facebook</option>
-                            <option value="other">Other</option>
-                        </select>
+                <div class="mb-4">
+                    <label for="hearAboutUs" class="form-label">How did you hear about us?</label>
+                    <select class="form-select" id="hearAboutUs">
+                        <option value="social_media">Social Media</option>
+                        <option value="friend">Friend</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="buyProducts" class="form-label">Where do you buy your products currently?</label>
+                    <input type="text" class="form-control" id="buyProducts" placeholder="Enter where you buy products">
+                </div>
+
+                <div class="mb-4">
+                    <label for="apparelSize" class="form-label">Apparel Size</label>
+                    <select class="form-select" id="apparelSize">
+                        <option>Small</option>
+                        <option>Medium</option>
+                        <option>Large</option>
+                        <option>XL</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Are you open to trying new products/routines?</label>
+                    <div>
+                        <input class="form-check-input" type="radio" name="newProducts" id="newProductsYes" value="yes">
+                        <label class="form-check-label" for="newProductsYes">Yes</label>
                     </div>
-
-                    <div class="mb-4">
-                        <label for="buyProducts" class="form-label">Where do you buy your products currently?</label>
-                        <input type="text" class="form-control" id="buyProducts" placeholder="Enter where you buy products">
+                    <div>
+                        <input class="form-check-input" type="radio" name="newProducts" id="newProductsNo" value="no">
+                        <label class="form-check-label" for="newProductsNo">No</label>
                     </div>
+                </div>
 
-                    <div class="mb-4">
-                        <label for="apparelSize" class="form-label">Apparel Size</label>
-                        <select class="form-select" id="apparelSize">
-                            <option>Small</option>
-                            <option>Medium</option>
-                            <option>Large</option>
-                            <option>XL</option>
-                        </select>
+                <div class="mb-4">
+                    <label class="form-label">Are you an active baldie? (workout, run, etc.)</label>
+                    <div>
+                        <input class="form-check-input" type="radio" name="activeBaldie" id="activeYes" value="yes">
+                        <label class="form-check-label" for="activeYes">Yes</label>
                     </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">Are you open to trying new products/routines?</label>
-                        <div>
-                            <input class="form-check-input" type="radio" name="newProducts" id="newProductsYes" value="yes">
-                            <label class="form-check-label" for="newProductsYes">Yes</label>
-                        </div>
-                        <div>
-                            <input class="form-check-input" type="radio" name="newProducts" id="newProductsNo" value="no">
-                            <label class="form-check-label" for="newProductsNo">No</label>
-                        </div>
+                    <div>
+                        <input class="form-check-input" type="radio" name="activeBaldie" id="activeNo" value="no">
+                        <label class="form-check-label" for="activeNo">No</label>
                     </div>
+                </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">Are you an active baldie? (workout, run, etc.)</label>
-                        <div>
-                            <input class="form-check-input" type="radio" name="activeBaldie" id="activeYes" value="yes">
-                            <label class="form-check-label" for="activeYes">Yes</label>
-                        </div>
-                        <div>
-                            <input class="form-check-input" type="radio" name="activeBaldie" id="activeNo" value="no">
-                            <label class="form-check-label" for="activeNo">No</label>
-                        </div>
-                    </div>
+                <div class="mb-4">
+                    <label for="monthlySpend" class="form-label">How much do you spend monthly on bald/beard products?</label>
+                    <input type="text" class="form-control" id="monthlySpend" placeholder="Enter amount in USD">
+                </div>
 
-                    <div class="mb-4">
-                        <label for="monthlySpend" class="form-label">How much do you spend monthly on bald/beard products?</label>
-                        <input type="text" class="form-control" id="monthlySpend" placeholder="Enter amount in USD">
-                    </div>
+                <!-- Baldie Types -->
+                <h4 class="mb-3">What Type of Bald Are You?</h4>
 
-                    <!-- Baldie Types -->
-                    <h4 class="mb-3">What Type of Bald Are You?</h4>
+                <div class="mb-4">
+                    <label class="form-label">Choose your bald type</label>
+                    <select class="form-select" id="baldType">
+                        <option value="veteran">Veteran/Confident Baldie</option>
+                        <option value="denier">The Denier Baldie</option>
+                        <option value="rookie">Rookie Up and Comer</option>
+                        <option value="beard_baldie">Beard Baldie</option>
+                    </select>
+                </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">Choose your bald type</label>
-                        <select class="form-select" id="baldType">
-                            <option value="veteran">Veteran/Confident Baldie</option>
-                            <option value="denier">The Denier Baldie</option>
-                            <option value="rookie">Rookie Up and Comer</option>
-                            <option value="beard_baldie">Beard Baldie</option>
-                        </select>
-                    </div>
+                <!-- Dynamic sections for each bald type -->
+                <div id="dynamic-section"></div>
 
-                    <!-- Dynamic sections for each bald type -->
-                    <div id="dynamic-section"></div>
-
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+                <button id="baldie-questionnaire" class="btn btn-primary">Submit</button>
             </div>
         </Authorized>
         <NotAuthorized>
@@ -122,9 +120,23 @@ else
         {
             var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Questionnaire.razor.js");
 
-            await jsModule.InvokeVoidAsync("onRender");
+            await jsModule.InvokeVoidAsync("onRender", objRef);
             isLoading = false;
             StateHasChanged();
         }
+    }
+
+    /// <summary>
+    /// Submit the questionnaire
+    /// </summary>
+    [JSInvokable]
+    public Task SubmitQuestionnaire(string answers)
+    {
+        logger.LogInformation($"Questionnaire answers: {answers}");
+        var questtionnaireAnswers = JsonSerializer.Deserialize<QuestionnaireItems>(answers);
+
+        var questionnaireClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+
+        return Task.CompletedTask;
     }
 }
