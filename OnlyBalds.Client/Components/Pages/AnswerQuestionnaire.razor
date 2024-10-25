@@ -1,7 +1,8 @@
 ﻿@page "/AnswerQuestionnaire"
 
+@inject NavigationManager NavigationManager
 @inject IHttpClientFactory httpClientFactory
-@inject ILogger<AnswerQuestionnaire> logger;
+@inject ILogger<AnswerQuestionnaire> logger
 @inject IJSRuntime JSRuntime
 
 @if (isLoading is true)
@@ -9,6 +10,13 @@
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
         </div>
+    </div>
+}
+else if (isNotSupportedYet is true)
+{
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Baldie Questionnaire</h2>
+        <p class="text-center">This feature is not supported yet.</p>
     </div>
 }
 else
@@ -99,6 +107,7 @@ else
 }
 
 @code {
+    private bool isNotSupportedYet = true;
     private bool isLoading = true;
 
     [CascadingParameter]
@@ -144,5 +153,9 @@ else
         {
             logger.LogDebug("Failed to submit questionnaire");
         }
+
+        // TODO: Update user table to reference this questionnaire.
+
+        NavigationManager.NavigateTo("/");
     }
 }
