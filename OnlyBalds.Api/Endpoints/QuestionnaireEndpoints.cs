@@ -106,6 +106,30 @@ public static class QuestionnaireEndpoints
             {
                 baldingOption.Id = Guid.NewGuid();
             }
+
+            foreach(var option in baldingOption.Option!)
+            {
+                if (option.Id == Guid.Empty)
+                {
+                    option.Id = Guid.NewGuid();
+                }
+
+                foreach(var question in option.Questions!)
+                {
+                    if (question.Id == Guid.Empty)
+                    {
+                        question.Id = Guid.NewGuid();
+                    }
+                }
+            }
+        }
+
+        foreach(var question in questionnaireItems.Data?.Questions!)
+        {
+            if (question.Id == Guid.Empty)
+            {
+                question.Id = Guid.NewGuid();
+            }
         }
 
         questionnaireItems.StartDate = DateTime.UtcNow.ToUniversalTime();

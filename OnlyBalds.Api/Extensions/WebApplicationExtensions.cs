@@ -71,6 +71,7 @@ public static class WebApplicationExtensions
         webApplication.MapThreadsEndpoints();
         webApplication.MapPostsEndpoints();
         webApplication.MapCommentsEndpoints();
+        webApplication.MapQuestionnaireEndpoints();
 
         return webApplication;
     }

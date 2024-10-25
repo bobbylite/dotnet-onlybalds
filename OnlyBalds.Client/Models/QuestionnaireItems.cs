@@ -7,7 +7,6 @@ namespace OnlyBalds.Client.Models;
 /// Represents a questionnaire item for the balding website.
 /// This questionnaire is used to target specific products for users.
 /// </summary>
-[Table("QuestionnaireItems")]
 public class QuestionnaireItems
 {
     /// <summary>
@@ -121,5 +120,5 @@ public class BaldingOption
     /// Gets or sets the list of questions for the balding option.
     /// </summary>
     [JsonPropertyName("questions")]
-    public IEnumerable<string>? Questions { get; set; }
+    public IEnumerable<Question>? Questions { get; set; }
 }

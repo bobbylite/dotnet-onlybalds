@@ -97,29 +97,53 @@ export const onRender = (dotnetHelper) => {
                                 {
                                     baldingOptionTitle: "Beard Baldie",
                                     questions: [
-                                        $(("#beardBaldie")).val()
-                                    ]
+                                        {
+                                            title: "What type of beard do you have?",
+                                            answer: $('#beardBaldie').val()
+                                        },
+                                    ],
                                 },
                                 {
                                     baldingOptionTitle: "Rookie Baldie",
                                     questions: [
-                                        $('#rookieBaldieHasBeard').val(),
-                                        $('#rookieBaldieLookingForRecommendations').val()
+                                        {
+                                            title: "Do you have a beard?",
+                                            answer: $('#rookieBaldieHasBeard').val()
+                                        },
+                                        {
+                                            title: "Are you looking for recommendations?",
+                                            answer: $('#rookieBaldieLookingForRecommendations').val()
+                                        }
                                     ]
                                 },
                                 {
                                     baldingOptionTitle: "Denier Baldie",
                                     questions: [
-                                        $('#denierBaldieSelfConscious').val(),
-                                        $('#denierBaldieReason').val()
+                                        {
+                                            title: "Are you self-conscious about being bald?",
+                                            answer: $('#denierBaldieSelfConscious').val()
+                                        },
+                                        {
+                                            title: "Reason?",
+                                            answer: $('#denierBaldieReason').val()
+                                        }
                                     ]
                                 },
                                 {
                                     baldingOptionTitle: "Confident Baldie",
                                     questions: [
-                                        $('#confidentBaldieShaveOrBuzz').val(),
-                                        $('#baldYears').val(),
-                                        $('#confidentBaldieChromeCap').val()
+                                        {
+                                            title: "Do you shave or buzz?",
+                                            answer: $('#confidentBaldieShaveOrBuzz').val()
+                                        },
+                                        {
+                                            title: "How long have you been bald?",
+                                            answer: $('#baldYears').val()
+                                        },
+                                        {
+                                            title: "Do you have the chrome cap?",
+                                            answer: $('#confidentBaldieChromeCap').val()
+                                        }
                                     ]
                                 }
                             ]

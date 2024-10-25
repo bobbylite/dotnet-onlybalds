@@ -1,7 +1,7 @@
-﻿@page "/Questionnaire"
+﻿@page "/AnswerQuestionnaire"
 
 @inject IHttpClientFactory httpClientFactory
-@inject ILogger<Threads> logger;
+@inject ILogger<AnswerQuestionnaire> logger;
 @inject IJSRuntime JSRuntime
 
 @if (isLoading is true)
@@ -104,7 +104,7 @@ else
     [CascadingParameter]
     private Task<AuthenticationState>? authenticationState { get; set; }
     
-     private DotNetObjectReference<Questionnaire>? objRef;
+     private DotNetObjectReference<AnswerQuestionnaire>? objRef;
 
     /// <inheritdoc />
     protected override void OnInitialized()
@@ -118,7 +118,7 @@ else
     {
         if (firstRender)
         {
-            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Questionnaire.razor.js");
+            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/AnswerQuestionnaire.razor.js");
 
             await jsModule.InvokeVoidAsync("onRender", objRef);
             isLoading = false;
@@ -130,13 +130,19 @@ else
     /// Submit the questionnaire
     /// </summary>
     [JSInvokable]
-    public Task SubmitQuestionnaire(string answers)
+    public async Task SubmitQuestionnaire(string answers)
     {
-        logger.LogInformation($"Questionnaire answers: {answers}");
-        var questtionnaireAnswers = JsonSerializer.Deserialize<QuestionnaireItems>(answers);
-
+        logger.LogDebug("Creating questionnaire http client");
         var questionnaireClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
 
-        return Task.CompletedTask;
+        var questionnaire = JsonSerializer.Deserialize<QuestionnaireItems>(answers);
+
+        logger.LogDebug("Performing POST request to submit questionnaire");
+        var response = await questionnaireClient.PostAsJsonAsync("questionnaire", questionnaire);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogDebug("Failed to submit questionnaire");
+        }
     }
 }
