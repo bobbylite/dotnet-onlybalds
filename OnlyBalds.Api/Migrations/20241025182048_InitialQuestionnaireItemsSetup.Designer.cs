@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OnlyBalds.Api.Data;
@@ -11,9 +12,11 @@ using OnlyBalds.Api.Data;
 namespace OnlyBalds.Api.Migrations
 {
     [DbContext(typeof(OnlyBaldsDataContext))]
-    partial class OnlyBaldsDataContextModelSnapshot : ModelSnapshot
+    [Migration("20241025182048_InitialQuestionnaireItemsSetup")]
+    partial class InitialQuestionnaireItemsSetup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,6 +31,9 @@ namespace OnlyBalds.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("BaldingOptionQuestionsId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("BaldingOptionTitle")
                         .IsRequired()
                         .HasColumnType("text");
@@ -35,14 +41,27 @@ namespace OnlyBalds.Api.Migrations
                     b.Property<Guid?>("BaldingOptionsId")
                         .HasColumnType("uuid");
 
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaldingOptionQuestionsId");
+
+                    b.HasIndex("BaldingOptionsId");
+
+                    b.ToTable("BaldingOption");
+                });
+
+            modelBuilder.Entity("OnlyBalds.Api.Models.BaldingOptionQuestions", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
                     b.Property<string[]>("Questions")
                         .HasColumnType("text[]");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BaldingOptionsId");
-
-                    b.ToTable("BaldingOption");
+                    b.ToTable("BaldingOptionQuestions");
                 });
 
             modelBuilder.Entity("OnlyBalds.Api.Models.BaldingOptions", b =>
@@ -186,9 +205,15 @@ namespace OnlyBalds.Api.Migrations
 
             modelBuilder.Entity("OnlyBalds.Api.Models.BaldingOption", b =>
                 {
+                    b.HasOne("OnlyBalds.Api.Models.BaldingOptionQuestions", "BaldingOptionQuestions")
+                        .WithMany()
+                        .HasForeignKey("BaldingOptionQuestionsId");
+
                     b.HasOne("OnlyBalds.Api.Models.BaldingOptions", null)
                         .WithMany("Option")
                         .HasForeignKey("BaldingOptionsId");
+
+                    b.Navigation("BaldingOptionQuestions");
                 });
 
             modelBuilder.Entity("OnlyBalds.Api.Models.BaldingOptions", b =>

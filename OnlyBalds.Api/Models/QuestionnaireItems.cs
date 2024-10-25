@@ -1,9 +1,12 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace OnlyBalds.Api.Models;
 
 /// <summary>
 /// Represents a questionnaire item for the balding website.
 /// This questionnaire is used to target specific products for users.
 /// </summary>
+[Table("QuestionnaireItems")]
 public class QuestionnaireItems
 {
     /// <summary>
@@ -78,22 +81,6 @@ public class BaldingOption
     /// Gets or sets the title of the balding option.
     /// </summary>
     public string BaldingOptionTitle { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the questions associated with the balding option.
-    /// </summary>
-    public BaldingOptionQuestions? BaldingOptionQuestions { get; set; }
-}
-
-/// <summary>
-/// Represents the questions associated with a balding option.
-/// </summary>
-public class BaldingOptionQuestions
-{
-    /// <summary>
-    /// Gets or sets the unique identifier for the item.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the list of questions for the balding option.

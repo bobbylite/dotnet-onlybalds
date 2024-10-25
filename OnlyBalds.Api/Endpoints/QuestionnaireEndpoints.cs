@@ -83,7 +83,9 @@ public static class QuestionnaireEndpoints
     /// <param name="questionnaireItems"></param>
     /// <param name="questionnaireRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreateQuestionnaireAsync([FromBody] QuestionnaireItems questionnaireItems, [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
+    public static async Task<IResult> CreateQuestionnaireAsync(
+        [FromBody] QuestionnaireItems questionnaireItems,
+        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
     {
         ArgumentNullException.ThrowIfNull(questionnaireItems);
         ArgumentNullException.ThrowIfNull(questionnaireRepository);
@@ -91,6 +93,19 @@ public static class QuestionnaireEndpoints
         if (questionnaireItems.Id == Guid.Empty)
         {
             questionnaireItems.Id = Guid.NewGuid();
+        }
+
+        if (questionnaireItems.Data?.Id == Guid.Empty)
+        {
+            questionnaireItems.Data.Id = Guid.NewGuid();
+        }
+
+        foreach(var baldingOption in questionnaireItems.Data?.BaldingOptions!)
+        {
+            if (baldingOption.Id == Guid.Empty)
+            {
+                baldingOption.Id = Guid.NewGuid();
+            }
         }
 
         questionnaireItems.StartDate = DateTime.UtcNow.ToUniversalTime();
@@ -107,7 +122,9 @@ public static class QuestionnaireEndpoints
     /// <param name="questionnaireItems"></param>
     /// <param name="questionnaireRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdateQuestionnaireAsync(Guid id, [FromBody] QuestionnaireItems questionnaireItems, [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
+    public static async Task<IResult> UpdateQuestionnaireAsync(Guid id, 
+        [FromBody] QuestionnaireItems questionnaireItems,
+        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(questionnaireItems);
@@ -129,7 +146,8 @@ public static class QuestionnaireEndpoints
     /// <param name="id"></param>
     /// <param name="questionnaireRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeleteQuestionnaireAsync(Guid id, [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
+    public static async Task<IResult> DeleteQuestionnaireAsync(Guid id,
+        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(questionnaireRepository);
