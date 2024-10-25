@@ -139,9 +139,10 @@ public static class WebApplicationBuilderExtensions
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
         webApplicationBuilder.Services.AddScoped<IHomeRepository, HomeRepository>();
-        webApplicationBuilder.Services.AddScoped<IThreadsRepository<ThreadItem>, ThreadsRepository<ThreadItem>>();
-        webApplicationBuilder.Services.AddScoped<IPostsRepository<PostItem>, PostsRepository<PostItem>>();
-        webApplicationBuilder.Services.AddScoped<ICommentsRepository<CommentItem>, CommentsRepository<CommentItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<ThreadItem>, OnlyBaldsRepository<ThreadItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<PostItem>, OnlyBaldsRepository<PostItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<CommentItem>, OnlyBaldsRepository<CommentItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<QuestionnaireItems>, OnlyBaldsRepository<QuestionnaireItems>>();
 
         return webApplicationBuilder;
     }

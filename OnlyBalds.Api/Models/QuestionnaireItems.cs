@@ -32,6 +32,11 @@ public class QuestionnaireItems
 /// </summary>
 public class QuestionnaireData
 {
+        /// <summary>
+    /// Gets or sets the unique identifier for the item.
+    /// </summary>
+    public Guid Id { get; set; }
+    
     /// <summary>
     /// Gets or sets the list of questions in the questionnaire.
     /// </summary>
@@ -48,6 +53,11 @@ public class QuestionnaireData
 /// </summary>
 public class BaldingOptions
 {
+     /// <summary>
+    /// Gets or sets the unique identifier for the item.
+    /// </summary>
+    public Guid Id { get; set; }
+
     /// <summary>
     /// Gets or sets the list of balding options.
     /// </summary>
@@ -59,6 +69,11 @@ public class BaldingOptions
 /// </summary>
 public class BaldingOption
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the item.
+    /// </summary>
+    public Guid Id { get; set; }
+
     /// <summary>
     /// Gets or sets the title of the balding option.
     /// </summary>
@@ -75,6 +90,11 @@ public class BaldingOption
 /// </summary>
 public class BaldingOptionQuestions
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the item.
+    /// </summary>
+    public Guid Id { get; set; }
+
     /// <summary>
     /// Gets or sets the list of questions for the balding option.
     /// </summary>

@@ -36,6 +36,8 @@ public class OnlyBaldsDataContext : DbContext
     /// </summary>
     public DbSet<CommentItem> CommentItems => Set<CommentItem>();
 
+    public DbSet<QuestionnaireItems> QuestionnaireItems => Set<QuestionnaireItems>();
+
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,6 +55,12 @@ public class OnlyBaldsDataContext : DbContext
 
         modelBuilder.Entity<CommentItem>()
             .Property(t => t.PostedOn)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        
+        modelBuilder.Entity<QuestionnaireItems>()
+            .Property(t => t.StartDate)
             .HasConversion(
                 v => v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
