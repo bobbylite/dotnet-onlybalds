@@ -4,21 +4,21 @@ using OnlyBalds.Api.Interfaces.Repositories;
 
 namespace OnlyBalds.Api.Repositories;
 
-public class PostsRepository<T> : IPostsRepository<T> where T : class
+public class OnlyBaldsRepository<T> : IOnlyBaldsRepository<T> where T : class
 {
     private readonly DbContext _context;
     private readonly DbSet<T> _dbSet;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PostsRepository{T}"/> class.
+    /// Initializes a new instance of the <see cref="OnlyBaldsRepository{T}"/> class.
     /// </summary>
     /// <param name="context"><see cref="OnlyBaldsDataContext"/></param>
-    public PostsRepository(OnlyBaldsDataContext context)
+    public OnlyBaldsRepository(OnlyBaldsDataContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();
     }
-
+    
     /// <inheritdoc/>
     public IEnumerable<T> GetAll()
     {
@@ -27,7 +27,7 @@ public class PostsRepository<T> : IPostsRepository<T> where T : class
         
         return items;
     }
-    
+
     /// <inheritdoc/>
     public T GetById(Guid id)
     {

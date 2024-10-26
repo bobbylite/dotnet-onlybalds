@@ -51,7 +51,7 @@ public static class ThreadsEndpoints
     /// </summary>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetThreads([FromServices] IThreadsRepository<ThreadItem> threadsRepository)
+    public static IResult GetThreads([FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
     {
         ArgumentNullException.ThrowIfNull(threadsRepository);
 
@@ -67,7 +67,7 @@ public static class ThreadsEndpoints
     /// <param name="id"></param>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetThreadById(Guid id, [FromServices] IThreadsRepository<ThreadItem> threadsRepository)
+    public static IResult GetThreadById(Guid id, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
     {
         ArgumentNullException.ThrowIfNull(threadsRepository);
 
@@ -83,7 +83,7 @@ public static class ThreadsEndpoints
     /// <param name="threadItem"></param>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreateThreadAsync([FromBody] ThreadItem threadItem, [FromServices] IThreadsRepository<ThreadItem> threadsRepository)
+    public static async Task<IResult> CreateThreadAsync([FromBody] ThreadItem threadItem, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
     {
         ArgumentNullException.ThrowIfNull(threadItem);
         ArgumentNullException.ThrowIfNull(threadsRepository);
@@ -107,7 +107,7 @@ public static class ThreadsEndpoints
     /// <param name="threadItem"></param>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdateThreadAsync(Guid id, [FromBody] ThreadItem threadItem, [FromServices] IThreadsRepository<ThreadItem> threadsRepository)
+    public static async Task<IResult> UpdateThreadAsync(Guid id, [FromBody] ThreadItem threadItem, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(threadItem);
@@ -132,7 +132,7 @@ public static class ThreadsEndpoints
     /// <param name="id"></param>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeleteThreadAsync(Guid id, [FromServices] IThreadsRepository<ThreadItem> threadsRepository)
+    public static async Task<IResult> DeleteThreadAsync(Guid id, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(threadsRepository);

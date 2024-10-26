@@ -1,3 +1,4 @@
+
 # OnlyBalds :bald_man:
 
 ![.NET](https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white)
@@ -13,6 +14,52 @@ The solution contains three projects:
 1. **Blazor Server**: This project handles the server-side rendering of the Blazor application.
 2. **Blazor Client**: This project is responsible for the client-side logic and UI of the Blazor application.
 3. **Web API**: This project provides the backend for frontend (BFF) implementations, serving as the bridge between the Blazor application and the database.
+
+## :books: Entity Framework with Npgsql for PostgreSQL
+
+OnlyBalds uses **Entity Framework Core** with **Npgsql** to interface with a PostgreSQL database, ensuring efficient data handling and easy integration.
+
+### Database Migrations
+
+1. Create a migration:
+   ```bash
+   dotnet ef migrations add MigrationName
+   ```
+2. Apply the migration:
+   ```bash
+   dotnet ef database update
+   ```
+
+This approach leverages the repository pattern and multiple DbContexts (e.g., `ThreadDataContext`, `PostDataContext`, `CommentDataContext`) to organize and handle data effectively.
+
+---
+
+## :heart: Health Checks
+
+The application includes health check support to monitor service health. Access health information at `/HealthChecks`:
+
+- **/HealthChecks**: Displays the application's current health status.
+
+---
+
+## :wrench: Build Information
+
+Build information is automatically generated at each build and accessible at the `/build-info.html` endpoint. This page provides key details like:
+
+- Build date and time
+- Commit hash
+- Build version
+
+---
+
+## 🤖 Hugging Face API Integration
+
+OnlyBalds integrates with the **Hugging Face Inference API** to enhance chat room moderation using AI models:
+
+- **Toxic BERT**: Identifies potentially toxic messages to maintain a respectful environment.
+- **Twitter Sentiment**: Analyzes sentiment to ensure positive interactions within the chat.
+
+---
 
 ## :rocket: Getting Started
 
@@ -38,15 +85,12 @@ First, you need to run the Backend for Frontend (BFF) which is the Web API proje
 dotnet run --project OnlyBalds.Api --launch-profile https
 ```
 
+### Step 2: Run the Client Application
 
+To run the OnlyBalds client application:
 
-### Step 2: Run the BFF Backend
-
-First, you need to run the Backend for Frontend (BFF) which is the Web API project. This project handles the backend operations and serves as the bridge between the Blazor application and the database.
-
-To run the OnlyBalds application locally, follow these steps:
 1. Create a launch profile in the properties directory.
-3. Use VS Code's debug section to run the profile created in the previous steps.
+2. Use VS Code's debug section to run the profile created in the previous steps.
 
 ## :gear: Built With
 
@@ -54,6 +98,8 @@ To run the OnlyBalds application locally, follow these steps:
 - [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
 - [.NET Core Web API](https://dotnet.microsoft.com/en-us/apps/aspnet/apis)
 - [Auth0](https://auth0.com/)
+
+---
 
 ## :handshake: Contributing
 

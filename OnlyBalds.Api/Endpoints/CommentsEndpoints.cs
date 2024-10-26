@@ -51,7 +51,7 @@ public static class CommentsEndpoints
     /// </summary>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetComments([FromServices] ICommentsRepository<CommentItem> commentsRepository)
+    public static IResult GetComments([FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(commentsRepository);
 
@@ -67,7 +67,7 @@ public static class CommentsEndpoints
     /// <param name="id"></param>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetCommentsById(Guid id, [FromServices] ICommentsRepository<CommentItem> commentsRepository)
+    public static IResult GetCommentsById(Guid id, [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(commentsRepository);
 
@@ -83,7 +83,7 @@ public static class CommentsEndpoints
     /// <param name="commentItem"></param>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreateCommentAsync([FromBody] CommentItem commentItem, [FromServices] ICommentsRepository<CommentItem> commentsRepository)
+    public static async Task<IResult> CreateCommentAsync([FromBody] CommentItem commentItem, [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(commentItem);
         ArgumentNullException.ThrowIfNull(commentsRepository);
@@ -107,7 +107,7 @@ public static class CommentsEndpoints
     /// <param name="commentItem"></param>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdateCommentAsync(Guid id, [FromBody] CommentItem commentItem, [FromServices] ICommentsRepository<CommentItem> commentsRepository)
+    public static async Task<IResult> UpdateCommentAsync(Guid id, [FromBody] CommentItem commentItem, [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(commentItem);
@@ -129,7 +129,7 @@ public static class CommentsEndpoints
     /// <param name="id"></param>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeleteCommentAsync(Guid id, [FromServices] ICommentsRepository<CommentItem> commentsRepository)
+    public static async Task<IResult> DeleteCommentAsync(Guid id, [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(commentsRepository);
