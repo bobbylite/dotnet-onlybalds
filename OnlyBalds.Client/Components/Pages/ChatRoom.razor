@@ -34,8 +34,8 @@
             <div class="row justify-content-center">
                 <div class="col-12 col-md-8 col-lg-6">
                     <div class="input-group shadow rounded">
-                        <input id="message-to-send" type="text" class="form-control" placeholder="Type a message..." />
-                        <button id="send-button" class="btn btn-primary">
+                        <input @bind="messageToSend" id="message-to-send" type="text" class="form-control" placeholder="Type a message..." />
+                        <button @onclick="SendOnClick" id="send-button" class="btn btn-primary">
                             Send
                         </button>
                     </div>
@@ -56,6 +56,7 @@ else
     private Task<AuthenticationState>? authenticationState { get; set; }
     public HubConnection? hubConnection;
     private List<ChatMessageModel> messages = new();
+    private string messageToSend = string.Empty;
     private string user = string.Empty;
     private DotNetObjectReference<ChatRoom>? objRef;
 
@@ -138,5 +139,16 @@ else
             await hubConnection.StopAsync();
             await hubConnection.DisposeAsync();
         }
+    }
+
+    private async Task SendOnClick()
+    {
+        if (string.IsNullOrWhiteSpace(messageToSend))
+        {
+            return;
+        }
+
+        await Send(messageToSend);
+        messageToSend = string.Empty;
     }
 }
