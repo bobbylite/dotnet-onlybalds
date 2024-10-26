@@ -109,7 +109,7 @@ public class ChatHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-        await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Empty, $"{username} has left.");
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Moderator", $"{username} has left.");
         await base.OnDisconnectedAsync(exception);
     }
 }
