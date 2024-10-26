@@ -14,4 +14,9 @@ public static class HttpClientNames
     /// The name of the HTTP client used to communicate with the OnlyBalds API.
     /// </summary>
     public const string OnlyBalds = "OnlyBalds.Api";
+
+    /// <summary>
+    /// The name of the HTTP client used to communicate with the HuggingFace Inference API.
+    /// </summary>
+    public const string HuggingFaceInferenceApi = "HuggingFace.Inference.Api";
 }

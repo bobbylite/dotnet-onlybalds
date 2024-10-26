@@ -6,6 +6,7 @@ using OnlyBalds.Http;
 using OnlyBalds.Identity;
 using OnlyBalds.Services.Token;
 using Yarp.ReverseProxy.Forwarder;
+using OnlyBalds.Services;
 
 namespace OnlyBalds.Extensions;
 
@@ -70,6 +71,31 @@ public static class WebApplicationBuilderExtensions
     }
 
     /// <summary>
+    /// Add an HttpClient for the Inference REST API. Includes handling authentication for the API by passing the access
+    /// token for the currently logged in user as a JWT bearer token to the API.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    public static WebApplicationBuilder AddInferenceApiClients(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        webApplicationBuilder.Services.AddOptionsWithValidateOnStart<InferenceApiOptions>()
+            .BindConfiguration(InferenceApiOptions.SectionKey);
+
+        webApplicationBuilder.Services.AddTransient<HuggingFaceHandler>()
+            .AddHttpClient(HttpClientNames.HuggingFaceInferenceApi, (provider, client) =>
+            {
+                var apiOptionsSnapshot = provider.GetRequiredService<IOptionsMonitor<InferenceApiOptions>>();
+                var apiOptions = apiOptionsSnapshot.CurrentValue;
+                client.BaseAddress = new Uri(apiOptions.BaseUrl);
+            })
+            .AddHttpMessageHandler<HuggingFaceHandler>();
+
+        return webApplicationBuilder;
+    }
+
+    /// <summary>
     /// Add an HttpClient for the OnlyBalds REST API. Includes handling authentication for the API by passing the access
     /// token for the currently logged in user as a JWT bearer token to the API.
     /// </summary>
@@ -120,6 +146,23 @@ public static class WebApplicationBuilderExtensions
         // Sync authentication state between server and client: https://auth0.com/blog/auth0-authentication-blazor-web-apps/
         webApplicationBuilder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
         
+        return webApplicationBuilder;
+    }
+
+    /// <summary>
+    /// Add services for the Hugging Face Inference API.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    /// <remarks>
+    /// This method adds services for the Hugging Face Inference API.
+    /// </remarks>
+    public static WebApplicationBuilder AddHuggingFaceInferenceServices(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        webApplicationBuilder.Services.AddScoped<IHuggingFaceInferenceService, HuggingFaceInferenceService>();
+
         return webApplicationBuilder;
     }
 }

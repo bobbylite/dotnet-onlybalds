@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using OnlyBalds.Services;
 
 namespace OnlyBalds.Hubs;
 
@@ -7,10 +8,10 @@ namespace OnlyBalds.Hubs;
 /// </summary>
 public class ChatHub : Hub
 {
-    // <summary>
-    // The context for the hub, providing access to methods that can be used from a SignalR hub.
-    // </summary>
+    
+    private readonly ILogger<ChatHub> _logger;
     private readonly IHubContext<ChatHub> _hubContext;
+    private readonly IHuggingFaceInferenceService _huggingFaceInferenceService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChatHub"/> class.
@@ -19,9 +20,18 @@ public class ChatHub : Hub
     /// <remarks>
     /// This constructor initializes a new instance of the <see cref="ChatHub"/> class.
     /// </remarks>
-    public ChatHub(IHubContext<ChatHub> hubContext)
+    public ChatHub(
+        ILogger<ChatHub> logger,
+        IHubContext<ChatHub> hubContext,
+        IHuggingFaceInferenceService huggingFaceInferenceService)
     {
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(hubContext);
+        ArgumentNullException.ThrowIfNull(huggingFaceInferenceService);
+
+        _logger = logger;
         _hubContext = hubContext;
+        _huggingFaceInferenceService = huggingFaceInferenceService;
     }
 
     /// <summary>
@@ -32,6 +42,44 @@ public class ChatHub : Hub
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task SendMessage(string user, string message)
     {
+        ArgumentNullException.ThrowIfNull(user);
+        ArgumentNullException.ThrowIfNull(message);
+
+        var inferences = await _huggingFaceInferenceService.UseRobertaToxicityClassifier(message);
+
+        if (inferences is null)
+        {
+            _logger.LogError("Failed to retrieve toxicity inference");
+            return;
+        }
+
+        var toxicityInferences = inferences.FirstOrDefault();
+
+        if (toxicityInferences is null)
+        {
+            _logger.LogError("Failed to retrieve toxicity inference");
+            return;
+        }
+
+        foreach(var inference in toxicityInferences)
+        {
+            if (inference.Label?.ToLower() is not "toxic")
+            {
+                continue;
+            }
+
+            if (inference.Score > .8f)
+            {
+                await Clients.Caller.SendAsync(
+                    "ReceiveMessage",
+                    "Moderator", 
+                    $"Message from {user} was blocked due to toxicity."
+                );
+
+                return;
+            }
+        }
+
         var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
         await _hubContext.Clients.All.SendAsync("ReceiveMessage", username, message);
     }
@@ -46,7 +94,7 @@ public class ChatHub : Hub
     public override async Task OnConnectedAsync()
     {
         var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-        await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Empty, $"{username} joined the OnlyBalds chat room.");
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Moderator", $"{username} has joined.");
         await base.OnConnectedAsync();
     }
 
@@ -61,7 +109,7 @@ public class ChatHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-        await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Empty, $"{username} has left the chat room.");
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Empty, $"{username} has left.");
         await base.OnDisconnectedAsync(exception);
     }
 }
