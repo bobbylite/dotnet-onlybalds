@@ -3,6 +3,7 @@
 
 @attribute [Authorize]
 
+@inject ILogger<ChatRoom> logger
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
@@ -59,6 +60,7 @@ else
     private string messageToSend = string.Empty;
     private string user = string.Empty;
     private DotNetObjectReference<ChatRoom>? objRef;
+    private  IJSObjectReference? jsModule;
 
     public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
 
@@ -79,9 +81,9 @@ else
     {
         if (firstRender)
         {   
-            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/ChatRoom.razor.js");
-            await jsModule.InvokeVoidAsync("collapseNavbar");
-            await jsModule.InvokeVoidAsync("handleOnSendOrEnterKeyPressed", objRef);
+            jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/ChatRoom.razor.js");
+            await jsModule.InvokeVoidAsync("onRenderAsync");
+            await jsModule.InvokeVoidAsync("handleOnSendOrEnterKeyPressedAsync", objRef);
 
             await Connect();
         }
@@ -113,6 +115,11 @@ else
         if (hubConnection.State is not HubConnectionState.Connected)
         {
             await hubConnection.StartAsync();
+        }
+
+        if (hubConnection.State is HubConnectionState.Connected)
+        {
+            await jsModule!.InvokeVoidAsync("onChatHubConnected", objRef);
         }
     }
 

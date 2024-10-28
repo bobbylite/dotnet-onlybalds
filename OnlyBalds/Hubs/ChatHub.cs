@@ -94,10 +94,11 @@ public class ChatHub : Hub
     public override async Task OnConnectedAsync()
     {
         var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-        await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Moderator", $"{username} has joined.");
 
         _logger.LogDebug("Initializing chat moderation.");
         var inferences = await _huggingFaceInferenceService.UseRobertaToxicityClassifier("Initialize Safe Chat.");
+
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Moderator", $"{username} has joined.");
 
         await base.OnConnectedAsync();
     }
