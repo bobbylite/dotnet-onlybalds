@@ -22,6 +22,7 @@
     private IJSObjectReference? jsModule;
     private DotNetObjectReference<Marketplace>? objRef;
 
+    /// <inheritdoc/>
     protected override void OnInitialized()
     {
         NavManager.LocationChanged += OnLocationChanged;
@@ -29,6 +30,7 @@
         base.OnInitialized();
     }
     
+    /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (jsModule is not null)
@@ -47,20 +49,18 @@
         }
     }
 
+    /// <summary>
+    /// Handle the location change event
+    /// </summary>
     [JSInvokable]
     public void CompleteDownloading() { 
         IsDownloading = false;
         StateHasChanged();
-
-        if (NavManager.Uri.Contains("/Marketplace/#!/"))
-        {
-            return;
-        }
-        else if (NavManager.Uri.Contains("/Marketplace"))
-        {
-            NavManager.NavigateTo("/Marketplace/#!/", forceLoad: true);
-        }
     }
+
+    /// <summary>
+    /// Dispose of the object reference and remove the event handler
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (jsModule is  null)
@@ -68,7 +68,6 @@
             return;
         }
         await jsModule.InvokeVoidAsync("dispose");
-        NavManager.LocationChanged -= OnLocationChanged;
     }
 
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
