@@ -1,8 +1,12 @@
 ﻿@page "/Marketplace"
+
+@using Flurl
+
 @implements IAsyncDisposable
 
 @attribute [Authorize]
 
+@inject ILogger<Marketplace> logger
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavManager
 
@@ -54,6 +58,12 @@
     /// </summary>
     [JSInvokable]
     public void CompleteDownloading() { 
+
+        if (!NavManager.Uri.Contains("#")) {
+            var fragmentUri = NavManager.BaseUri.AppendPathSegment("Marketplace").SetFragment("my-store-103074754");
+            NavManager.NavigateTo(fragmentUri);
+        }
+
         IsDownloading = false;
         StateHasChanged();
     }

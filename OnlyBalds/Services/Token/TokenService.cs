@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Ardalis.GuardClauses;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Models;
 
@@ -64,9 +63,13 @@ public class TokenService : ITokenService
         IHttpClientFactory httpClientFactory,
         IOptionsMonitor<Auth0ApiOptions> optionsMonitor)
     {
-        _logger = Guard.Against.Null(logger);
-        _httpClientFactory = Guard.Against.Null(httpClientFactory);
-        _optionsMonitor = Guard.Against.Null(optionsMonitor);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
+        ArgumentNullException.ThrowIfNull(optionsMonitor);
+        
+        _logger = logger;
+        _httpClientFactory = httpClientFactory;
+        _optionsMonitor = optionsMonitor;
     }
 
     /// <inheritdoc />

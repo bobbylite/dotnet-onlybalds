@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
-using Ardalis.GuardClauses;
 using OnlyBalds.Services.Token;
 
 namespace OnlyBalds.Http;
@@ -31,8 +30,11 @@ public class AuthenticationHandler : DelegatingHandler
         ILogger<AuthenticationHandler> logger,
         ITokenService tokenService)
     {
-        _logger = Guard.Against.Null(logger);
-        _authenticateService = Guard.Against.Null(tokenService);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(tokenService);
+
+        _logger = logger;
+        _authenticateService = tokenService;
     }
         
     /// <summary>
