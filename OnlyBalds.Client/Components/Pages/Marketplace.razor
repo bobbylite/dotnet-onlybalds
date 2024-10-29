@@ -61,7 +61,6 @@
 
         if (!NavManager.Uri.Contains("#")) {
             var fragmentUri = NavManager.BaseUri.AppendPathSegment("Marketplace").SetFragment("my-store-103074754");
-            logger.LogInformation($"Navigating to {fragmentUri}");
             NavManager.NavigateTo(fragmentUri);
         }
 
