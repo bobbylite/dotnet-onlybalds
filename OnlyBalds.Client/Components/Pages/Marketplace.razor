@@ -1,92 +1,62 @@
 ﻿@page "/Marketplace"
 
-@using Flurl
-
-@implements IAsyncDisposable
-
 @attribute [Authorize]
 
 @inject ILogger<Marketplace> logger
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 @inject NavigationManager NavManager
+
+@rendermode InteractiveWebAssembly
 
 <title>Store</title>
 
-@if(IsDownloading) {
+@if(_isDownloading)
+{
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
         </div>
     </div>
 }
-
-<div id="my-store-103074754"></div>
+else
+{
+    <div id="my-store-103074754" class="ecwid-store-container" style="width: 100%; height: auto;"></div>
+}
 
 @code {
-    private bool IsDownloading = true;
-    private IJSObjectReference? jsModule;
-    private DotNetObjectReference<Marketplace>? objRef;
+    private bool _isDownloading = true;
+    private IJSObjectReference? _jsModule;
+    private DotNetObjectReference<Marketplace>? _objRef;
 
     /// <inheritdoc/>
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        NavManager.LocationChanged += OnLocationChanged;
-        objRef = DotNetObjectReference.Create(this);
-        base.OnInitialized();
+        _objRef = DotNetObjectReference.Create(this);
+        await base.OnInitializedAsync();
     }
-    
+
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (jsModule is not null)
-        {
-            return;
-        }
-
-        jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Marketplace.razor.js");
-
         if (firstRender)
         {
-            await jsModule.InvokeVoidAsync("onLoad");
-            await jsModule.InvokeVoidAsync("downloadMarketplace","my-store-103074754", objRef);
-
-            StateHasChanged();
+            await InitializeEcwidWidget(isFirstRender: firstRender);
         }
     }
 
     /// <summary>
-    /// Handle the location change event
+    /// Initializes the Ecwid widget.
     /// </summary>
-    [JSInvokable]
-    public void CompleteDownloading() { 
-
-        if (!NavManager.Uri.Contains("#")) {
-            var fragmentUri = NavManager.BaseUri.AppendPathSegment("Marketplace").SetFragment("my-store-103074754");
-            NavManager.NavigateTo(fragmentUri);
+    private async Task InitializeEcwidWidget(bool isFirstRender)
+    {
+        if (_jsModule is null)
+        {
+            _jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/Marketplace.razor.js");
         }
 
-        IsDownloading = false;
+        await _jsModule.InvokeVoidAsync("onLoad");
+        await _jsModule.InvokeVoidAsync("initializeMarketplace", "my-store-103074754", _objRef, isFirstRender);
+
+        _isDownloading = false;
         StateHasChanged();
-    }
-
-    /// <summary>
-    /// Dispose of the object reference and remove the event handler
-    /// </summary>
-    public async ValueTask DisposeAsync()
-    {
-        if (jsModule is  null)
-        {
-            return;
-        }
-        await jsModule.InvokeVoidAsync("dispose");
-    }
-
-    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        if (jsModule is null)
-        {
-            return;
-        }
-
-        await jsModule.InvokeVoidAsync("unloadEcwidAccountComponents", e.Location, objRef);
     }
 }
