@@ -1,0 +1,161 @@
+﻿@page "/AnswerQuestionnaire"
+
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory httpClientFactory
+@inject ILogger<AnswerQuestionnaire> logger
+@inject IJSRuntime JSRuntime
+
+@if (isLoading is true)
+{
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        </div>
+    </div>
+}
+else if (isNotSupportedYet is true)
+{
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Baldie Questionnaire</h2>
+        <p class="text-center">This feature is not supported yet.</p>
+    </div>
+}
+else
+{
+    <AuthorizeView>
+        <Authorized>
+            <div class="container my-5">
+                <h2 class="text-center mb-4">Baldie Questionnaire</h2>
+                
+                <!-- General Questions -->
+                <div class="mb-4">
+                    <label for="hearAboutUs" class="form-label">How did you hear about us?</label>
+                    <select class="form-select" id="hearAboutUs">
+                        <option value="social_media">Social Media</option>
+                        <option value="friend">Friend</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label for="buyProducts" class="form-label">Where do you buy your products currently?</label>
+                    <input type="text" class="form-control" id="buyProducts" placeholder="Enter where you buy products">
+                </div>
+
+                <div class="mb-4">
+                    <label for="apparelSize" class="form-label">Apparel Size</label>
+                    <select class="form-select" id="apparelSize">
+                        <option>Small</option>
+                        <option>Medium</option>
+                        <option>Large</option>
+                        <option>XL</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Are you open to trying new products/routines?</label>
+                    <div>
+                        <input class="form-check-input" type="radio" name="newProducts" id="newProductsYes" value="yes">
+                        <label class="form-check-label" for="newProductsYes">Yes</label>
+                    </div>
+                    <div>
+                        <input class="form-check-input" type="radio" name="newProducts" id="newProductsNo" value="no">
+                        <label class="form-check-label" for="newProductsNo">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Are you an active baldie? (workout, run, etc.)</label>
+                    <div>
+                        <input class="form-check-input" type="radio" name="activeBaldie" id="activeYes" value="yes">
+                        <label class="form-check-label" for="activeYes">Yes</label>
+                    </div>
+                    <div>
+                        <input class="form-check-input" type="radio" name="activeBaldie" id="activeNo" value="no">
+                        <label class="form-check-label" for="activeNo">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="monthlySpend" class="form-label">How much do you spend monthly on bald/beard products?</label>
+                    <input type="text" class="form-control" id="monthlySpend" placeholder="Enter amount in USD">
+                </div>
+
+                <!-- Baldie Types -->
+                <h4 class="mb-3">What Type of Bald Are You?</h4>
+
+                <div class="mb-4">
+                    <label class="form-label">Choose your bald type</label>
+                    <select class="form-select" id="baldType">
+                        <option value="veteran">Veteran/Confident Baldie</option>
+                        <option value="denier">The Denier Baldie</option>
+                        <option value="rookie">Rookie Up and Comer</option>
+                        <option value="beard_baldie">Beard Baldie</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic sections for each bald type -->
+                <div id="dynamic-section"></div>
+
+                <button id="baldie-questionnaire" class="btn btn-primary">Submit</button>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <OnlyBaldsNotAuthorized />
+        </NotAuthorized>
+    </AuthorizeView>
+}
+
+@code {
+    private bool isNotSupportedYet = true;
+    private bool isLoading = true;
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+    
+     private DotNetObjectReference<AnswerQuestionnaire>? objRef;
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        base.OnInitialized();
+    }
+ 
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Pages/AnswerQuestionnaire.razor.js");
+
+            await jsModule.InvokeVoidAsync("onRender", objRef);
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Submit the questionnaire
+    /// </summary>
+    [JSInvokable]
+    public async Task SubmitQuestionnaire(string answers)
+    {
+        logger.LogDebug("Creating questionnaire http client");
+        var questionnaireClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+
+        var questionnaire = JsonSerializer.Deserialize<QuestionnaireItems>(answers);
+
+        logger.LogDebug("Performing POST request to submit questionnaire");
+        var response = await questionnaireClient.PostAsJsonAsync("questionnaire", questionnaire);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogDebug("Failed to submit questionnaire");
+        }
+
+        // TODO: Update user table to reference this questionnaire.
+
+        NavigationManager.NavigateTo("/");
+    }
+}

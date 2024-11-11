@@ -1,8 +1,11 @@
-﻿namespace OnlyBalds.Api.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace OnlyBalds.Api.Models;
 
 /// <summary>
 /// Represents a comment in the application.
 /// </summary>
+[Table("CommentItems")]
 public class CommentItem
 {
     /// <summary>

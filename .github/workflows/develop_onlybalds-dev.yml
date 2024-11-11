@@ -1,39 +1,42 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - OnlyBalds
+name: Build and deploy ASP.Net Core app to Azure Web App - onlybalds-dev
 
 on:
   push:
     branches:
-      - main
+      - develop
   workflow_dispatch:
 
 jobs:
-  build-onlybalds:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
+          include-prerelease: true
 
-      - name: Generate build-info.html
+      - name: Inject build info into build-info.html
         run: |
-          pwd
-          ls
           COMMIT_HASH=$(git rev-parse --short HEAD)
           BUILD_DATE=$(date +"%Y-%m-%d %H:%M:%S")
-          echo "<html>" > ./OnlyBalds/wwwroot/build-info.html
-          echo "<head><title>Build Info</title></head>" >> ./OnlyBalds/wwwroot/build-info.html
-          echo "<body>" >> ./OnlyBalds/wwwroot/build-info.html
-          echo "<h1>Build Info</h1>" >> ./OnlyBalds/wwwroot/build-info.html
-          echo "<p><strong>Version:</strong> $COMMIT_HASH</p>" >> ./OnlyBalds/wwwroot/build-info.html
-          echo "<p><strong>Date:</strong> $BUILD_DATE</p>" >> ./OnlyBalds/wwwroot/build-info.html
-          echo "</body></html>" >> ./OnlyBalds/wwwroot/build-info.html
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+          echo "Commit Hash: $COMMIT_HASH"
+          echo "Build Date: $BUILD_DATE"
+          echo "Branch: $BRANCH"
+
+          # Injecting data into existing build-info.html
+          sed -i "s|<div id='build-version'></div>|<div id='build-version'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/build-info.html
+          sed -i "s|<div id='build-date'></div>|<div id='build-date'>$BUILD_DATE</div>|g" ./OnlyBalds/wwwroot/build-info.html
+          sed -i "s|<div id='commit-hash'></div>|<div id='commit-hash'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/build-info.html
+          sed -i "s|<div id='branch'></div>|<div id='branch'>$BRANCH</div>|g" ./OnlyBalds/wwwroot/build-info.html
 
       - name: Build with dotnet
         run: cd OnlyBalds;dotnet build --configuration Release
@@ -42,33 +45,33 @@ jobs:
         run: cd OnlyBalds;dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
 
-  deploy-onlybalds:
+  deploy:
     runs-on: ubuntu-latest
-    needs: build-onlybalds
+    needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: .net-app
-      
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
-          app-name: 'OnlyBalds'
+          app-name: 'onlybalds-dev'
           slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_46F7A700961D45CCB240B33A82FAC382 }}
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D4F63BD79A1242D9B42CC4787E2F68A1 }}
-
+          
   build-api:
     runs-on: ubuntu-latest
 
@@ -79,6 +82,22 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
+
+      - name: Inject build info into index.html
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+          echo "Commit Hash: $COMMIT_HASH"
+          echo "Build Date: $BUILD_DATE"
+          echo "Branch: $BRANCH"
+
+          # Injecting data into existing index.html
+          sed -i "s|<div id='build-version'></div>|<div id='build-version'>$COMMIT_HASH</div>|g" ./OnlyBalds.Api/wwwroot/index.html
+          sed -i "s|<div id='build-date'></div>|<div id='build-date'>$BUILD_DATE</div>|g" ./OnlyBalds.Api/wwwroot/index.html
+          sed -i "s|<div id='commit-hash'></div>|<div id='commit-hash'>$COMMIT_HASH</div>|g" ./OnlyBalds.Api/wwwroot/index.html
+          sed -i "s|<div id='branch'></div>|<div id='branch'>$BRANCH</div>|g" ./OnlyBalds.Api/wwwroot/index.html
 
       - name: Build with dotnet
         run: cd OnlyBalds.Api;dotnet build --configuration Release
@@ -109,7 +128,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'OnlyBaldsApi'
+          app-name: 'onlybaldsapi-dev'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7CD52F73A6894D0E958DFAFD60FA3651 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_635A11C3A4ED4727A4FDEBBFCD34E46B }}

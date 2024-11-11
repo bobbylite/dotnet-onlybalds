@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OnlyBalds.Api.Data;
+using OnlyBalds.Api.Health;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 using OnlyBalds.Api.Repositories;
@@ -15,20 +17,18 @@ namespace OnlyBalds.Api.Extensions;
 public static class WebApplicationBuilderExtensions
 {
     /// <summary>
-    /// Add support for persisting data to a database.
+    /// Add support for persisting data to a PostgreSQL database in Azure.
     /// </summary>
     /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
     /// <returns>A reference to this instance after the operation has completed.</returns>
     public static WebApplicationBuilder AddDataPersistence(this WebApplicationBuilder webApplicationBuilder)
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+        
+        var connectionString = webApplicationBuilder.Configuration.GetConnectionString("PostgreSqlConnection");
 
-        webApplicationBuilder.Services.AddDbContext<ThreadDataContext>(opt => 
-            opt.UseInMemoryDatabase("ThreadData"));
-        webApplicationBuilder.Services.AddDbContext<PostDataContext>(opt => 
-            opt.UseInMemoryDatabase("PostData"));
-        webApplicationBuilder.Services.AddDbContext<CommentDataContext>(opt => 
-            opt.UseInMemoryDatabase("CommentData"));
+        webApplicationBuilder.Services.AddDbContext<OnlyBaldsDataContext>(opt => 
+            opt.UseNpgsql(connectionString));
         webApplicationBuilder.Services.AddDatabaseDeveloperPageExceptionFilter();
         
         return webApplicationBuilder;
@@ -138,9 +138,30 @@ public static class WebApplicationBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplicationBuilder);
 
-        webApplicationBuilder.Services.AddScoped<IThreadsRepository<ThreadItem>, ThreadsRepository<ThreadItem>>();
-        webApplicationBuilder.Services.AddScoped<IPostsRepository<PostItem>, PostsRepository<PostItem>>();
-        webApplicationBuilder.Services.AddScoped<ICommentsRepository<CommentItem>, CommentsRepository<CommentItem>>();
+        webApplicationBuilder.Services.AddScoped<IHomeRepository, HomeRepository>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<ThreadItem>, OnlyBaldsRepository<ThreadItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<PostItem>, OnlyBaldsRepository<PostItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<CommentItem>, OnlyBaldsRepository<CommentItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<QuestionnaireItems>, OnlyBaldsRepository<QuestionnaireItems>>();
+
+        return webApplicationBuilder;
+    }
+
+    /// <summary>
+    /// Add health checks to the application.
+    /// </summary>
+    /// <param name="webApplicationBuilder">A builder for web applications and services.</param>
+    /// <returns>A reference to this instance after the operation has completed.</returns>
+    public static WebApplicationBuilder AddHealthChecks(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        var connectionString = webApplicationBuilder.Configuration.GetConnectionString("PostgreSqlConnection");
+
+        webApplicationBuilder.Services.AddHealthChecks()
+            .AddCheck<OnlyBaldsDatabaseHealthCheck>("OnlyBalds Database Tables Health Check", HealthStatus.Unhealthy)
+            .AddDbContextCheck<OnlyBaldsDataContext>("ADO.NET DbContext Health Check", HealthStatus.Unhealthy)
+            .AddNpgSql(connectionString!);
 
         return webApplicationBuilder;
     }

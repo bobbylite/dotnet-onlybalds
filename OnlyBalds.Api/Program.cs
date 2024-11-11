@@ -10,6 +10,9 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
+// Add health checks to the application.
+builder.AddHealthChecks();
+
 // Add support for exposing API documentation.
 builder.AddApiDocumentation();
 
@@ -30,6 +33,9 @@ builder.Services.Configure<HttpsRedirectionOptions>(options =>
 
 var app = builder.Build();
 
+// Run Database Migrations
+app.RunDatabaseMigrations();
+
 // Enable support for persisting data to a database.
 app.UseAccessControl();
 
@@ -45,7 +51,13 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 // Add middleware for redirecting HTTP Requests to HTTPS.
 app.UseHttpsRedirection();
 
+// Maps the index endpoint for the exposed OnlyBalds API.
+app.MapIndexEndpoint();
+
 // Maps endpoints for the exposed OnlyBalds API.
 app.MapOnlyBaldsEndpoints();
+
+// Maps health checks endpoint for the application.
+app.MapHealthChecksEndpoint();
 
 app.Run();

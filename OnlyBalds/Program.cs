@@ -1,13 +1,22 @@
-using OnlyBalds.Client.Components.Pages;
 using OnlyBalds.Components;
 using OnlyBalds.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the application.
 builder.AddServices();
 
+// Add Hugging Face Inference services.
+builder.AddHuggingFaceInferenceServices();
+
+// Add the token client.
 builder.AddTokenClient();
+
+// Add the Hugging Face Inference API client.
 builder.AddOnlyBaldsApiClients();
+
+// Add the Inference API client.
+builder.AddInferenceApiClients();
 
 // Add authentication and authorization.
 builder.AddAccessControl();
@@ -44,7 +53,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(OnlyBalds.Client.Components._Imports).Assembly);
 
-app.MapThreadsApiProxy();
+app.MapOnlyBaldsApiProxy();
 
 app.MapChatHub();
 

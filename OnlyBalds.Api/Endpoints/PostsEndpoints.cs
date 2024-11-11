@@ -51,7 +51,7 @@ public static class PostsEndpoints
     /// </summary>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetPosts([FromServices] IPostsRepository<PostItem> postsRepository)
+    public static IResult GetPosts([FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
 
@@ -67,7 +67,7 @@ public static class PostsEndpoints
     /// <param name="id"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetPostsById(Guid id, [FromServices] IThreadsRepository<ThreadItem> postsRepository)
+    public static IResult GetPostsById(Guid id, [FromServices] IOnlyBaldsRepository<ThreadItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
 
@@ -83,7 +83,7 @@ public static class PostsEndpoints
     /// <param name="postItem"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreatePostAsync([FromBody] PostItem postItem, [FromServices] IPostsRepository<PostItem> postsRepository)
+    public static async Task<IResult> CreatePostAsync([FromBody] PostItem postItem, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postItem);
         ArgumentNullException.ThrowIfNull(postsRepository);
@@ -92,6 +92,8 @@ public static class PostsEndpoints
         {
             postItem.Id = Guid.NewGuid();
         }
+
+        postItem.PostedOn = DateTime.UtcNow.ToUniversalTime();
 
         await postsRepository.Add(postItem);
 
@@ -105,7 +107,7 @@ public static class PostsEndpoints
     /// <param name="postItem"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdatePostAsync(Guid id, [FromBody] PostItem postItem, [FromServices] IPostsRepository<PostItem> postsRepository)
+    public static async Task<IResult> UpdatePostAsync(Guid id, [FromBody] PostItem postItem, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(postItem);
@@ -128,7 +130,7 @@ public static class PostsEndpoints
     /// <param name="id"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeletePostAsync(Guid id, [FromServices] IPostsRepository<PostItem> postsRepository)
+    public static async Task<IResult> DeletePostAsync(Guid id, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(postsRepository);

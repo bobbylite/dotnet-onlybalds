@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Api.Data;
 using OnlyBalds.Api.Endpoints;
@@ -69,7 +71,53 @@ public static class WebApplicationExtensions
         webApplication.MapThreadsEndpoints();
         webApplication.MapPostsEndpoints();
         webApplication.MapCommentsEndpoints();
+        webApplication.MapQuestionnaireEndpoints();
 
+        return webApplication;
+    }
+
+    /// <summary>
+    /// Run database migrations.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    /// <returns><see cref="WebApplication"/></returns>
+    public static WebApplication RunDatabaseMigrations(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        try
+        {
+            using (var scope = webApplication.Services.CreateScope())
+            {
+                var threadsDbContext = scope.ServiceProvider.GetRequiredService<OnlyBaldsDataContext>();
+                threadsDbContext.Database.Migrate();
+                return webApplication;
+            }
+        }
+        catch (Exception ex)
+        {
+            var logger = webApplication.Services.GetRequiredService<ILogger<WebApplication>>();
+            logger.LogError(ex, "An error occurred while migrating the database.");
+            return webApplication;
+        }
+    }
+
+    /// <summary>
+    /// Maps the index endpoint for the exposed OnlyBalds API.
+    /// </summary>
+    /// <param name="webApplication"></param>
+    /// <returns><see cref="WebApplication"/></returns>
+    public static WebApplication MapHealthChecksEndpoint(this WebApplication webApplication)
+    {
+        ArgumentNullException.ThrowIfNull(webApplication);
+
+        webApplication.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        })
+        .WithName(nameof(MapHealthChecksEndpoint))
+        .WithOpenApi();
+        
         return webApplication;
     }
 }
