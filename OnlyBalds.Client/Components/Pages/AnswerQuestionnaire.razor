@@ -12,13 +12,6 @@
         </div>
     </div>
 }
-else if (isNotSupportedYet is true)
-{
-    <div class="container my-5">
-        <h2 class="text-center mb-4">Baldie Questionnaire</h2>
-        <p class="text-center">This feature is not supported yet.</p>
-    </div>
-}
 else
 {
     <AuthorizeView>
@@ -87,6 +80,7 @@ else
                 <div class="mb-4">
                     <label class="form-label">Choose your bald type</label>
                     <select class="form-select" id="baldType">
+                        <option value="none">Select an option</option>
                         <option value="veteran">Veteran/Confident Baldie</option>
                         <option value="denier">The Denier Baldie</option>
                         <option value="rookie">Rookie Up and Comer</option>
@@ -107,7 +101,6 @@ else
 }
 
 @code {
-    private bool isNotSupportedYet = true;
     private bool isLoading = true;
 
     [CascadingParameter]

@@ -14,7 +14,7 @@
         "dotnetRunMessages": true,
         "launchBrowser": true,
         "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
-        "applicationUrl": "http://local.onlybalds.com:8080;https://local.onlybalds.com:8081",
+        "applicationUrl": "http://local.onlybalds.com:80;https://local.onlybalds.com:443",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development",
           "OnlyBaldsAPI__BaseUrl": "localhost:7204/"
