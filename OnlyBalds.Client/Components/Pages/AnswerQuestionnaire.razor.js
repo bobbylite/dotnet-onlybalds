@@ -3,6 +3,12 @@
  **/
 export const onRender = (dotnetHelper) => {
     $(document).ready(function () {
+        document.getElementById("baldie-questionnaire").addEventListener("click", function() {
+            this.disabled = true;
+            this.classList.add("btn-secondary");
+            this.classList.remove("btn-primary");
+        });
+        
         $('#baldType').change(function () {
             let baldType = $(this).val();
             let dynamicSection = $('#dynamic-section');
