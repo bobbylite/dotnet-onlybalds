@@ -22,6 +22,11 @@ public class OnlyBaldsDataContext : DbContext
         : base(options) { }
 
     /// <summary>
+    /// Gets the set of all <see cref="Account"/> entities in the context.
+    /// </summary>
+    public DbSet<Account> Accounts => Set<Account>();
+
+    /// <summary>
     /// Gets the set of all <see cref="ThreadItem"/> entities in the context.
     /// </summary>
     public DbSet<ThreadItem> ThreadItems => Set<ThreadItem>();

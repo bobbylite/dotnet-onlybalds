@@ -155,7 +155,6 @@ export const onRender = (dotnetHelper) => {
             try {
                 console.log('Submitting form:', answers);
                 await dotnetHelper.invokeMethodAsync('SubmitQuestionnaire', JSON.stringify(answers));
-                alert('Form submitted successfully!');
             } catch (error) {
                 console.error('Error submitting form:', error);
             }

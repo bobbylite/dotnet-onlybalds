@@ -72,6 +72,7 @@ public static class WebApplicationExtensions
         webApplication.MapPostsEndpoints();
         webApplication.MapCommentsEndpoints();
         webApplication.MapQuestionnaireEndpoints();
+        webApplication.MapAccountsEndpoints();
 
         return webApplication;
     }
