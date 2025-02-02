@@ -12,13 +12,6 @@
         </div>
     </div>
 }
-else if (isNotSupportedYet is true)
-{
-    <div class="container my-5">
-        <h2 class="text-center mb-4">Baldie Questionnaire</h2>
-        <p class="text-center">This feature is not supported yet.</p>
-    </div>
-}
 else
 {
     <AuthorizeView>
@@ -87,6 +80,7 @@ else
                 <div class="mb-4">
                     <label class="form-label">Choose your bald type</label>
                     <select class="form-select" id="baldType">
+                        <option value="none">Select an option</option>
                         <option value="veteran">Veteran/Confident Baldie</option>
                         <option value="denier">The Denier Baldie</option>
                         <option value="rookie">Rookie Up and Comer</option>
@@ -107,7 +101,6 @@ else
 }
 
 @code {
-    private bool isNotSupportedYet = true;
     private bool isLoading = true;
 
     [CascadingParameter]
@@ -141,10 +134,24 @@ else
     [JSInvokable]
     public async Task SubmitQuestionnaire(string answers)
     {
+        if (authenticationState is null)
+        {
+            return;
+        }
+
+        var state = await authenticationState;
+
         logger.LogDebug("Creating questionnaire http client");
         var questionnaireClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
 
         var questionnaire = JsonSerializer.Deserialize<QuestionnaireItems>(answers);
+
+        if (questionnaire is null)
+        {
+            return;
+        }
+
+        questionnaire.Id = Guid.NewGuid();
 
         logger.LogDebug("Performing POST request to submit questionnaire");
         var response = await questionnaireClient.PostAsJsonAsync("questionnaire", questionnaire);
@@ -154,7 +161,33 @@ else
             logger.LogDebug("Failed to submit questionnaire");
         }
 
-        // TODO: Update user table to reference this questionnaire.
+        var username = state?.User?.Claims?.FirstOrDefault(c => c.Type == "nickname")?.Value ?? string.Empty;
+        var email = state?.User?.Claims?.FirstOrDefault(c => c.Type == "email")?.Value ?? string.Empty;
+        var subject = state?.User?.Claims?.FirstOrDefault(c => c.Type == "sub")?.Value ?? string.Empty;
+
+        var stringList = new List<string>();
+
+        foreach(var item in state?.User?.Claims!)
+        {
+            stringList.Add($"{item.Type}: {item.Value}");
+        }
+
+        var account = new AccountItem
+        {
+            Username = username,
+            Email = email,
+            QuestionnaireId = questionnaire.Id.ToString(),
+            HasSubmittedQuistionnaire = true,
+            IdentityProviderId = subject
+        };
+
+        logger.LogDebug("Performing POST request to create account");
+        var accountsResponse = await questionnaireClient.PostAsJsonAsync("account", account);
+
+        if (!accountsResponse.IsSuccessStatusCode)
+        {
+            logger.LogDebug("Failed to create account");
+        }
 
         NavigationManager.NavigateTo("/");
     }

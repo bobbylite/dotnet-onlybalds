@@ -3,6 +3,12 @@
  **/
 export const onRender = (dotnetHelper) => {
     $(document).ready(function () {
+        document.getElementById("baldie-questionnaire").addEventListener("click", function() {
+            this.disabled = true;
+            this.classList.add("btn-secondary");
+            this.classList.remove("btn-primary");
+        });
+        
         $('#baldType').change(function () {
             let baldType = $(this).val();
             let dynamicSection = $('#dynamic-section');
@@ -155,7 +161,6 @@ export const onRender = (dotnetHelper) => {
             try {
                 console.log('Submitting form:', answers);
                 await dotnetHelper.invokeMethodAsync('SubmitQuestionnaire', JSON.stringify(answers));
-                alert('Form submitted successfully!');
             } catch (error) {
                 console.error('Error submitting form:', error);
             }

@@ -143,6 +143,7 @@ public static class WebApplicationBuilderExtensions
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<PostItem>, OnlyBaldsRepository<PostItem>>();
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<CommentItem>, OnlyBaldsRepository<CommentItem>>();
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<QuestionnaireItems>, OnlyBaldsRepository<QuestionnaireItems>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<Account>, OnlyBaldsRepository<Account>>();
 
         return webApplicationBuilder;
     }

@@ -107,13 +107,19 @@ internal sealed class PersistingAuthenticationStateProvider : RevalidatingServer
     {
       var userId = principal.FindFirst(_options.ClaimsIdentity.UserIdClaimType)?.Value;
       var name = principal.FindFirst("name")?.Value;
+      var email = principal.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+      var nickname = principal.FindFirst("nickname")?.Value;
+      var subject = principal.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
 
-      if (userId != null && name != null)
+      if (userId != null && name != null && email != null && nickname != null && subject != null)
       {
         _state.PersistAsJson(nameof(UserInfo), new UserInfo
         {
           UserId = userId,
-          Name = name
+          Name = name,
+          NickName = nickname,
+          Email = email,
+          Subject = subject
         });
       }
     }
