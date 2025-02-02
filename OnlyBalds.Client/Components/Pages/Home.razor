@@ -1,5 +1,8 @@
 ﻿@page "/"
 
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory httpClientFactory
+@inject ILogger<Threads> logger;
 @inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
@@ -63,6 +66,61 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationState { get; set; }
+
+    private HttpClient? httpClient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (authenticationState is null)
+        {
+            return;
+        }        
+        
+        await base.OnInitializedAsync();
+
+        var state = await authenticationState;
+
+        var IsAuthenticated = state.User?.Identity?.IsAuthenticated ?? false;
+
+        if (IsAuthenticated is false)
+        {
+            return;
+        }
+
+        httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        logger.LogInformation("Creating HTTP client for API calls.");
+        
+        var subject = state?.User?.Claims?.FirstOrDefault(c => c.Type == "sub")?.Value ?? string.Empty;
+        if (string.IsNullOrEmpty(subject))
+        {
+            subject = state?.User?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? string.Empty;
+        }
+
+        var url = $"account?id={Uri.EscapeDataString(subject)}";
+        var response = await httpClient.GetAsync(url);
+        
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            NavigationManager.NavigateTo("/AnswerQuestionnaire");
+            return;
+        }
+        
+        response.EnsureSuccessStatusCode();
+
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var account = JsonSerializer.Deserialize<AccountItem>(jsonString, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        if (account?.HasSubmittedQuistionnaire is false)
+        {
+            NavigationManager.NavigateTo("/AnswerQuestionnaire");
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
