@@ -101,7 +101,7 @@
         var url = $"account?id={Uri.EscapeDataString(subject)}";
         var response = await httpClient.GetAsync(url);
         
-        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        if (response.StatusCode != System.Net.HttpStatusCode.OK)
         {
             NavigationManager.NavigateTo("/AnswerQuestionnaire");
             return;
