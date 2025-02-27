@@ -165,13 +165,6 @@ else
         var email = state?.User?.Claims?.FirstOrDefault(c => c.Type == "email")?.Value ?? string.Empty;
         var subject = state?.User?.Claims?.FirstOrDefault(c => c.Type == "sub")?.Value ?? string.Empty;
 
-        var stringList = new List<string>();
-
-        foreach(var item in state?.User?.Claims!)
-        {
-            stringList.Add($"{item.Type}: {item.Value}");
-        }
-
         var account = new AccountItem
         {
             Username = username,
