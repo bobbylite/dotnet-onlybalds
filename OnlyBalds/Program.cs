@@ -18,16 +18,19 @@ builder.AddOnlyBaldsApiClients();
 // Add the Inference API client.
 builder.AddInferenceApiClients();
 
-// Add authentication and authorization.
-builder.AddAccessControl();
-
 // Add support for forwarding HTTP requests to the server.
 builder.Services.AddHttpForwarderWithServiceDiscovery();
 
+// Add support for backends for frontends architecture.
+builder.AddBff();
+
+// Add authentication and authorization.
+builder.AddOnlyBaldsAccessControl();
+
 // Add services to the container.
-builder.Services.AddRazorComponents()
+/*builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents();
+    .AddInteractiveWebAssemblyComponents();*/
 
 var app = builder.Build();
 
@@ -46,7 +49,11 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+app.UseStaticFilesOnClient();
+app.UseOnlyBaldsAccessControl();
+app.UseBffReverseProxy();
+
+/*app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
@@ -54,7 +61,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(OnlyBalds.Client.Components._Imports).Assembly);
 
-app.MapOnlyBaldsApiProxy();
+app.MapOnlyBaldsApiProxy();*/
 
 app.MapChatHub();
 

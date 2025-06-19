@@ -123,7 +123,7 @@ public static class WebApplicationBuilderExtensions
         {
             o.AddPolicy("Thread.ReadWrite", p => p.
                 RequireAuthenticatedUser().
-                RequireClaim("scope", "Threads.Read Threads.Write"));
+                RequireClaim("scope", "user:access"));
         });
         
         return webApplicationBuilder;
