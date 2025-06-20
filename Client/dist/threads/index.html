@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum - Threads</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 5px solid #3498db;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .list-group {
+            width: 60%;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .list-group-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            transition: background 0.2s;
+            text-decoration: none;
+            color: black;
+            display: block;
+        }
+
+        .list-group-item:hover {
+            background: #e8e8e8;
+        }
+
+        .text-muted {
+            color: gray;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Threads</h1>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="spinner">
+        <div class="spinner-border"></div>
+    </div>
+
+    <!-- Threads List -->
+    <div id="threadsContainer" class="list-group" style="display: none;"></div>
+
+    <!-- Create Thread Button -->
+    <a class="btn-primary" href="CreateThread">Create Thread</a>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const threadsContainer = document.getElementById("threadsContainer");
+            const loadingSpinner = document.getElementById("loading");
+
+            async function fetchThreads() {
+                try {
+                    // Simulated API call - replace with your actual API URL
+                    const response = await fetch("https://local.onlybalds.com/onlybalds-api/Threads"); 
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch threads");
+                    }
+                    const threads = await response.json();
+
+                    if (threads.length === 0) {
+                        threadsContainer.innerHTML = "<p>No threads available.</p>";
+                    } else {
+                        threads.forEach(thread => {
+                            const threadElement = document.createElement("a");
+                            threadElement.href = `Posts/${thread.id}`;
+                            threadElement.classList.add("list-group-item");
+
+                            threadElement.innerHTML = `
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">${thread.title}</h5>
+                                    <small class="text-muted">Posts: ${thread.postsCount}</small>
+                                </div>
+                                <p class="mb-1">${thread.summary}</p>
+                                <small class="text-muted">Started by ${thread.creator} on ${new Date(thread.startDate).toLocaleDateString()}</small>
+                            `;
+                            threadsContainer.appendChild(threadElement);
+                        });
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching threads:", error);
+                    threadsContainer.innerHTML = "<p>Failed to load threads.</p>";
+                } finally {
+                    // Hide loading spinner and show the content
+                    loadingSpinner.style.display = "none";
+                    threadsContainer.style.display = "block";
+                }
+            }
+
+            await fetchThreads();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border: 5px solid #3498db;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .store-container {
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body style="background-color: #fffcf1;">
+
+    <h1>Marketplace</h1>
+
+    <!-- Loading Spinner -->
+    <div class="spinner">
+        <div class="spinner-border"></div>
+    </div>
+
+    <!-- Marketplace Container -->
+    <div id="my-store-103074754" class="store-container"></div>
+
+    <button onclick="window.location.href='/'">Back to Home</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const elementId = "my-store-103074754";
+            const storeId = "103074754";
+            const scriptUrl = `https://app.ecwid.com/script.js?${storeId}&data_platform=code&data_date=${Date.now()}`;
+            let container = document.getElementById(elementId);
+
+            // Show spinner
+            const spinner = document.querySelector('.spinner');
+            spinner.style.display = "flex";
+
+            // Hide the navbar if using Bootstrap
+            const collapseNavbar = () => {
+                let navbar = document.querySelector('.navbar-collapse');
+                if (navbar) {
+                    navbar.classList.remove('show');
+                }
+            };
+
+            collapseNavbar();
+
+            // Ensure proper URL fragment
+            const currentUrl = window.location.href;
+            if (!currentUrl.includes("#ecwid")) {
+                window.location.href = currentUrl + "#ecwid";
+                window.location.reload();
+                return;
+            }
+
+            // Clear the container content if needed
+            if (container) {
+                container.innerHTML = '';
+                if (container.hasAttribute('data-v-app')) {
+                    container.removeAttribute('data-v-app');
+                }
+            } else {
+                console.error(`Container with ID "${elementId}" not found.`);
+                return;
+            }
+
+            // Function to initialize the Ecwid marketplace widget
+            const loadWidget = () => {
+                xProductBrowser(
+                    "categoriesPerRow=3",
+                    "views=grid(20,3) list(60) table(60)",
+                    "categoryView=grid",
+                    "searchView=list",
+                    `id=${elementId}`
+                );
+                console.log("Marketplace initialized.");
+                
+                // Hide spinner and show the store
+                spinner.style.display = "none";
+                container.style.display = "block";
+            };
+
+            // Load Ecwid script dynamically if not already loaded
+            const loadScript = () => {
+                return new Promise((resolve, reject) => {
+                    const scriptElement = document.createElement('script');
+                    scriptElement.src = scriptUrl;
+                    scriptElement.charset = 'utf-8';
+                    scriptElement.setAttribute('data-cfasync', 'false');
+
+                    scriptElement.onload = resolve;
+                    scriptElement.onerror = reject;
+                    document.head.appendChild(scriptElement);
+                });
+            };
+
+            const existingScript = document.querySelector(`script[src^="https://app.ecwid.com/script.js?${storeId}"]`);
+
+            try {
+                if (existingScript) {
+                    loadWidget();
+                    return;
+                }
+                await loadScript();
+                loadWidget();
+            } catch (error) {
+                console.error("Failed to load the Ecwid script:", error);
+            }
+        });
+
+        // Handle ResizeObserver loop errors
+        const resizeObserverErrorHandler = (error) => {
+            if (error.message && error.message.includes('ResizeObserver loop')) {
+                return;
+            }
+        };
+
+        window.addEventListener('error', (event) => {
+            if (event.message && event.message.includes('ResizeObserver loop')) {
+                event.stopImmediatePropagation();
+            }
+        });
+        window.addEventListener('error', resizeObserverErrorHandler);
+        window.addEventListener('unhandledrejection', resizeObserverErrorHandler);
+    </script>
+
+</body>
+</html>

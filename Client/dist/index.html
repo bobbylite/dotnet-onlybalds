@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+    <script type="module" crossorigin src="/assets/index-DtSgQokD.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-SvJWS2w9.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <!--<head>
+    <meta charset="UTF-8">
+    <title>Ecwid Marketplace</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>-->
+  <body style="background-color: #fffcf1;">
+    <div class="container py-5">
+      <div class="text-center">
+        <img src="img/OnlyBalds-CircleLogo.webp" alt="OnlyBalds Logo" class="img-fluid mb-4" style="max-width: 300px;">
+      </div>
+      <h2 class="text-center mb-4">Welcome to the OnlyBalds Ecosystem!</h2>
+      <div class="text-center mb-4">
+        <a href="/auth/login" class="btn btn-secondary rounded-pill">Login</a>
+      </div>
+          <div id="ecwid-marketplace"></div>
+    <script type="module">
+        // Suppress ResizeObserver errors globally
+        const resizeObserverErrorHandler = (error) => {
+            if (error.message && error.message.includes('ResizeObserver loop')) {
+                return;
+            }
+        };
+
+        window.addEventListener('error', (event) => {
+            if (event.message && event.message.includes('ResizeObserver loop')) {
+                event.stopImmediatePropagation();
+            }
+        });
+        window.addEventListener('error', resizeObserverErrorHandler);
+        window.addEventListener('unhandledrejection', resizeObserverErrorHandler);
+
+        // Handles the onLoad event.
+        const onLoad = () => {
+            $('.navbar-collapse').collapse('hide');
+        };
+
+        // Initializes the Ecwid marketplace widget.
+        const initializeMarketplace = (elementId) => {
+            $(document).ready(async function() {
+                const currentUrl = window.location.href;
+                if (!currentUrl.includes("#ecwid")) {
+                    window.location.href = currentUrl + "#ecwid";
+                    window.location.reload();
+                    return;
+                }
+
+                const storeId = '103074754';
+                const scriptUrl = `https://app.ecwid.com/script.js?${storeId}&data_platform=code&data_date=${Date.now()}`;
+                let container = document.getElementById(elementId);
+
+                if (container) {
+                    container.innerHTML = '';
+                    if (container.hasAttribute('data-v-app')) {
+                        container.removeAttribute('data-v-app');
+                    }
+                } else {
+                    console.error(`Container with ID "${elementId}" not found.`);
+                    return;
+                }
+
+                const loadWidget = () => {
+                    xProductBrowser(
+                        "categoriesPerRow=3",
+                        "views=grid(20,3) list(60) table(60)",
+                        "categoryView=grid",
+                        "searchView=list",
+                        `id=${elementId}`
+                    );
+                    console.log("Marketplace initialized.");
+                };
+
+                const loadScript = () => {
+                    return new Promise((resolve, reject) => {
+                        const scriptElement = document.createElement('script');
+                        scriptElement.src = scriptUrl;
+                        scriptElement.charset = 'utf-8';
+                        scriptElement.setAttribute('data-cfasync', 'false');
+                        scriptElement.onload = resolve;
+                        scriptElement.onerror = reject;
+                        document.head.appendChild(scriptElement);
+                    });
+                };
+
+                const existingScript = document.querySelector(`script[src^="https://app.ecwid.com/script.js?${storeId}"]`);
+
+                try {
+                    if (existingScript) {
+                        loadWidget();
+                        return;
+                    }
+                    await loadScript();
+                    loadWidget();
+                } catch (error) {
+                    console.error("Failed to load the Ecwid script:", error);
+                }
+            });
+        };
+
+        // Unloads the Ecwid account components.
+        const unloadEcwidAccountComponents = () => {
+            console.log(`location changed -> ${location}`);
+        };
+
+        // Determines if the browser is a mobile browser.
+        const isMobileBrowser = () => {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        };
+
+        // Call the initialization
+        initializeMarketplace("ecwid-marketplace");
+    </script>
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="col">
+          <div class="card h-100 rounded">
+            <div class="card-body">
+              <h5 class="card-title">Marketplace</h5>
+              <img src="img/OnlyBalds-Marketplace.webp" alt="Marketplace" class="img-fluid mb-3 bg-light">
+              <p class="card-text">Find the best razors and shaving kits tailored for bald individuals.</p>
+              <a href="marketplace" class="btn btn-primary rounded-pill">Go to Marketplace</a>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 rounded">
+            <div class="card-body">
+              <h5 class="card-title">Chat Room</h5>
+              <img src="img/OnlyBalds-Chatroom.webp" alt="Chat Room" class="img-fluid mb-3 bg-light">
+              <p class="card-text">Connect with the community in real-time, share tips, stories, and more.</p>
+              <a href="ChatRoom" class="btn btn-primary rounded-pill">Join the Chat</a>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 rounded">
+            <div class="card-body">
+              <h5 class="card-title">Forums</h5>
+              <img src="img/OnlyBalds-SoloLaptop.webp" alt="Chat Room" class="img-fluid mb-3 bg-light">
+              <p class="card-text">Engage in discussions, ask questions, and get answers.</p>
+              <a href="threads" class="btn btn-primary rounded-pill">Visit the Forums</a>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 rounded">
+            <div class="card-body">
+              <h5 class="card-title">Take a Tour</h5>
+              <img src="img/OnlyBalds-DiscoverServices.webp" alt="Marketplace" class="img-fluid mb-3 bg-light">
+              <p class="card-text">Discover additional services and features exclusively for you.</p>
+              <a href="about" class="btn btn-primary rounded-pill">Explore</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
