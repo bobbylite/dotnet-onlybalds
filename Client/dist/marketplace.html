@@ -30,13 +30,9 @@
 	<meta property="og:site_name" content="Site Name">
 	<meta property="og:locale" content="en_US">
 
-	<!-- build:css assets/styles/styles.css -->
-	<link rel="stylesheet" href="temp/styles/styles.css">
-	<!-- endbuild -->
+    <link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
 
-	<!-- build:js assets/scripts/Vendor.js --> 
-	<script src="/temp/scripts/Vendor.js"></script>
-	<!-- endbuild -->
+	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
 
 </head>
 <body>
@@ -118,14 +114,14 @@
                 <div class="box__top-line box__top-line--blue"></div>
                 <div class="box__holder">
                     <div class="box__section">
-                        <p>Ecwid embed goes here...</p>
+                        <div id="ecwid-marketplace"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-	    <div class="footer">
+	<div class="footer">
         <div class="container">
             <div class="footer__buttons">
                 <ul class="footer__button-links">
@@ -139,9 +135,92 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
-    <!-- build:js assets/scripts/App.js -->
-	<script src="/temp/scripts/App.js"></script>
-	<!-- endbuild -->
+    <script src="assets/scripts/App-5379555225.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Initializes the Ecwid marketplace widget.
+        const resizeObserverErrorHandler = (error) => {
+            if (error.message && error.message.includes('ResizeObserver loop')) {
+                return;
+            }
+        };
+
+        window.addEventListener('error', (event) => {
+            if (event.message && event.message.includes('ResizeObserver loop')) {
+                event.stopImmediatePropagation();
+            }
+        });
+        window.addEventListener('error', resizeObserverErrorHandler);
+        window.addEventListener('unhandledrejection', resizeObserverErrorHandler);
+
+        // Handles the onLoad event.
+        const onLoad = () => {
+            $('.navbar-collapse').collapse('hide');
+        };
+
+        // Initializes the Ecwid marketplace widget.
+        const initializeMarketplace = (elementId) => {
+            $(document).ready(async function() {
+                const currentUrl = window.location.href;
+
+                const storeId = '103074754';
+                const scriptUrl = `https://app.ecwid.com/script.js?${storeId}&data_platform=code&data_date=${Date.now()}`;
+                let container = document.getElementById(elementId);
+
+                if (container) {
+                    container.innerHTML = '';
+                    if (container.hasAttribute('data-v-app')) {
+                        container.removeAttribute('data-v-app');
+                    }
+                } else {
+                    console.error(`Container with ID "${elementId}" not found.`);
+                    return;
+                }
+
+                const loadWidget = () => {
+                    xProductBrowser(
+                        "categoriesPerRow=3",
+                        "views=grid(20,3) list(60) table(60)",
+                        "categoryView=grid",
+                        "searchView=list",
+                        `id=${elementId}`
+                    );
+                    console.log("Marketplace initialized.");
+                };
+
+                const loadScript = () => {
+                    return new Promise((resolve, reject) => {
+                        const scriptElement = document.createElement('script');
+                        scriptElement.src = scriptUrl;
+                        scriptElement.charset = 'utf-8';
+                        scriptElement.setAttribute('data-cfasync', 'false');
+                        scriptElement.onload = resolve;
+                        scriptElement.onerror = reject;
+                        document.head.appendChild(scriptElement);
+                    });
+                };
+
+                const existingScript = document.querySelector(`script[src^="https://app.ecwid.com/script.js?${storeId}"]`);
+
+                try {
+                    if (existingScript) {
+                        loadWidget();
+                        return;
+                    }
+                    await loadScript();
+                    loadWidget();
+                } catch (error) {
+                    console.error("Failed to load the Ecwid script:", error);
+                }
+            });
+        };
+
+        initializeMarketplace("ecwid-marketplace");
+    </script>
+
+
 
 </body>
 </html>

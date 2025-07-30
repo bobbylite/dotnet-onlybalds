@@ -1,4 +1,5 @@
 using OnlyBalds.Components;
+using OnlyBalds.Endpoints;
 using OnlyBalds.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +63,11 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(OnlyBalds.Client.Components._Imports).Assembly);
 
 app.MapOnlyBaldsApiProxy();*/
+
+app.MapForumEndpoints();
+app.MapChatRoomEndpoints();
+app.MapMarketplaceEndpoints();
+app.MapQuestionnaireEndpoints();
 
 app.MapChatHub();
 
