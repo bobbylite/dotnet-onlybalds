@@ -28,11 +28,6 @@ builder.AddBff();
 // Add authentication and authorization.
 builder.AddOnlyBaldsAccessControl();
 
-// Add services to the container.
-/*builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents();*/
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,16 +48,6 @@ app.UseHttpsRedirection();
 app.UseStaticFilesOnClient();
 app.UseOnlyBaldsAccessControl();
 app.UseBffReverseProxy();
-
-/*app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(OnlyBalds.Client.Components._Imports).Assembly);
-
-app.MapOnlyBaldsApiProxy();*/
 
 app.MapForumEndpoints();
 app.MapChatRoomEndpoints();
