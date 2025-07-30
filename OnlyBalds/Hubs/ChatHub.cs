@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using OnlyBalds.Services;
+using OnlyBalds.Services.WebState;
 
 namespace OnlyBalds.Hubs;
 
@@ -13,8 +14,7 @@ public class ChatHub : Hub
     private readonly ILogger<ChatHub> _logger;
     private readonly IHubContext<ChatHub> _hubContext;
     private readonly IHuggingFaceInferenceService _huggingFaceInferenceService;
-    private static int _userCount = 0;
-    private static List<string>? _users;
+    private readonly IWebStateService _webStateService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChatHub"/> class.
@@ -26,16 +26,18 @@ public class ChatHub : Hub
     public ChatHub(
         ILogger<ChatHub> logger,
         IHubContext<ChatHub> hubContext,
-        IHuggingFaceInferenceService huggingFaceInferenceService)
+        IHuggingFaceInferenceService huggingFaceInferenceService,
+        IWebStateService webStateService)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(hubContext);
         ArgumentNullException.ThrowIfNull(huggingFaceInferenceService);
+        ArgumentNullException.ThrowIfNull(webStateService);
 
         _logger = logger;
         _hubContext = hubContext;
         _huggingFaceInferenceService = huggingFaceInferenceService;
-        _users = new List<string>();
+        _webStateService = webStateService;
     }
 
     /// <summary>
@@ -105,17 +107,14 @@ public class ChatHub : Hub
             return;
         }
 
-        ++_userCount;
-        if (!_users!.Contains(username))
-        {
-            _users.Add(username);
-        }
+        var users = _webStateService.AddActiveUser(username);
+        var userCount = _webStateService.GetActiveUsers();
 
         _logger.LogDebug("Initializing chat moderation.");
         var inferences = await _huggingFaceInferenceService.UseRobertaToxicityClassifier("Initialize Safe Chat.");
 
         await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Moderator", $"{username} has joined.");
-        await _hubContext.Clients.All.SendAsync("UserCountChanged", _userCount, JsonSerializer.Serialize(_users));
+        await _hubContext.Clients.All.SendAsync("UserCountChanged", userCount, JsonSerializer.Serialize(users));
         await base.OnConnectedAsync();
     }
 
@@ -136,14 +135,11 @@ public class ChatHub : Hub
             _logger.LogWarning("User connected without a valid identity.");
         }
 
-        --_userCount;
-        if (_users!.Contains(username!))
-        {
-            _users.Remove(username!);
-        }
+        var users = _webStateService.RemoveActiveUser(username!);
+        var userCount = _webStateService.GetActiveUsers();
 
         await _hubContext.Clients.All.SendAsync("ReceiveMessage", "Moderator", $"{username} has left.");
-        await _hubContext.Clients.All.SendAsync("UserCountChanged", _userCount, JsonSerializer.Serialize(_users));
+        await _hubContext.Clients.All.SendAsync("UserCountChanged", userCount, JsonSerializer.Serialize(users));
         await base.OnDisconnectedAsync(exception);
     }
 }

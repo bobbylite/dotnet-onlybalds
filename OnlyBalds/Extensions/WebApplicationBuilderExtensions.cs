@@ -8,6 +8,7 @@ using OnlyBalds.Services.Token;
 using Yarp.ReverseProxy.Forwarder;
 using OnlyBalds.Services;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using OnlyBalds.Services.WebState;
 
 namespace OnlyBalds.Extensions;
 
@@ -59,6 +60,7 @@ public static class WebApplicationBuilderExtensions
         
         // Add a singleton service of type ITokenService. The same instance of TokenService will be used every time ITokenService is requested.
         webApplicationBuilder.Services.AddSingleton<ITokenService, TokenService>();
+        webApplicationBuilder.Services.AddSingleton<IWebStateService, WebStateService>();
         webApplicationBuilder.Services.AddHttpContextAccessor();
         webApplicationBuilder.Services.AddSignalR();
 

@@ -257,10 +257,12 @@
 
             hubConnection.on("UserCountChanged", function (count, users) {
                 console.log("Connected users:", count);
+                console.log("Users JSON:", users);
                 activeUsers = JSON.parse(users);
-                console.log("Users:", activeUsers);
+                console.log("Active Users:", activeUsers);
                 $("#userCount").text(`${count} Members Are Here!`);
                 const $chatList = $("#activeUsers");
+                $chatList.empty();
                 activeUsers.forEach(activeUser => {
                     $chatList.append(`
                         <li class="user-list__item">
