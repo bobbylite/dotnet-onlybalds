@@ -1,4 +1,8 @@
 ﻿
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Configuration;
 using OnlyBalds.Http;
@@ -18,6 +22,100 @@ namespace OnlyBalds.Extensions;
 /// </remarks>
 public static class WebApplicationExtensions
 {
+
+    /// <summary>
+    /// Adds the access control services to the application.
+    /// </summary>
+    /// <param name="app"></param>
+    /// <returns></returns>
+    public static WebApplication UseOnlyBaldsAccessControl(this WebApplication app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+
+        app
+        .UseRouting()
+        .UseAuthentication()
+        .UseAuthorization();
+
+        return app;
+    }
+
+    /// <summary>
+    /// Adds the BFF reverse proxy to the application.
+    /// Adds Back-End For Front-End (BFF) reverse proxy services to the application.
+    /// </summary>
+    /// <remarks>
+    /// The BFF reverse proxy is a reverse proxy that is used to forward requests from the client to the back-end services.
+    /// More information on the BFF pattern can be found at 
+    // https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends
+    /// </remarks>
+    /// <param name="app"></param>
+    /// <returns></returns>
+    public static WebApplication UseBffReverseProxy(this WebApplication app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+
+        app.MapGet("/auth/login", async (HttpContext context, string? returnUrl = "/") =>
+        {
+            var redirectUri = returnUrl ?? "/";
+            var authProps = new AuthenticationProperties { RedirectUri = redirectUri };
+            await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, authProps);
+        }).AllowAnonymous();
+
+        app.MapGet("/auth/logout", async (HttpContext context) =>
+        {
+            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await context.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+
+            return Results.SignOut();
+        });
+
+        app.MapGet("/auth/user", async (HttpContext context) =>
+        {
+            var result = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (result.Succeeded is false)
+            {
+                return Results.Unauthorized();
+            }
+
+            return Results.Json(new
+            {
+                context.User?.Identity?.Name,
+                Claims = context.User?.Claims.Select(c => new { c.Type, c.Value })
+            });
+        }).RequireAuthorization();
+        
+        app.MapReverseProxy();
+
+        return app;
+    }
+    /// <summary>
+    /// Adds the access control services to the application.
+    /// </summary>
+    /// <param name="app"></param>
+    /// <returns></returns>
+    public static WebApplication UseStaticFilesOnClient(this WebApplication app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+
+        var currentPath = Directory.GetCurrentDirectory();
+        var clientPublishPath = Path.Combine(Directory.GetParent(currentPath)!.FullName, "Client", "dist");        
+        app.UseDefaultFiles(new DefaultFilesOptions
+        {
+            DefaultFileNames = new List<string> { "index.html" },
+            FileProvider = new PhysicalFileProvider(clientPublishPath)
+        });
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(clientPublishPath)
+        });
+
+        app.UseStaticFiles();
+
+        return app;
+    }
+
     /// <summary>
     /// Maps the OnlyBalds API proxy.
     /// This is based on the example found here:
@@ -70,7 +168,7 @@ public static class WebApplicationExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplication);
 
-        webApplication.MapHub<ChatHub>("/chathub");
+        webApplication.MapHub<ChatHub>("/chathub").RequireAuthorization();
 
         return webApplication;
     }

@@ -488,3 +488,7 @@ notes.txt
 
 # Local appsettings
 appsettings.Local.json
+.vscode
+
+# Local
+ClientBak

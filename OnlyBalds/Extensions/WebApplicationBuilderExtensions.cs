@@ -7,11 +7,37 @@ using OnlyBalds.Identity;
 using OnlyBalds.Services.Token;
 using Yarp.ReverseProxy.Forwarder;
 using OnlyBalds.Services;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using OnlyBalds.Services.WebState;
 
 namespace OnlyBalds.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {   
+    /// <summary>
+    /// Adds the BFF reverse proxy to the application.
+    /// Adds Back-End For Front-End (BFF) reverse proxy services to the application.
+    /// </summary>
+    /// <remarks>
+    /// The BFF reverse proxy is a reverse proxy that is used to forward requests from the client to the back-end services.
+    /// More information on the BFF pattern can be found at https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends
+    /// </remarks>
+    /// <param name="app"></param>
+    /// <returns></returns>
+    public static WebApplicationBuilder AddBff(this WebApplicationBuilder app)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+
+        var configuration = app.Configuration;
+        
+        app.Services
+            .AddReverseProxy()
+            .LoadFromConfig(configuration.GetSection("ReverseProxy"))
+            .AddBffReverseProxy(configuration, app.Services);
+
+        return app;
+    }
+
     /// <summary>
     /// Add services to the application.
     /// </summary>
@@ -34,6 +60,7 @@ public static class WebApplicationBuilderExtensions
         
         // Add a singleton service of type ITokenService. The same instance of TokenService will be used every time ITokenService is requested.
         webApplicationBuilder.Services.AddSingleton<ITokenService, TokenService>();
+        webApplicationBuilder.Services.AddSingleton<IWebStateService, WebStateService>();
         webApplicationBuilder.Services.AddHttpContextAccessor();
         webApplicationBuilder.Services.AddSignalR();
 
@@ -117,6 +144,20 @@ public static class WebApplicationBuilderExtensions
         })
             .AddHttpMessageHandler<AuthenticationHandler>();
         
+        return webApplicationBuilder;
+    }
+        
+    /// <summary>
+    /// Adds the access control services to the application.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static WebApplicationBuilder AddOnlyBaldsAccessControl(this WebApplicationBuilder webApplicationBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(webApplicationBuilder);
+
+        webApplicationBuilder.Services.AddOnlyBaldsAccessControl(webApplicationBuilder.Configuration);
+
         return webApplicationBuilder;
     }
 
