@@ -99,7 +99,7 @@ public static class WebApplicationExtensions
         ArgumentNullException.ThrowIfNull(app);
 
         var currentPath = Directory.GetCurrentDirectory();
-        var clientPublishPath = Path.Combine(Directory.GetParent(currentPath)!.FullName, "Client", "dist");        
+        var clientPublishPath = Path.Combine(currentPath, "wwwroot");        
         app.UseDefaultFiles(new DefaultFilesOptions
         {
             DefaultFileNames = new List<string> { "index.html" },
