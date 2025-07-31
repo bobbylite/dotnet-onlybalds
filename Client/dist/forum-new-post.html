@@ -69,18 +69,18 @@
                 </div> 
                 <span class="navbar__mobile-hide">My </span>Account <i class="fa fa-angle-down dropdown__toggle-icon"></i>
             </a>
-            <ul class="dropdown__nav dropdown__nav--user">
-                <li class="dropdown__item dropdown__item--title">Hi, David May</li>
+            <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
+                <li class="dropdown__item dropdown__item--title greeting">Hi, David May</li>
                 <li class="dropdown__item">
                     <a href="/questionnaire" class="dropdown__link dropdown__link--icon">
                         <i class="fa fa-edit"></i> 
                         Questionnaire
                     </a>
                 </li>
-                <li class="dropdown__item">
-                    <a href="#" class="dropdown__link dropdown__link--icon">
-                        <i class="fa fa-sign-out"></i> 
-                        Log Out    
+                <li class="dropdown__item sign-in">
+                    <a href="/auth/login" class="dropdown__link dropdown__link--icon">
+                        <i class="fa fa-sign-in"></i> 
+                        Sign In
                     </a>
                 </li>
             </ul>
@@ -155,6 +155,34 @@
     </div>
 
     <script src="assets/scripts/App-5379555225.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        $(() => {
+            $.ajax({
+                url: "/identity-information",
+                method: "GET",
+                success: function (data) {
+                    user = data;
+                    let userName = user.name;
+                    console.log("User name:", userName);
+                    $(".sign-in").remove();
+                    $(".greeting").empty().append(`Hi, ${userName}`);
+                    $("#menu-options").append(`
+                        <li class="dropdown__item sign-out">
+                            <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
+                                <i class="fa fa-sign-out"></i> 
+                                Sign Out
+                            </a>
+                        </li>
+                    `);
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
