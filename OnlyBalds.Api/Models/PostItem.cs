@@ -14,6 +14,11 @@ public class PostItem
     public Guid Id { get; set; }
 
     /// <summary>
+    /// Gets or sets the unique identifier for the user who created the post.
+    /// </summary>
+    public string UserId { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the title of the post.
     /// </summary>
     /// <remarks>

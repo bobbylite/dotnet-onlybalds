@@ -220,7 +220,7 @@
                     console.log("Threads data:", data);
                     data.forEach(thread => {
                         console.log("Thread Id:", thread.id);
-                        if (thread.name === "development")
+                        if (thread.name === "NewsArticles")
                         {
                             GetPosts(thread.id);
                         }
@@ -265,12 +265,12 @@
                     method: "GET",
                     success: function (data) {
                         console.log(data);
-                        data.forEach(threadItem => {
-                            console.log("Thread:", threadItem);
+                        data.forEach(post => {
+                            console.log("Post:", post);
                             $("#threads-list").append(
                                 `
                                 <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                                    <h2 class="listing__title">${threadItem.title}</h2>
+                                    <h2 class="listing__title">${post.title}</h2>
                                     <div class="listing__meta">
                                         <div class="listing__meta-author">
                                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
@@ -280,13 +280,13 @@
                                             </svg>
                                         </div>
                                         <div class="listing__meta-author-info">
-                                            <p class="listing__meta-author-name">Posted by ${threadItem.creator}</p>
-                                            <p class="listing__meta-post-date">${new Date(threadItem.startDate).toLocaleDateString()}</p>
+                                            <p class="listing__meta-author-name">Posted by ${post.author}</p>
+                                            <p class="listing__meta-post-date">${new Date(post.postedOn).toLocaleDateString()}</p>
                                         </div>
                                     </div>
                                     <div class="listing__content">
-                                        <p class="listing__snippet">${threadItem.summary}</p>
-                                        <a href="/forum-single/${threadItem.id}" class="text-link">Read Article</a>
+                                        <p class="listing__snippet">${post.content}</p>
+                                        <a href="/forum-single/${post.id}" class="text-link">Read Article</a>
                                     </div>
                                 </div>
                                 `);

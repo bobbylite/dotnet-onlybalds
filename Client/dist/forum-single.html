@@ -221,10 +221,10 @@
     <script>
         $(() => {
             const params = new URLSearchParams(window.location.search);
-            const articleId = params.get("articleId");
+            const articleId = params.get("postId");
 
             $.ajax({
-                url: `/article?articleId=${articleId}`,
+                url: `/article?postId=${articleId}`,
                 method: "GET",
                 success: function (data) {
                     console.log(data);

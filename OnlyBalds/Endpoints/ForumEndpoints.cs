@@ -33,10 +33,10 @@ public static class ForumEndpoints
             return Task.CompletedTask;
         }).RequireAuthorization();
 
-        endpoints.MapGet("/forum-single/{threadId:guid}", context =>
+        endpoints.MapGet("/forum-single/{postId:guid}", context =>
         {
             context.Response.ContentType = "text/html";
-            context.Response.Redirect($"/forum-single.html?threadId={context.Request.RouteValues["threadId"]}");
+            context.Response.Redirect($"/forum-single.html?postId={context.Request.RouteValues["postId"]}");
 
             return Task.CompletedTask;
         }).RequireAuthorization();
@@ -51,6 +51,7 @@ public static class ForumEndpoints
         endpoints.MapGet("/threads", GetThreads).RequireAuthorization();
         endpoints.MapGet("/thread", GetThread).RequireAuthorization();
         endpoints.MapGet("/articles", GetPosts).RequireAuthorization();
+        endpoints.MapGet("/article", GetPost).RequireAuthorization();
 
         return endpoints;
     }
@@ -131,10 +132,10 @@ public static class ForumEndpoints
 
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
         var response = await httpClient.GetFromJsonAsync<List<PostItem>>($"posts");
-        //posts = postsClient.Where(p => p.ThreadId == Guid.Parse(ThreadId)).ToList();
+        var posts = response?.Where(p => p.ThreadId == Guid.Parse(threadId!)).ToList();
 
 
-        if (response is null)
+        if (posts is null)
         {
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsync("Posts not found for the specified thread.");
@@ -142,6 +143,37 @@ public static class ForumEndpoints
         }
 
         context.Response.ContentType = "application/json";
-        await context.Response.WriteAsJsonAsync(response);
-    }   
+        await context.Response.WriteAsJsonAsync(posts);
+    }
+
+    private static async Task GetPost(
+    HttpContext context,
+        [FromServices] IHttpClientFactory httpClientFactory,
+        [FromQuery] string? postId = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
+
+        if (string.IsNullOrWhiteSpace(postId))
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsync("Missing threadId query parameter.");
+            return;
+        }
+
+        var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        var response = await httpClient.GetFromJsonAsync<List<PostItem>>($"posts");
+        var post = response?.SingleOrDefault(p => p.Id == Guid.Parse(postId!));
+
+        if (post is null)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsync("Thread not found.");
+            return;
+        }
+
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(post);
+    }
 }
