@@ -25,10 +25,11 @@ public static class ForumEndpoints
             return Task.CompletedTask;
         }).RequireAuthorization();
 
-        endpoints.MapGet("/forum-new-post", context =>
+        endpoints.MapGet("/forum-new-post/{threadId:guid}", context =>
         {
             context.Response.ContentType = "text/html";
-            context.Response.Redirect("/forum-new-post.html");
+            context.Response.Redirect($"/forum-new-post.html?threadId={context.Request.RouteValues["threadId"]}");
+
 
             return Task.CompletedTask;
         }).RequireAuthorization();
@@ -52,6 +53,7 @@ public static class ForumEndpoints
         endpoints.MapGet("/thread", GetThread).RequireAuthorization();
         endpoints.MapGet("/articles", GetPosts).RequireAuthorization();
         endpoints.MapGet("/article", GetPost).RequireAuthorization();
+        endpoints.MapPost("/articles", PostPost).RequireAuthorization();
 
         return endpoints;
     }
@@ -175,5 +177,30 @@ public static class ForumEndpoints
 
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsJsonAsync(post);
+    }
+
+    private static async Task PostPost(
+        [FromBody] PostItem postItem,
+        HttpContext context,
+        [FromServices] IHttpClientFactory httpClientFactory
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
+        ArgumentNullException.ThrowIfNull(postItem);
+
+        var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        var response = await httpClient.PostAsJsonAsync("posts", postItem);
+
+        if (response.IsSuccessStatusCode)
+        {
+            context.Response.StatusCode = StatusCodes.Status201Created;
+            await context.Response.WriteAsync("Post created successfully.");
+        }
+        else
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync("Failed to create post.");
+        }
     }
 }

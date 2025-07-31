@@ -108,7 +108,7 @@
             <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">News Articles</h1>
             <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Catch up on the latest news and articles from the Only Balds community.</p>
             <div class="banner__btn-holder" data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
-                <a href="/forum-new-post" class="btn btn--blue banner__btn">Write New Post</a>
+                <a id="write-new-post" class="btn btn--blue banner__btn">Write New Post</a>
             </div>
         </div>
     </div><!--/banner -->
@@ -222,34 +222,10 @@
                         console.log("Thread Id:", thread.id);
                         if (thread.name === "NewsArticles")
                         {
+                            $('#write-new-post').attr('href', `/forum-new-post.html?threadId=${thread.id}`);
                             GetPosts(thread.id);
                         }
                     });
-                    /*data.forEach(thread => {
-                        console.log("Thread:", thread);
-                        $("#threads-list").append(`
-                            <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                                <h2 class="listing__title">${thread.title}</h2>
-                                <div class="listing__meta">
-                                    <div class="listing__meta-author">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
-                                            class="bi bi-person-fill" viewBox="0 0 16 16">
-                                            <path
-                                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                                        </svg>
-                                    </div>
-                                    <div class="listing__meta-author-info">
-                                        <p class="listing__meta-author-name">Posted by ${thread.creator}</p>
-                                        <p class="listing__meta-post-date">${new Date(thread.startDate).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                                <div class="listing__content">
-                                    <p class="listing__snippet">${thread.summary}</p>
-                                    <a href="/forum-single/${thread.id}" class="text-link">Read Article</a>
-                                </div>
-                            </div>
-                        `);
-                    });*/
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching threads:", error);
@@ -267,7 +243,8 @@
                         console.log(data);
                         data.forEach(post => {
                             console.log("Post:", post);
-                            $("#threads-list").append(
+                            if (threadId === post.threadId) {
+                                $("#threads-list").append(
                                 `
                                 <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                                     <h2 class="listing__title">${post.title}</h2>
@@ -290,6 +267,7 @@
                                     </div>
                                 </div>
                                 `);
+                            }
                         });
                     },
                     error: function (xhr, status, error) {

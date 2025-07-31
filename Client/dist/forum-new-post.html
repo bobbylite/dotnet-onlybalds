@@ -189,5 +189,53 @@
         });
     </script>
 
+    <script>
+        $(document).ready(function () {
+            $('.btn.btn--blue').on('click', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: "/identity-information",
+                    method: "GET",
+                    success: function (data) {
+                        console.log("User data:", data);
+                        const userId = data.claims.sub;
+                        const params = new URLSearchParams(window.location.search);
+                        const threadId = params.get('threadId');
+
+                        let postItem = 
+                        {
+                            id: crypto.randomUUID(),
+                            title: $("#newPostTitle").val(),
+                            content: $("#newPostContent").val(),
+                            postedOn: new Date().toISOString(),
+                            author: data.name,
+                            threadId: threadId,
+                            userId: userId
+                        };
+                        let postItemJson = JSON.stringify(postItem);
+
+                        $.ajax({
+                            url: '/articles',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: postItemJson,
+                            success: function(response) {
+                                console.log('Post successful:', response);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Post failed:', error);
+                            }
+                        });
+
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+            });
+        });
+
+    </script>
+
 </body>
 </html>
