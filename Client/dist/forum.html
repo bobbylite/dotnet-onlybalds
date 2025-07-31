@@ -214,10 +214,28 @@
     <script>
         $(() => {
             $.ajax({
+                url: "/identity-information",
+                method: "GET",
+                success: function (data) {
+                    user = data;
+                    GetThreads(user);
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        });
+
+        const GetThreads = (user) => 
+        {
+            $.ajax({
                 url: "/threads",
                 method: "GET",
                 success: function (data) {
                     console.log("Threads data:", data);
+                    if (data.every(thread => thread.name !== "NewsArticles")) {
+                        CreateNewsArticleThread(user);
+                        return;
+                    }
                     data.forEach(thread => {
                         console.log("Thread Id:", thread.id);
                         if (thread.name === "NewsArticles")
@@ -231,7 +249,7 @@
                     console.error("Error fetching threads:", error);
                 }
             });
-        });
+        }
 
         const GetPosts = (threadId) =>
         {
@@ -276,6 +294,35 @@
                 });
             });
         }
+
+        const CreateNewsArticleThread = (user) => {
+            $(() => {
+                let threadItem = 
+                {
+                    id: crypto.randomUUID(),
+                    name: "NewsArticles",
+                    creator: user.name,
+                    startDate: new Date().toISOString(),
+                    summary: "This thread is for posting news articles related to the Only Balds community.",
+                    postsCount: 0
+                };
+                let threadItemJson = JSON.stringify(threadItem);
+
+                $.ajax({
+                    url: '/threads',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: threadItemJson,
+                    success: function(response) {
+                        console.log('Post successful:', response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Post failed:', error);
+                    }
+                });
+            });
+        }
+        
     </script>
 
 </body>

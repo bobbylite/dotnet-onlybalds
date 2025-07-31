@@ -51,9 +51,10 @@ public static class ForumEndpoints
 
         endpoints.MapGet("/threads", GetThreads).RequireAuthorization();
         endpoints.MapGet("/thread", GetThread).RequireAuthorization();
+        endpoints.MapPost("/threads", PostThread).RequireAuthorization();
         endpoints.MapGet("/articles", GetPosts).RequireAuthorization();
         endpoints.MapGet("/article", GetPost).RequireAuthorization();
-        endpoints.MapPost("/articles", PostPost).RequireAuthorization();
+        endpoints.MapPost("/articles", PostArticle).RequireAuthorization();
 
         return endpoints;
     }
@@ -179,7 +180,7 @@ public static class ForumEndpoints
         await context.Response.WriteAsJsonAsync(post);
     }
 
-    private static async Task PostPost(
+    private static async Task PostArticle(
         [FromBody] PostItem postItem,
         HttpContext context,
         [FromServices] IHttpClientFactory httpClientFactory
@@ -201,6 +202,31 @@ public static class ForumEndpoints
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             await context.Response.WriteAsync("Failed to create post.");
+        }
+    }
+
+    private static async Task PostThread(
+        [FromBody] ThreadItem threadItem,
+        HttpContext context,
+        [FromServices] IHttpClientFactory httpClientFactory
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
+        ArgumentNullException.ThrowIfNull(threadItem);
+
+        var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        var response = await httpClient.PostAsJsonAsync("threads", threadItem);
+
+        if (response.IsSuccessStatusCode)
+        {
+            context.Response.StatusCode = StatusCodes.Status201Created;
+            await context.Response.WriteAsync("Thread created successfully.");
+        }
+        else
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync("Failed to create thread.");
         }
     }
 }
