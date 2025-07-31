@@ -107,42 +107,21 @@
         <div class="container article__container">
 
             <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h1 class="h2 article__heading">Health Checks Page</h1>
+                <h1 id="article-title" class="h2 article__heading">Health Checks Page</h1>
                 <div class="author-info">
-                    <div class="author-info__picture">
-                        <img src="https://picsum.photos/id/669/300/300" alt="" class="author-info__picture-src">
+                    <div class="listing__meta-author">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                            class="bi bi-person-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                        </svg>
                     </div>
                     <div class="author-info__content">
-                        <p class="author-info__name">Posted by Robert Luisi</p>
-                        <p class="author-info__date">October 25, 2025</p>
+                        <p id="article-author" class="author-info__name"></p>
+                        <p id="article-date" class="author-info__date"></p>
                     </div>
                 </div>
-                <div class="article__body" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                    <p><b>Lorem ipsum dolor sit amet</b>, consectetur adipiscing elit. Sed eget dolor mattis, bibendum quam quis, laoreet eros. Phasellus ac nunc dapibus, volutpat nisi in, rutrum tellus. <i>In hac habitasse platea dictumst</i>. Aenean vitae velit in tortor posuere finibus sed non odio. Integer a ornare nisi. Nunc egestas erat id tortor hendrerit pellentesque. Morbi fermentum dolor scelerisque ex aliquet vulputate. Interdum et malesuada fames ac <a href="#">ante ipsum primis</a> in faucibus. Suspendisse facilisis molestie elit, vitae bibendum velit laoreet quis. Pellentesque non tempus dui. Pellentesque condimentum est ligula, id euismod quam auctor elementum. Suspendisse feugiat sollicitudin viverra. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aliquam id pellentesque diam, a tristique velit. Sed erat velit, varius sed magna a, dictum aliquet ligula. Sed augue nisi, ornare ut augue ac, viverra consectetur est.</p>
-
-                    <h2>Heading Level 2</h2>
-                    <h3>Heading Level 3</h3>
-                    <h4>Heading Level 4</h4>
-                    <h5>Heading Level 5</h5>
-                    <h6>Heading Level 6</h6>
-                    
-
-                    <ul>
-                        <li>Etiam tincidunt ultrices elit vel dapibus.</li>
-                        <li>Mauris ornare imperdiet bibendum.</li>
-                        <li>Praesent placerat suscipit leo, vel blandit libero aliquam ac.</li>
-                        <li>Curabitur eu lorem quam.</li>
-                        <li>Ut mattis tortor arcu.</li>
-                    </ul>
-
-                    <ol>
-                        <li>Donec aliquet pharetra justo a sollicitudin.</li>
-                        <li>Quisque mauris orci.</li>
-                        <li>Accumsan facilisis mi vel.</li>
-                        <li>Posuere pharetra nisi.</li>
-                        <li>In hac habitasse platea dictumst.</li>
-                    </ol>
-                                   
+                <div id="article-content" class="article__body" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 </div>
             </div>
 
@@ -155,7 +134,7 @@
                             <img src="https://picsum.photos/id/91/300/300" alt="" class="author-info__picture-src">
                         </div>
                         <div class="author-info__content">
-                            <p class="author-info__name">Posted by David May</p>
+                            <p id="post-author" class="author-info__name">Posted by David May</p>
                             <p class="author-info__date">October 25, 2025</p>
                         </div>
                     </div>
@@ -228,6 +207,9 @@
                 method: "GET",
                 success: function (data) {
                     console.log(data);
+                    $("#article-title").text(data.title);
+                    $("#article-author").text(`Posted by ${data.author}`);
+                    $("#article-content").html(data.content);
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching thread:", error);
