@@ -117,8 +117,10 @@
     ============================================== -->
     <div class="section section--gray">
         <div class="container">
+            <ul id="threads-list" class="list-group list-group-flush list-unstyled">
 
-            <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+            </ul>
+            <!--<div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <h2 class="listing__title">Health Checks Page</h2>
                 <div class="listing__meta">
                     <div class="listing__meta-author">
@@ -150,7 +152,7 @@
                     <p class="listing__snippet">OnlyBalds is officially supporting PostgreSQL. Built with Azure Database for PostgreSQL - Flexible Server and Entity Framework.</p>
                     <a href="/forum-single" class="text-link">Read Article</a>
                 </div>
-            </div>
+            </div>-->
 
             <nav class="pagination" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <ul class="pagination__nav">
@@ -207,6 +209,95 @@
                 }
             });
         });
+    </script>
+
+    <script>
+        $(() => {
+            $.ajax({
+                url: "/threads",
+                method: "GET",
+                success: function (data) {
+                    console.log("Threads data:", data);
+                    data.forEach(thread => {
+                        console.log("Thread Id:", thread.id);
+                        if (thread.name === "development")
+                        {
+                            GetPosts(thread.id);
+                        }
+                    });
+                    /*data.forEach(thread => {
+                        console.log("Thread:", thread);
+                        $("#threads-list").append(`
+                            <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                                <h2 class="listing__title">${thread.title}</h2>
+                                <div class="listing__meta">
+                                    <div class="listing__meta-author">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                                            class="bi bi-person-fill" viewBox="0 0 16 16">
+                                            <path
+                                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                        </svg>
+                                    </div>
+                                    <div class="listing__meta-author-info">
+                                        <p class="listing__meta-author-name">Posted by ${thread.creator}</p>
+                                        <p class="listing__meta-post-date">${new Date(thread.startDate).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                                <div class="listing__content">
+                                    <p class="listing__snippet">${thread.summary}</p>
+                                    <a href="/forum-single/${thread.id}" class="text-link">Read Article</a>
+                                </div>
+                            </div>
+                        `);
+                    });*/
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching threads:", error);
+                }
+            });
+        });
+
+        const GetPosts = (threadId) =>
+        {
+            $(() => {
+                $.ajax({
+                    url: `/articles?threadId=${threadId}`,
+                    method: "GET",
+                    success: function (data) {
+                        console.log(data);
+                        data.forEach(threadItem => {
+                            console.log("Thread:", threadItem);
+                            $("#threads-list").append(
+                                `
+                                <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                                    <h2 class="listing__title">${threadItem.title}</h2>
+                                    <div class="listing__meta">
+                                        <div class="listing__meta-author">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                            </svg>
+                                        </div>
+                                        <div class="listing__meta-author-info">
+                                            <p class="listing__meta-author-name">Posted by ${threadItem.creator}</p>
+                                            <p class="listing__meta-post-date">${new Date(threadItem.startDate).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <div class="listing__content">
+                                        <p class="listing__snippet">${threadItem.summary}</p>
+                                        <a href="/forum-single/${threadItem.id}" class="text-link">Read Article</a>
+                                    </div>
+                                </div>
+                                `);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching thread:", error);
+                    }
+                });
+            });
+        }
     </script>
 
 </body>

@@ -218,5 +218,23 @@
         });
     </script>
 
+    <script>
+        $(() => {
+            const params = new URLSearchParams(window.location.search);
+            const articleId = params.get("articleId");
+
+            $.ajax({
+                url: `/article?articleId=${articleId}`,
+                method: "GET",
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching thread:", error);
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
