@@ -230,8 +230,10 @@
                 success: function (data) {
                     const filteredComments = data.filter(comment => comment.postId === articleId);
                     console.log("Filtered comments:", filteredComments);
+                    
                     $('#comments-count').empty();
                     $('#comments-count').text(`${filteredComments.length} Comment${filteredComments.length !== 1 ? 's' : ''}`);
+                    
                     $("#comments-list").empty();
                     filteredComments.forEach(comment => {
                         console.log("Comment:", comment);

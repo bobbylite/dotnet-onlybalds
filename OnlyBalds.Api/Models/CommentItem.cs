@@ -14,6 +14,11 @@ public class CommentItem
     public Guid Id { get; set; }
 
     /// <summary>
+    /// Gets or sets the unique identifier for the user who created the comment.
+    /// </summary>
+    public string UserId { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the author of the comment.
     /// </summary>
     /// <remarks>
