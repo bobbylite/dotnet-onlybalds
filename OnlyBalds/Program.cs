@@ -49,6 +49,7 @@ app.UseStaticFilesOnClient();
 app.UseOnlyBaldsAccessControl();
 app.UseBffReverseProxy();
 
+app.MapAppEndpoints();
 app.MapIdentityEndpoints();
 app.MapForumEndpoints();
 app.MapChatRoomEndpoints();
