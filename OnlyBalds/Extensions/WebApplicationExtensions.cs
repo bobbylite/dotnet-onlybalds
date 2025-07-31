@@ -168,7 +168,7 @@ public static class WebApplicationExtensions
     {
         ArgumentNullException.ThrowIfNull(webApplication);
 
-        webApplication.MapHub<ChatHub>("/chathub");
+        webApplication.MapHub<ChatHub>("/chathub").RequireAuthorization();
 
         return webApplication;
     }
