@@ -55,6 +55,7 @@ public static class ForumEndpoints
         endpoints.MapGet("/articles", GetPosts).RequireAuthorization();
         endpoints.MapGet("/article", GetPost).RequireAuthorization();
         endpoints.MapPost("/articles", PostArticle).RequireAuthorization();
+        endpoints.MapGet("/article-comments", GetComments).RequireAuthorization();
 
         return endpoints;
     }
@@ -228,5 +229,29 @@ public static class ForumEndpoints
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             await context.Response.WriteAsync("Failed to create thread.");
         }
+    }
+
+    private static async Task GetComments(
+        HttpContext context,
+        [FromServices] IHttpClientFactory httpClientFactory,
+        [FromQuery] string? postId = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
+
+        var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        var commentsReponse = await httpClient.GetFromJsonAsync<List<CommentItem>>($"comments");
+        var comments = commentsReponse?.Where(c => c.PostId == Guid.Parse(postId!)).ToList();
+
+        if (comments is null)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsync("Comments not found.");
+            return;
+        }
+
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(comments);
     }
 }
