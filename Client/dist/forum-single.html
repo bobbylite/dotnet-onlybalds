@@ -151,7 +151,7 @@
             <form class="article__write-comment" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <h2 class="h4 article__write-comment-heading">Leave A Comment</h2>
                 <textarea name="" id="" placeholder="Enter your message here..." class="article__comment-textarea"></textarea>
-                <button class="btn btn--blue article__post-comment-btn">Post Comment</button>
+                <button id="comment-button" class="btn btn--blue article__post-comment-btn">Post Comment</button>
             </form>
 
         </div>
@@ -202,6 +202,8 @@
     </script>
 
     <script>
+        let userId = '';
+
         $(() => {
             const params = new URLSearchParams(window.location.search);
             const articleId = params.get("postId");
@@ -214,7 +216,8 @@
                     $("#article-title").text(data.title);
                     $("#article-author").text(`Posted by ${data.author}`);
                     $("#article-content").html(data.content);
-                    PopulateComments(articleId);
+                    userId = data.userId;
+                    PopulateComments(articleId, data);
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching thread:", error);
@@ -222,7 +225,7 @@
             });
         });
 
-        const PopulateComments = (articleId) => {
+        const PopulateComments = (articleId, userData) => {
             $.ajax({
                 url: `/article-comments?postId=${articleId}`,
                 method: "GET",
@@ -266,6 +269,50 @@
                 }
             });
         };
+
+        $(document).ready(function () {
+            $('#comment-button').on('click', function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: "/identity-information",
+                    method: "GET",
+                    success: function (data) {
+                        console.log("User data:", data);
+                        const userId = data.claims.sub;
+                        const params = new URLSearchParams(window.location.search);
+                        const postId = params.get('postId');
+
+                        let commentItem = 
+                        {
+                            id: crypto.randomUUID(),
+                            author: data.name,
+                            content: $(".article__comment-textarea").val(),
+                            postedOn: new Date().toISOString(),
+                            postId: postId,
+                            userId: userId
+                        };
+                        let commentItemJson = JSON.stringify(commentItem);
+
+                        $.ajax({
+                            url: '/article-comments',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: commentItemJson,
+                            success: function(response) {
+                                console.log('Post successful:', response);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Post failed:', error);
+                            }
+                        });
+
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+            });
+        });
 
     </script>
 

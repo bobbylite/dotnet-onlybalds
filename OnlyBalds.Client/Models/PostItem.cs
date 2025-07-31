@@ -14,6 +14,12 @@ public class PostItem
     public Guid Id { get; set; }
 
     /// <summary>
+    /// Gets or sets the unique identifier for the user who created the post.
+    /// </summary>
+    [JsonPropertyName("userId")]
+    public string UserId { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the title of the post. This field is initialized to an empty string.
     /// </summary>
     [JsonPropertyName("title")]
@@ -42,10 +48,4 @@ public class PostItem
     /// </summary>
     [JsonPropertyName("threadId")]
     public Guid ThreadId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the unique identifier for the user who created the post.
-    /// </summary>
-    [JsonPropertyName("userId")]
-    public string? UserId { get; set; }
 }
