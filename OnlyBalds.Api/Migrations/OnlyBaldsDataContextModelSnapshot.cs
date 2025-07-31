@@ -115,6 +115,10 @@ namespace OnlyBalds.Api.Migrations
                     b.Property<DateTime>("PostedOn")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("CommentItems");
@@ -141,6 +145,10 @@ namespace OnlyBalds.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
