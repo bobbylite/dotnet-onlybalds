@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
+using OnlyBalds.Client.Models;
+
 namespace OnlyBalds.Endpoints;
 
 /// <summary>
@@ -14,7 +17,7 @@ public static class QuestionnaireEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGet("/questionnaire", context =>
+        endpoints.MapGet("/account-questionnaire", context =>
         {
             var isAuthenticated = context.User?.Identity?.IsAuthenticated;
 
@@ -32,6 +35,32 @@ public static class QuestionnaireEndpoints
             return Task.CompletedTask;
         }).AllowAnonymous();
 
+        endpoints
+        .MapPost("/account-questionnaire", PostQuestionnaire)
+        .RequireAuthorization();
+
         return endpoints;
+    }
+
+    private static async Task PostQuestionnaire(
+        [FromBody] QuestionnaireItems questionnaireItem,
+        HttpContext context,
+        [FromServices] IHttpClientFactory httpClientFactory
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(httpClientFactory);
+        ArgumentNullException.ThrowIfNull(questionnaireItem);
+
+        var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        var response = await httpClient.PostAsJsonAsync("questionnaire", questionnaireItem);
+
+        if (questionnaireItem is null)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+        
+        context.Response.Redirect("/");
     }
 }
