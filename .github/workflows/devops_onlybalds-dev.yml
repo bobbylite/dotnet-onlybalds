@@ -1,6 +1,6 @@
 name: Secrets Scan
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   gitleaks:
@@ -9,7 +9,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Gitleaks
+      - name: Install Gitleaks
         uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect -v --redact --exit-code=2 --report-format=sarif --report-path=results.sarif --log-level=debug --log-opts=--no-merges --first-parent
+
+      - name: Run Gitleaks
+        run: |
+          gitleaks detect \
+            --redact \
+            --exit-code=2 \
+            --report-format=sarif \
+            --report-path=results.sarif \
+            --log-level=debug \
+            --log-opts=--no-merges \
+            --verbose
