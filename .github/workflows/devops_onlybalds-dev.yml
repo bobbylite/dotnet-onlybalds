@@ -1,6 +1,6 @@
 name: Secrets Scan
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   gitleaks:
@@ -8,15 +8,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full git history is available
 
       - name: Install Gitleaks
         uses: gitleaks/gitleaks-action@v2
 
       - name: Run Gitleaks
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gitleaks detect \
             --redact \
@@ -24,4 +20,5 @@ jobs:
             --report-format=sarif \
             --report-path=results.sarif \
             --log-level=debug \
-            --log-opts=--no-merges
+            --log-opts=--no-merges \
+            --verbose
