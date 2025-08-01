@@ -30,6 +30,8 @@
 	<meta property="og:site_name" content="Site Name">
 	<meta property="og:locale" content="en_US">
 
+    <link rel="stylesheet" href="/app.css"/>
+
 	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
 
 	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
@@ -103,7 +105,13 @@
 
     <!-- FORUM LISTINGS
     ============================================== -->
-    <div class="section section--gray article">
+    <div id="spinner-holder" class="box__holder">
+        <div class="flex-center">
+            <div class="spinner-border" role="status" aria-label="Loading"></div>
+        </div>
+    </div>
+    
+    <div id="app-holder" class="section section--gray article" style="display: none;">
         <div class="container article__container">
 
             <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
@@ -218,6 +226,9 @@
                     $("#article-content").html(data.content);
                     userId = data.userId;
                     PopulateComments(articleId, data);
+
+                    $('#app-holder').css('display', 'block');
+                    $('#spinner-holder').remove();
                 },
                 error: function (xhr, status, error) {
                     console.error("Error fetching thread:", error);
