@@ -26,6 +26,9 @@ public static class QuestionnaireEndpoints
                 return Task.CompletedTask;
             }
 
+            context.Response.ContentType = "text/html";
+            context.Response.Redirect("/questionnaire.html");
+
             return Task.CompletedTask;
         }).AllowAnonymous();
 
