@@ -40,6 +40,39 @@
             display: none;
             content: "";
         }
+
+        #spinner-holder {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px; 
+        }
+
+        .spinner-border {
+            width: 6rem;
+            height: 6rem;
+            display: inline-block;
+            vertical-align: middle;
+            border: 0.5rem solid #f3f3f3; 
+            border-top: 0.5rem solid #1762fb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            display: inline-block;
+            vertical-align: middle;
+            border: 0.5rem solid #f3f3f3; 
+            border-top: 0.5rem solid #1762fb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+        to { transform: rotate(360deg); }
+        }
     </style>
 
 </head>
@@ -125,7 +158,15 @@
             <div class="box box--with-top-lines"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <div class="box__top-line box__top-line--light-blue"></div>
                 <div class="box__top-line box__top-line--blue"></div>
-                <div class="box__holder">
+
+
+                <div id="spinner-holder" class="box__holder">
+                    <div class="flex-center">
+                        <div class="spinner-border" role="status" aria-label="Loading"></div>
+                    </div>
+                </div>
+
+                <div id="app-holder" class="box__holder" style="display:none;">
                     <ul class="box__header">
                         <li class="box__header-item box__header-item--title">
                             <div id="userCount"></div> 
@@ -140,38 +181,6 @@
                         <ul id="chatMessages" class="list-group list-group-flush list-unstyled">
 
                         </ul>
-                            
-                        <!--<div class="chat-item chat-item--joined">
-                            <img src="https://picsum.photos/id/91/300/300" alt="" class="chat-item__profile-picture">
-                            <div class="chat-item__text">
-                                <span class="chat-item__author"><b>David May</b> has joined the chat.</span>
-                            </div>
-                        </div>
-                        <div class="chat-item chat-item--message">
-                            <img src="https://picsum.photos/id/237/300/300" alt="" class="chat-item__profile-picture">
-                            <div class="chat-item__text">
-                                <span class="chat-item__author"><b>John Doe</b></span>
-                                <div class="chat-item__message">
-                                    Hey everybody! What’s everyone up to tonight?
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chat-item chat-item--message chat-item--is-you">
-                            <img src="https://picsum.photos/id/91/300/300" alt="" class="chat-item__profile-picture">
-                            <div class="chat-item__text">
-                                <span class="chat-item__author"><b>David May</b> (You)</span>
-                                <div class="chat-item__message">
-                                    Relaxing and finding the greatested products on the internet for balding!
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chat-item chat-item--left">
-                            <img src="https://picsum.photos/id/64/300/300" alt="" class="chat-item__profile-picture">
-                            <div class="chat-item__text">
-                                <span class="chat-item__author"><b>Brianna D.</b> has left the chat.</span>
-                            </div>
-                        </div>-->
-
                     </div>
                     <div class="box__section box__section--form-box box__section--top-border" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                         <textarea id="messageInput" name="" placeholder="Enter your message here..."></textarea>
@@ -190,30 +199,6 @@
             </div>
             <div class="popup__content">
                 <ul id="activeUsers" class="user-list">
-                    <!--<li class="user-list__item">
-                        <img class="user-list__picture" src="https://picsum.photos/id/91/300/300" alt="">
-                        <span class="user-list__name">David May</span>
-                    </li>
-                    <li class="user-list__item">
-                        <img class="user-list__picture" src="https://picsum.photos/id/237/300/300" alt="">
-                        <span class="user-list__name">John Doe</span>
-                    </li>
-                    <li class="user-list__item">
-                        <img class="user-list__picture" src="https://picsum.photos/id/64/300/300" alt="">
-                        <span class="user-list__name">Brianna D.</span>
-                    </li>
-                    <li class="user-list__item">
-                        <img class="user-list__picture" src="https://picsum.photos/id/401/300/300" alt="">
-                        <span class="user-list__name">Jillian's Circus</span>
-                    </li>
-                    <li class="user-list__item">
-                        <img class="user-list__picture" src="https://picsum.photos/id/433/300/300" alt="">
-                        <span class="user-list__name">Bear Jones</span>
-                    </li>
-                    <li class="user-list__item">
-                        <img class="user-list__picture" src="https://picsum.photos/id/528/300/300" alt="">
-                        <span class="user-list__name">Jur Nell</span>
-                    </li>-->
                 </ul>
             </div>
         </div>
@@ -462,6 +447,9 @@
                     `;
                 }
 
+                $('#app-holder').css('display', 'block');
+                $('#spinner-holder').remove();
+
                 $chatList.append(messageTemplate);
             });
         }
@@ -504,13 +492,13 @@
 
         $('#sendButton').on('click', function () {
             const $btn = $(this);
-            const originalText = $btn.html(); // Store original text
+            const originalText = $btn.html();
             const message = $('#messageInput').val();
 
             if (!message.trim()) return;
 
             $btn.html(`<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...`);
-            $btn.prop('disabled', true); // Optional: disable button during send
+            $btn.prop('disabled', true);
 
             sendMessageToHub(message);
             $('#messageInput').val('');
