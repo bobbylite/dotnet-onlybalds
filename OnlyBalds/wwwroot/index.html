@@ -260,7 +260,7 @@
         const handleAccount = (user) => {
             var account = user.account;
             
-            if (account.hasSubmittedQuistionnaire === true) {
+            if (account.hasSubmittedQuistionnaire !== true) {
                 window.location.replace('/account-questionnaire');
             }
         }
