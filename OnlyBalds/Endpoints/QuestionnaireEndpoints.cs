@@ -16,11 +16,18 @@ public static class QuestionnaireEndpoints
 
         endpoints.MapGet("/questionnaire", context =>
         {
-            context.Response.ContentType = "text/html";
-            context.Response.Redirect("/questionnaire.html");
+            var isAuthenticated = context.User?.Identity?.IsAuthenticated;
+
+            if (isAuthenticated is null || isAuthenticated is false)
+            {
+                context.Response.ContentType = "text/html";
+                context.Response.Redirect("/access-denied.html");
+
+                return Task.CompletedTask;
+            }
 
             return Task.CompletedTask;
-        }).RequireAuthorization();
+        }).AllowAnonymous();
 
         return endpoints;
     }

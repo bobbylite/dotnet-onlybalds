@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	<title>New Post | Only Balds</title>
+	<title>Marketplace | Only Balds</title>
 	<meta name="description" content="">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,10 +30,10 @@
 	<meta property="og:site_name" content="Site Name">
 	<meta property="og:locale" content="en_US">
 
-	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
+    <link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
 
 	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
-    
+
 </head>
 <body>
 
@@ -105,47 +105,36 @@
     ============================================== -->
     <div class="banner banner--fade-to-gray">
         <div class="container">
-            <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">New Post</h1>
-            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">To make a new Forum post, fill out the form below!</p>
+            <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">Unauthorized</h1>
+            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">You are unauthorized to access this members only page.</p>
         </div>
     </div><!--/banner -->
 
-    <!-- BALDIE QUESTIONNAIRE
+    <!-- MARKETPLACE
     ============================================== -->
     <div class="section section--gray">
         <div class="container">
-            <div class="box box--with-top-lines"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+            <div class="box box--with-top-lines" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <div class="box__top-line box__top-line--light-blue"></div>
                 <div class="box__top-line box__top-line--blue"></div>
                 <div class="box__holder">
-                    <div class="box__section box__section--chat-frame">
-                        <form action="" id="baldie-questionnaire">
-                            <div class="grid">
-                                <div class="grid__column grid__column--12 control">
-                                    <label for="newPostTitle" class="control__label">Post Title</label>
-                                    <input type="text" id="newPostTitle" name="newPostTitle" class="control__input">
-                                </div>
-                                <div class="grid__column grid__column--12 control">
-                                    <label for="newPostContent" class="control__label">Post Content</label>
-                                    <textarea id="newPostContent" name="newPostContent" class="control__input" style="height:300px;"></textarea>
-                                </div>
-                                <div class="grid__column grid__column--12 control">
-                                    <button class="btn btn--blue" type="submit">Submit New Post!</button>
-                                </div>
-                            </div>
-                        </form>
-
+                    <div class="box__section">
+                        <p class="card-text">
+                            It looks like you’re trying to access a page that requires membership. Join our community of like-minded individuals and get full access to exclusive content, special offers, and much more!
+                        </p>
+                        <p class="card-text">
+                            Signing up is quick and easy. Just click the button below to get started and unlock the benefits of being a member of The Only Balds Marketplace.
+                        </p>
+                        <div class="box__buttons">
+                            <a href="/auth/login" class="btn btn--rounded btn--blue">Become A Member</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-        </div>
-    </div><!--/baldie questionnaire-->
-
-
-	    <div class="footer">
+	<div class="footer">
         <div class="container">
             <div class="footer__buttons">
                 <ul class="footer__button-links">
@@ -160,83 +149,6 @@
     </div>
 
     <script src="assets/scripts/App-5379555225.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-    <script>
-        $(() => {
-            $.ajax({
-                url: "/identity-information",
-                method: "GET",
-                success: function (data) {
-                    user = data;
-                    let userName = user.name;
-                    console.log("User name:", userName);
-                    $(".sign-in").remove();
-                    $(".greeting").empty().append(`Hi, ${userName}`);
-                    $("#menu-options").append(`
-                        <li class="dropdown__item sign-out">
-                            <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
-                                <i class="fa fa-sign-out"></i> 
-                                Sign Out
-                            </a>
-                        </li>
-                    `);
-                },
-                error: function (xhr, status, error) {
-                }
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            $('.btn.btn--blue').on('click', function (e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: "/identity-information",
-                    method: "GET",
-                    success: function (data) {
-                        console.log("User data:", data);
-                        const userId = data.claims.sub;
-                        const params = new URLSearchParams(window.location.search);
-                        const threadId = params.get('threadId');
-
-                        let postItem = 
-                        {
-                            id: crypto.randomUUID(),
-                            title: $("#newPostTitle").val(),
-                            content: $("#newPostContent").val(),
-                            postedOn: new Date().toISOString(),
-                            author: data.name,
-                            threadId: threadId,
-                            userId: userId
-                        };
-                        let postItemJson = JSON.stringify(postItem);
-
-                        $.ajax({
-                            url: '/articles',
-                            type: 'POST',
-                            contentType: 'application/json',
-                            data: postItemJson,
-                            success: function(response) {
-                                console.log('Post successful:', response);
-                                window.location.replace('/forum');
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Post failed:', error);
-                            }
-                        });
-
-                    },
-                    error: function (xhr, status, error) {
-                    }
-                });
-            });
-        });
-
-    </script>
 
 </body>
 </html>

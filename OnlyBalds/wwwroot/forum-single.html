@@ -301,6 +301,7 @@
                             data: commentItemJson,
                             success: function(response) {
                                 console.log('Post successful:', response);
+                                location.reload();
                             },
                             error: function(xhr, status, error) {
                                 console.error('Post failed:', error);

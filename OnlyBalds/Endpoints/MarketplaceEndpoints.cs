@@ -20,7 +20,7 @@ public static class MarketplaceEndpoints
             context.Response.Redirect("/marketplace.html");
 
             return Task.CompletedTask;
-        }).RequireAuthorization();
+        }).AllowAnonymous();
 
         return endpoints;
     }
