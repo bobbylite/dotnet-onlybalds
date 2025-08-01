@@ -233,8 +233,7 @@
                 success: function (data) {
                     console.log("Threads data:", data);
                     if (data.every(thread => thread.name !== "NewsArticles")) {
-                        CreateNewsArticleThread(user);
-                        return;
+                        return CreateNewsArticleThread(user);
                     }
                     data.forEach(thread => {
                         console.log("Thread Id:", thread.id);
@@ -315,6 +314,7 @@
                     data: threadItemJson,
                     success: function(response) {
                         console.log('Post successful:', response);
+                        location.reload();
                     },
                     error: function(xhr, status, error) {
                         console.error('Post failed:', error);

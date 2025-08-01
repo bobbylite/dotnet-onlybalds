@@ -19,11 +19,21 @@ public static class ForumEndpoints
 
         endpoints.MapGet("/forum", context =>
         {
+            var isAuthenticated = context.User?.Identity?.IsAuthenticated;
+
+            if (isAuthenticated is null || isAuthenticated is false)
+            {
+                context.Response.ContentType = "text/html";
+                context.Response.Redirect("/access-denied.html");
+
+                return Task.CompletedTask;
+            }
+
             context.Response.ContentType = "text/html";
             context.Response.Redirect("/forum.html");
 
             return Task.CompletedTask;
-        }).RequireAuthorization();
+        }).AllowAnonymous();
 
         endpoints.MapGet("/forum-new-post/{threadId:guid}", context =>
         {
@@ -49,14 +59,37 @@ public static class ForumEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGet("/threads", GetThreads).RequireAuthorization();
-        endpoints.MapGet("/thread", GetThread).RequireAuthorization();
-        endpoints.MapPost("/threads", PostThread).RequireAuthorization();
-        endpoints.MapGet("/articles", GetPosts).RequireAuthorization();
-        endpoints.MapGet("/article", GetPost).RequireAuthorization();
-        endpoints.MapPost("/articles", PostArticle).RequireAuthorization();
-        endpoints.MapGet("/article-comments", GetComments).RequireAuthorization();
-        endpoints.MapPost("/article-comments", PostComment).RequireAuthorization();
+        endpoints
+        .MapGet("/threads", GetThreads)
+        .RequireAuthorization();
+
+        endpoints
+        .MapGet("/thread", GetThread)
+        .RequireAuthorization();
+
+        endpoints
+        .MapPost("/threads", PostThread)
+        .RequireAuthorization();
+
+        endpoints
+        .MapGet("/articles", GetPosts)
+        .RequireAuthorization();
+
+        endpoints
+        .MapGet("/article", GetPost)
+        .RequireAuthorization();
+
+        endpoints
+        .MapPost("/articles", PostArticle)
+        .RequireAuthorization();
+
+        endpoints
+        .MapGet("/article-comments", GetComments)
+        .RequireAuthorization();
+
+        endpoints
+        .MapPost("/article-comments", PostComment)
+        .RequireAuthorization();
 
         return endpoints;
     }
