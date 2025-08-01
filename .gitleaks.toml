@@ -1,0 +1,11 @@
+[[rules]]
+id = "allow-oauth-client-id"
+description = "Ignore known OAuthClientId dev value"
+regex = '''"OAuthClientId":\s?"dev-client-id"'''
+tags = ["allowlist"]
+
+[[rules]]
+id = "allow-oauth-client-secret"
+description = "Ignore known OAuthClientSecret dev value"
+regex = '''"OAuthClientSecret":\s?"dev-client-secret"'''
+tags = ["allowlist"]

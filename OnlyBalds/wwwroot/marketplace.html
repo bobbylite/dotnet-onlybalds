@@ -30,6 +30,8 @@
 	<meta property="og:site_name" content="Site Name">
 	<meta property="og:locale" content="en_US">
 
+    <link rel="stylesheet" href="/app.css"/>
+
     <link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
 
 	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
@@ -112,7 +114,13 @@
 
     <!-- MARKETPLACE
     ============================================== -->
-    <div class="section section--gray">
+    <div id="spinner-holder" class="box__holder">
+        <div class="flex-center">
+            <div class="spinner-border" role="status" aria-label="Loading"></div>
+        </div>
+    </div>
+
+    <div id="app-holder" class="section section--gray" style="display: none;">
         <div class="container">
             <div class="box box--with-top-lines" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <div class="box__top-line box__top-line--light-blue"></div>
@@ -219,6 +227,9 @@
                         `id=${elementId}`
                     );
                     console.log("Marketplace initialized.");
+
+                    $('#app-holder').css('display', 'block');
+                    $('#spinner-holder').remove();
                 };
 
                 const loadScript = () => {
