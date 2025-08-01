@@ -17,6 +17,7 @@ jobs:
       - name: Run Gitleaks
         run: |
           gitleaks detect \
+            --config .gitleaks.toml \
             --redact \
             --exit-code=2 \
             --report-format=sarif \
