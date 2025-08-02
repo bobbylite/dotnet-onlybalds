@@ -77,7 +77,7 @@
                 <span class="navbar__mobile-hide">My </span>Account <i class="fa fa-angle-down dropdown__toggle-icon"></i>
             </a>
             <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
-                <li class="dropdown__item dropdown__item--title greeting">Hi, David May</li>
+                <li class="dropdown__item dropdown__item--title greeting"></li>
                 <li class="dropdown__item">
                     <a href="/account-questionnaire" class="dropdown__link dropdown__link--icon">
                         <i class="fa fa-edit"></i> 
@@ -259,9 +259,15 @@
 
         const handleAccount = (user) => {
             var account = user.account;
+
+            if (account === null || account === undefined) {
+                window.location.replace('/account-questionnaire');
+                return;
+            }
             
             if (account.hasSubmittedQuistionnaire !== true) {
                 window.location.replace('/account-questionnaire');
+                return;
             }
         }
     </script>

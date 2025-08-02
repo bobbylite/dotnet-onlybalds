@@ -25,13 +25,11 @@ public static class QuestionnaireEndpoints
             {
                 context.Response.ContentType = "text/html";
                 context.Response.Redirect("/access-denied.html");
-
                 return Task.CompletedTask;
             }
 
             context.Response.ContentType = "text/html";
             context.Response.Redirect("/questionnaire.html");
-
             return Task.CompletedTask;
         }).AllowAnonymous();
 
