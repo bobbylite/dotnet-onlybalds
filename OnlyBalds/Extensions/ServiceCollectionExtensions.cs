@@ -55,6 +55,7 @@ public static class ServiceCollectionExtensions
             options.Scope.Clear();
             options.Scope.Add("openid");
             options.Scope.Add("profile");
+            options.Scope.Add("email");
             options.Scope.Add("offline_access");
             options.Scope.Add("user:access");
 
