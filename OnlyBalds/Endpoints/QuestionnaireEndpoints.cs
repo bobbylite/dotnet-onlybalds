@@ -79,7 +79,7 @@ public static class QuestionnaireEndpoints
             LastName = questionnaireItem.LastName,
             Address = questionnaireItem.Address,
             Username = username,
-            Email = subject.Contains("auth0") ? Name :  email,
+            Email = email,
             QuestionnaireId = questionnaireItem.Id.ToString(),
             HasSubmittedQuistionnaire = true,
             IdentityProviderId = subject,
