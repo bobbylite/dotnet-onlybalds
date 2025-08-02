@@ -32,6 +32,36 @@ public class QuestionnaireItems
     /// </summary>
     [JsonPropertyName("data")]
     public QuestionnaireData? Data { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user identifier associated with the questionnaire.
+    /// /// </summary>
+    [JsonPropertyName("userId")]
+    public string UserId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The display name of the identity.
+    /// </summary>
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the first name of the user filling out the questionnaire.
+    /// </summary>
+    [JsonPropertyName("firstName")]
+    public string FirstName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the last name of the user filling out the questionnaire.
+    /// </summary>
+    [JsonPropertyName("lastName")]
+    public string LastName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the address of the user filling out the questionnaire.
+    /// </summary>
+    [JsonPropertyName("address")]
+    public string Address { get; set; } = string.Empty;
 }
 
 /// <summary>

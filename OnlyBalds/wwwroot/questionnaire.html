@@ -105,10 +105,14 @@
     ============================================== -->
     <div class="banner banner--fade-to-gray">
         <div class="container">
-            <h1 class="banner__heading"  data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">Baldie Questionnaire</h1>
-            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Want to join a growing community of people all at different points in their balding journey?</p>
+            <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">Welcome to OnlyBalds</h1>
+            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">
+                Thanks for signing up! You're just a few clicks away from joining a supportive community navigating their balding journeys together.
+                Fill out the quick questionnaire below to personalize your experience and set up your profile.
+            </p>
         </div>
     </div><!--/banner -->
+
 
     <!-- BALDIE QUESTIONNAIRE
     ============================================== -->
@@ -121,6 +125,22 @@
                     <div class="box__section box__section--chat-frame">
                         <form action="" id="baldie-questionnaire">
                             <div class="grid">
+                                <div class="grid__column grid__column--12 grid__column--6--md control">
+                                    <label for="firstName" class="control__label">What is your first name?</label>
+                                    <input type="text" id="firstName" name="firstName" class="control__input">
+                                </div>
+                                <div class="grid__column grid__column--12 grid__column--6--md control">
+                                    <label for="lastName" class="control__label">What is your last name?</label>
+                                    <input type="text" id="lastName" name="lastName" class="control__input">
+                                </div>
+                                <div class="grid__column grid__column--12 grid__column--6--md control">
+                                    <label for="displayName" class="control__label">What would you like us to call you?</label>
+                                    <input type="text" id="displayName" name="displayName" class="control__input">
+                                </div>
+                                <div class="grid__column grid__column--12 grid__column--6--md control">
+                                    <label for="address" class="control__label">What is your current address?</label>
+                                    <input type="text" id="address" name="address" class="control__input">
+                                </div>
                                 <div class="grid__column grid__column--12 grid__column--6--md control">
                                     <label for="hearAbout" class="control__label">How Did You Hear About Us?</label>
                                     <select class="select control__input" id="hearAbout" name="hearAbout">
@@ -281,6 +301,11 @@
                     `);
 
                     handleSubmitQuestionnaire(user.account);
+
+                    if (user.account.hasSubmittedQuistionnaire == true)
+                    {
+                        window.location.replace('/');
+                    }
                 },
                 error: function (xhr, status, error) {
                 }
@@ -296,11 +321,15 @@
                 const baldType = $('#baldType').val();
 
                 const answers = {
-                isCompleted: true,
-                data: {
-                    questions: [
-                    {
-                        title: "How did you hear about us?",
+                    firstName: $('#firstName').val(),
+                    lastName: $('#lastName').val(),
+                    displayName: $('#displayName').val(),
+                    address: $('#address').val(),
+                    isCompleted: true,
+                    data: {
+                        questions: [
+                            {
+                                title: "How did you hear about us?",
                         answer: $('#hearAbout').val()
                     },
                     {
@@ -398,6 +427,7 @@
                         data: JSON.stringify(answers),
                         success: function (response) {
                             console.log("Success:", response);
+                            window.location.replace('/');
                         },
                         error: function (xhr, status, error) {
                             console.error("Error:", status, error);

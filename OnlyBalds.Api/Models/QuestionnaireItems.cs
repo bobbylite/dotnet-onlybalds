@@ -33,6 +33,12 @@ public class QuestionnaireItems
     /// </summary>
     [JsonPropertyName("data")]
     public QuestionnaireData? Data { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user identifier associated with the questionnaire.
+    /// /// </summary>
+    [JsonPropertyName("userId")]
+    public string UserId { get; set; } = string.Empty;
 }
 
 /// <summary>
