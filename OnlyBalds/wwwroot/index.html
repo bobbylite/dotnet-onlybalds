@@ -259,9 +259,15 @@
 
         const handleAccount = (user) => {
             var account = user.account;
+
+            if (account === null || account === undefined) {
+                window.location.replace('/account-questionnaire');
+                return;
+            }
             
             if (account.hasSubmittedQuistionnaire !== true) {
                 window.location.replace('/account-questionnaire');
+                return;
             }
         }
     </script>

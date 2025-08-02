@@ -17,10 +17,10 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->   
 	
-	<link rel="icon" href="images/favicon-16.png" sizes="16x16" type="image/png">
-	<link rel="icon" href="images/favicon-32.png" sizes="32x32" type="image/png">
-	<link rel="icon" href="images/favicon-48.png" sizes="48x48" type="image/png">
-	<link rel="icon" href="images/favicon-62.png" sizes="62x62" type="image/png">
+	<link rel="icon" href="/images/favicon-16.png" sizes="16x16" type="image/png">
+	<link rel="icon" href="/images/favicon-32.png" sizes="32x32" type="image/png">
+	<link rel="icon" href="/images/favicon-48.png" sizes="48x48" type="image/png">
+	<link rel="icon" href="/images/favicon-62.png" sizes="62x62" type="image/png">
 	<link rel="apple-touch-icon" href="apple-touch-icon.png">
 	<meta property="og:url" content="https://example.com/page.html">
 	<meta property="og:type" content="website">
@@ -30,9 +30,9 @@
 	<meta property="og:site_name" content="Site Name">
 	<meta property="og:locale" content="en_US">
 
-	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
+	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
 
-	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
+	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
 
 </head>
 <body>
@@ -256,7 +256,7 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
-    <script src="assets/scripts/App-5379555225.js"></script>
+    <script src="/assets/scripts/App-5379555225.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -268,7 +268,7 @@
                 success: function (data) {
                     user = data;
                     let userName = user.name;
-                    console.log("User name:", userName);
+                    
                     $(".sign-in").remove();
                     $(".greeting").empty().append(`Hi, ${userName}`);
                     $("#menu-options").append(`
