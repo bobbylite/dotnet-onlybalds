@@ -51,6 +51,9 @@ public static class QuestionnaireEndpoints
         ArgumentNullException.ThrowIfNull(questionnaireItem);
 
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
+        var subject = context.User?.Claims?.FirstOrDefault(c => c.Type == "sub")?.Value ?? string.Empty;
+        questionnaireItem.Id = Guid.NewGuid();
+        questionnaireItem.UserId = subject;
         var response = await httpClient.PostAsJsonAsync("questionnaire", questionnaireItem);
 
         if (questionnaireItem is null)
@@ -58,7 +61,38 @@ public static class QuestionnaireEndpoints
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
-        
-        context.Response.Redirect("/");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            return;
+        }
+
+        var Name = context.User?.Claims?.FirstOrDefault(c => c.Type == "name")?.Value ?? string.Empty;
+        var username = context.User?.Claims?.FirstOrDefault(c => c.Type == "nickname")?.Value ?? string.Empty;
+        var email = context.User?.Claims?.FirstOrDefault(c => c.Type == "email")?.Value ?? string.Empty;
+
+        var account = new AccountItem
+        {
+            DisplayName = questionnaireItem.DisplayName,
+            FirstName = questionnaireItem.FirstName,
+            LastName = questionnaireItem.LastName,
+            Address = questionnaireItem.Address,
+            Username = username,
+            Email = subject.Contains("auth0") ? Name :  email,
+            QuestionnaireId = questionnaireItem.Id.ToString(),
+            HasSubmittedQuistionnaire = true,
+            IdentityProviderId = subject,
+        };
+
+        var accountsResponse = await httpClient.PostAsJsonAsync("account", account);
+
+        if (!accountsResponse.IsSuccessStatusCode)
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            return;
+        }
+
+        context.Response.StatusCode = StatusCodes.Status201Created;
     }
 }

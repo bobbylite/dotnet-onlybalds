@@ -16,6 +16,26 @@ public class Account
     public Guid Id { get; set; }
 
     /// <summary>
+    /// The display name of the identity.
+    /// </summary>
+    public string DisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string FirstName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string LastName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string Address { get; set; } = string.Empty;
+
+    /// <summary>
     /// The identity provider identifier.
     /// </summary>
     public string IdentityProviderId { get; set; } = string.Empty;

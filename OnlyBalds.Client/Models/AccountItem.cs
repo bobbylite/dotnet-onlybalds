@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace OnlyBalds.Client.Models;
 
 public class AccountItem
@@ -6,6 +8,30 @@ public class AccountItem
     /// Unique identifier for the account.
     /// </summary>
     public Guid Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the user filling out the questionnaire.
+    /// </summary>
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the first name of the user filling out the questionnaire.
+    /// </summary>
+    [JsonPropertyName("firstName")]
+    public string FirstName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the last name of the user filling out the questionnaire.
+    /// </summary>
+    [JsonPropertyName("lastName")]
+    public string LastName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the address of the user filling out the questionnaire.
+    /// </summary>
+    [JsonPropertyName("address")]
+    public string Address { get; set; } = string.Empty;
 
     /// <summary>
     /// The identity provider identifier.
