@@ -34,6 +34,8 @@
 
 	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
 
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+
 </head>
 <body>
 
@@ -139,7 +141,7 @@
                                 </div>
                                 <div class="grid__column grid__column--12 grid__column--6--md control">
                                     <label for="address" class="control__label">What is your current address?</label>
-                                    <input type="text" id="address" name="address" class="control__input">
+                                    <input type="text" id="address" name="address" class="control__input" autocomplete="off">
                                 </div>
                                 <div class="grid__column grid__column--12 grid__column--6--md control">
                                     <label for="hearAbout" class="control__label">How Did You Hear About Us?</label>
@@ -439,6 +441,20 @@
             });
         }
     </script>
+
+    <script>
+    function initAutocomplete() {
+        const input = document.getElementById('address');
+        const options = {
+            types: ['address'],
+            componentRestrictions: { country: 'us' }
+        };
+
+        new google.maps.places.Autocomplete(input, options);
+    }
+
+    //window.addEventListener('load', initAutocomplete);
+</script>
 
 </body>
 </html>
