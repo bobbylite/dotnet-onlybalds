@@ -279,11 +279,135 @@
                             </a>
                         </li>
                     `);
+
+                    handleSubmitQuestionnaire(user.account);
                 },
                 error: function (xhr, status, error) {
                 }
             });
         });
+
+        const handleSubmitQuestionnaire = (account) => {
+            $('#submit-questionnaire').click(async function (event) {
+                event.preventDefault();
+
+                console.log("Submitting questionnaire for account:", account);
+
+                const baldType = $('#baldType').val();
+
+                const answers = {
+                isCompleted: true,
+                data: {
+                    questions: [
+                    {
+                        title: "How did you hear about us?",
+                        answer: $('#hearAbout').val()
+                    },
+                    {
+                        title: "Where do you usually buy products?",
+                        answer: $('#whereYouBuy').val()
+                    },
+                    {
+                        title: "Apparel size",
+                        answer: $('#apparelSize').val()
+                    },
+                    {
+                        title: "Monthly spend on grooming products",
+                        answer: $('#monthlySpend').val()
+                    },
+                    {
+                        title: "Are you open to trying new products/routines?",
+                        answer: $('input[name="newRoutine"]:checked').val()
+                    },
+                    {
+                        title: "Are you an active baldie?",
+                        answer: $('input[name="activeBaldie"]:checked').val()
+                    },
+                    {
+                        title: "Type of bald",
+                        answer: baldType
+                    }
+                    ],
+                    baldingOptions: [
+                    {
+                        option: [
+                        {
+                            baldingOptionTitle: "Beard Baldie",
+                            questions: [
+                            {
+                                title: "What type of beard do you have?",
+                                answer: $('#typeOfBeard').val()
+                            }
+                            ]
+                        },
+                        {
+                            baldingOptionTitle: "Rookie Baldie",
+                            questions: [
+                            {
+                                title: "Do you have a beard?",
+                                answer: $('#haveABeard').val()
+                            },
+                            {
+                                title: "Are you looking for recommendations?",
+                                answer: $('#lookingForRecommendations').val()
+                            }
+                            ]
+                        },
+                        {
+                            baldingOptionTitle: "Denier Baldie",
+                            questions: [
+                            {
+                                title: "Are you self-conscious about being bald?",
+                                answer: $('#selfConscious').val()
+                            },
+                            {
+                                title: "Reason?",
+                                answer: $('#selfConsciousReason').val()
+                            }
+                            ]
+                        },
+                        {
+                            baldingOptionTitle: "Confident Baldie",
+                            questions: [
+                            {
+                                title: "Do you shave or buzz?",
+                                answer: $('#shaveOrBuzz').val()
+                            },
+                            {
+                                title: "How long have you been bald?",
+                                answer: $('#howLong').val()
+                            },
+                            {
+                                title: "Do you have the chrome cap?",
+                                answer: $('#chromeCap').val()
+                            }
+                            ]
+                        }
+                        ]
+                    }
+                    ]}
+                };
+
+                try {
+                    console.log('Submitting form:', answers);
+
+                    $.ajax({
+                        url: "/account-questionnaire",
+                        method: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(answers),
+                        success: function (response) {
+                            console.log("Success:", response);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error:", status, error);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                }
+            });
+        }
     </script>
 
 </body>
