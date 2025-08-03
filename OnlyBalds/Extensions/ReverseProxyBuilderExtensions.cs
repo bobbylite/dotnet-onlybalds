@@ -73,7 +73,8 @@ public static class ReverseProxyBuilderExtensions
 
                 var originalUri = transformContext.Path.Value;
                 var updatedPath = originalUri?.Replace("/onlybalds-api", "", StringComparison.OrdinalIgnoreCase);
-                transformContext.ProxyRequest.RequestUri = new Uri($"{transformContext.DestinationPrefix}{updatedPath}");
+                var queryString = transformContext.Query.QueryString.Value;
+                transformContext.ProxyRequest.RequestUri = new Uri($"{transformContext.DestinationPrefix}{updatedPath}{queryString}");
 
                 if (transformContext.ProxyRequest.Method.Method == HttpMethod.Get.Method)
                 {
