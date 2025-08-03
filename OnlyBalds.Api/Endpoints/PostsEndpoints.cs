@@ -23,7 +23,12 @@ public static class PostsEndpoints
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
 
-        app.MapGet("/posts/{id}", GetPostsById)
+        app.MapGet("/posts-by-thread-id/{threadId}", GetPostsByThreadId)
+            .WithName(nameof(GetPostsByThreadId))
+            .WithOpenApi()
+            .RequireAuthorization(ThreadAuthorizationPolicyName);
+
+        app.MapGet("/posts/{postId}", GetPostsById)
             .WithName(nameof(GetPostsById))
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
@@ -52,54 +57,81 @@ public static class PostsEndpoints
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
     public static IResult GetPosts(
-        [FromQuery] string? postId,
-        [FromQuery] string? threadId,
+        string? postId,
+        string? threadId,
         [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
 
-        System.Diagnostics.Debug.WriteLine($"post ID: {postId}");
-
         if (string.IsNullOrEmpty(postId) is not true)
         {
-            var post = postsRepository.GetById(Guid.Parse(postId));
-            
+            var post = postsRepository
+                .GetAll()
+                .SingleOrDefault(c => c.Id == Guid.Parse(postId));
+
             ArgumentNullException.ThrowIfNull(post);
+
             return Results.Ok(post);
         }
 
         if (string.IsNullOrEmpty(threadId) is not true)
         {
-            var post = postsRepository
+            var posts = postsRepository
                 .GetAll()
-                .Where(p => p.ThreadId == Guid.Parse(threadId))
+                .Where(c => c.ThreadId == Guid.Parse(threadId))
                 .ToList();
 
-            ArgumentNullException.ThrowIfNull(post);
-            return Results.Ok(post);
+            ArgumentNullException.ThrowIfNull(posts);
+
+            return Results.Ok(posts);
         }
 
-        var posts = postsRepository.GetAll();
-        ArgumentNullException.ThrowIfNull(posts);
 
+        //var posts = postsRepository.GetAll();
+        //ArgumentNullException.ThrowIfNull(posts);
+
+        //return Results.Ok(posts);
+
+        return Results.BadRequest("Post ID cannot be null or empty.");
+    }
+
+    /// <summary>
+    /// Retrieves all posts from the repository.
+    /// </summary>
+    /// <param name="postsRepository"></param>
+    /// <returns><see cref="IResult"/></returns>
+    public static IResult GetPostsByThreadId(string threadId, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+    {
+        ArgumentNullException.ThrowIfNull(postsRepository);
+
+        if (string.IsNullOrEmpty(threadId))
+        {
+            return Results.BadRequest("Thread ID cannot be null or empty.");
+        }
+
+        var posts = postsRepository
+            .GetAll()
+            .Where(p => p.ThreadId == Guid.Parse(threadId)).ToList();
         return Results.Ok(posts);
     }
 
+    /*
     /// <summary>
     /// Retrieves posts associated with a specific thread.
     /// </summary>
     /// <param name="threadId"></param>
     /// <param name="postsRepository"></param>
     /// <returns></returns>
-    public static IResult GetPostsByPostId([FromQuery] string postId, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+    public static IResult GetPostsByThreadId(string id, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
 
-        var posts = postsRepository.GetById(Guid.Parse(postId));
+        var posts = postsRepository.GetAll().Where(p => p.ThreadId == Guid.Parse(id)).ToList();
         ArgumentNullException.ThrowIfNull(posts);
 
         return Results.Ok(posts);
     }
+    */
 
     /// <summary>
     /// Retrieves a specific post by its identifier.
@@ -107,11 +139,16 @@ public static class PostsEndpoints
     /// <param name="id"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetPostsById(Guid id, [FromServices] IOnlyBaldsRepository<ThreadItem> postsRepository)
+    public static IResult GetPostsById(string postId, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
 
-        var post = postsRepository.GetById(id);
+        if (string.IsNullOrEmpty(postId))
+        {
+            return Results.BadRequest("Post ID cannot be null or empty.");
+        }
+
+        var post = postsRepository.GetById(Guid.Parse(postId));
         ArgumentNullException.ThrowIfNull(post);
 
         return Results.Ok(post);

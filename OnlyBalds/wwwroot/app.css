@@ -62,6 +62,26 @@ ol#chatMessages li::marker {
     content: "";
 }
 
+.circle-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: black;
+    color: white;
+    border: none;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s ease;
+}
+
+.circle-btn:hover {
+    background-color: #333;
+}
+
 #spinner-holder {
     display: flex;
     justify-content: center;

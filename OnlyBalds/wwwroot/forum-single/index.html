@@ -31,7 +31,7 @@
 	<meta property="og:locale" content="en_US">
 
     <link rel="stylesheet" href="/app.css"/>
-
+    
 	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
 
 	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
@@ -115,7 +115,18 @@
         <div class="container article__container">
 
             <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h1 id="article-title" class="h2 article__heading">Health Checks Page</h1>
+                <h1 id="article-title" class="h2 article__heading"></h1>
+                <div class="article__actions" style="float: right; margin-top: -40px; display: flex; gap: 8px;">
+                    <button class="circle-btn" id="star-post" title="Star Post">
+                        <i class="fa fa-heart"></i>
+                    </button>
+                    <button class="circle-btn" id="edit-post" title="Edit Post">
+                        <i class="fa fa-pencil"></i>
+                    </button>
+                    <button class="circle-btn" id="delete-post" title="Delete Post">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
                 <div class="author-info">
                     <div class="listing__meta-author">
                         <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
@@ -198,15 +209,16 @@
     <script>
         let userId = '';
 
-        $(() => {
+        $(document).ready(() => {
             const params = new URLSearchParams(window.location.search);
             const postId = params.get("postId");
 
             $.ajax({
                 url: `/onlybalds-api/posts?postId=${postId}`,
                 method: "GET",
+                dataType: "json",
                 success: function (data) {
-                    let post = data[0];
+                    let post = data;
                     $("#article-title").text(post.title);
                     $("#article-author").text(`Posted by ${post.author}`);
                     $("#article-content").html(post.content);
