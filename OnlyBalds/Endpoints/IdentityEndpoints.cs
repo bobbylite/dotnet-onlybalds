@@ -1,6 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using OnlyBalds.Client.Models;
+using OnlyBalds.Models;
 
 namespace OnlyBalds.Endpoints;
 
