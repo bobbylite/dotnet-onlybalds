@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	<title>Forum | Only Balds</title>
+	<title>Marketplace | Only Balds</title>
 	<meta name="description" content="">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,10 +31,10 @@
 	<meta property="og:locale" content="en_US">
 
     <link rel="stylesheet" href="/app.css"/>
-    
-	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
 
-	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
+    <link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
+
+	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
 
 </head>
 <body>
@@ -107,40 +107,34 @@
     ============================================== -->
     <div class="banner banner--fade-to-gray">
         <div class="container">
-            <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">News Articles</h1>
-            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Catch up on the latest news and articles from the Only Balds community.</p>
-            <div class="banner__btn-holder" data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
-                <a id="write-new-post" class="btn btn--blue banner__btn">Write New Post</a>
-            </div>
+            <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">The Only Balds Marketplace</h1>
+            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Find the perfect product for your place in the balding journey!</p>
         </div>
     </div><!--/banner -->
 
-    <!-- FORUM LISTINGS
+    <!-- MARKETPLACE
     ============================================== -->
     <div id="spinner-holder" class="box__holder">
         <div class="flex-center">
             <div class="spinner-border" role="status" aria-label="Loading"></div>
         </div>
     </div>
+
     <div id="app-holder" class="section section--gray" style="display: none;">
         <div class="container">
-            <ul id="threads-list" class="list-group list-group-flush list-unstyled">
-
-            </ul>
-            <nav class="pagination" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <ul class="pagination__nav">
-                    <li class="pagination__item"><a href="#" class="pagination__link pagination__link--prev"><i class="fa fa-angle-left pagination__icon"></i> Prev</a></li>
-                    <li class="pagination__item"><a href="#" class="pagination__link pagination__link--is-active">1</a></li>
-                    <!--<li class="pagination__item"><a href="#" class="pagination__link">2</a></li>
-                    <li class="pagination__item"><a href="#" class="pagination__link">3</a></li>-->
-                    <li class="pagination__item"><a href="#" class="pagination__link pagination__link--next">Next <i class="fa fa-angle-right pagination__icon"></i></a></li>
-                </ul>
-            </nav>
-
+            <div class="box box--with-top-lines" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                <div class="box__top-line box__top-line--light-blue"></div>
+                <div class="box__top-line box__top-line--blue"></div>
+                <div class="box__holder">
+                    <div class="box__section">
+                        <div id="ecwid-marketplace"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div><!--forum listings -->
+    </div>
 
-	    <div class="footer">
+	<div class="footer">
         <div class="container">
             <div class="footer__buttons">
                 <ul class="footer__button-links">
@@ -154,9 +148,9 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
-    <script src="assets/scripts/App-5379555225.js"></script>
+    <script src="/assets/scripts/App-5379555225.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
         $(() => {
@@ -185,120 +179,87 @@
     </script>
 
     <script>
-        $(() => {
-            $.ajax({
-                url: "/identity-information",
-                method: "GET",
-                success: function (data) {
-                    user = data;
-                    GetThreads(user);
-                },
-                error: function (xhr, status, error) {
-                }
-            });
+        // Initializes the Ecwid marketplace widget.
+        const resizeObserverErrorHandler = (error) => {
+            if (error.message && error.message.includes('ResizeObserver loop')) {
+                return;
+            }
+        };
+
+        window.addEventListener('error', (event) => {
+            if (event.message && event.message.includes('ResizeObserver loop')) {
+                event.stopImmediatePropagation();
+            }
         });
+        window.addEventListener('error', resizeObserverErrorHandler);
+        window.addEventListener('unhandledrejection', resizeObserverErrorHandler);
 
-        const GetThreads = (user) => 
-        {
-            $.ajax({
-                url: "/onlybalds-api/threads",
-                method: "GET",
-                success: function (data) {
-                    console.log("Threads data:", data);
-                    if (data.every(thread => thread.name !== "NewsArticles")) {
-                        return CreateNewsArticleThread(user);
+        // Handles the onLoad event.
+        const onLoad = () => {
+            $('.navbar-collapse').collapse('hide');
+        };
+
+        // Initializes the Ecwid marketplace widget.
+        const initializeMarketplace = (elementId) => {
+            $(document).ready(async function() {
+                const currentUrl = window.location.href;
+
+                const storeId = '103074754';
+                const scriptUrl = `https://app.ecwid.com/script.js?${storeId}&data_platform=code&data_date=${Date.now()}`;
+                let container = document.getElementById(elementId);
+
+                if (container) {
+                    container.innerHTML = '';
+                    if (container.hasAttribute('data-v-app')) {
+                        container.removeAttribute('data-v-app');
                     }
-                    data.forEach(thread => {
-                        console.log("Thread Id:", thread.id);
-                        if (thread.name === "NewsArticles")
-                        {
-                            $('#write-new-post').attr('href', `/forum-new-post.html?threadId=${thread.id}`);
-                            GetPosts(thread.id);
-                        }
+                } else {
+                    console.error(`Container with ID "${elementId}" not found.`);
+                    return;
+                }
+
+                const loadWidget = () => {
+                    xProductBrowser(
+                        "categoriesPerRow=3",
+                        "views=grid(20,3) list(60) table(60)",
+                        "categoryView=grid",
+                        "searchView=list",
+                        `id=${elementId}`
+                    );
+                    console.log("Marketplace initialized.");
+
+                    $('#app-holder').css('display', 'block');
+                    $('#spinner-holder').remove();
+                };
+
+                const loadScript = () => {
+                    return new Promise((resolve, reject) => {
+                        const scriptElement = document.createElement('script');
+                        scriptElement.src = scriptUrl;
+                        scriptElement.charset = 'utf-8';
+                        scriptElement.setAttribute('data-cfasync', 'false');
+                        scriptElement.onload = resolve;
+                        scriptElement.onerror = reject;
+                        document.head.appendChild(scriptElement);
                     });
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching threads:", error);
+                };
+
+                const existingScript = document.querySelector(`script[src^="https://app.ecwid.com/script.js?${storeId}"]`);
+
+                try {
+                    if (existingScript) {
+                        loadWidget();
+                        return;
+                    }
+                    await loadScript();
+                    loadWidget();
+                } catch (error) {
+                    console.error("Failed to load the Ecwid script:", error);
                 }
             });
-        }
+        };
 
-        const GetPosts = (threadId) =>
-        {
-            $(() => {
-                $.ajax({
-                    url: `/onlybalds-api/posts?threadId=${threadId}`,
-                    method: "GET",
-                    success: function (data) {
-                        console.log(data);
-                        data.forEach(post => {
-                            console.log("Post:", post);
-                            if (threadId === post.threadId) {
-                                $("#threads-list").append(
-                                `
-                                <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                                    <h2 class="listing__title">${post.title}</h2>
-                                    <div class="listing__meta">
-                                        <div class="listing__meta-author">
-                                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
-                                                class="bi bi-person-fill" viewBox="0 0 16 16">
-                                                <path
-                                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                                            </svg>
-                                        </div>
-                                        <div class="listing__meta-author-info">
-                                            <p class="listing__meta-author-name">Posted by ${post.author}</p>
-                                            <p class="listing__meta-post-date">${new Date(post.postedOn).toLocaleDateString()}</p>
-                                        </div>
-                                    </div>
-                                    <div class="listing__content">
-                                        <p class="listing__snippet">${post.content}</p>
-                                        <a href="/forum-single/${post.id}" class="text-link">Read Article</a>
-                                    </div>
-                                </div>
-                                `);
-                            }
-                        });
-
-                        $('#app-holder').css('display', 'block');
-                        $('#spinner-holder').remove();
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching thread:", error);
-                    }
-                });
-            });
-        }
-
-        const CreateNewsArticleThread = (user) => {
-            $(() => {
-                let threadItem = 
-                {
-                    id: crypto.randomUUID(),
-                    name: "NewsArticles",
-                    creator: user.name,
-                    startDate: new Date().toISOString(),
-                    summary: "This thread is for posting news articles related to the Only Balds community.",
-                    postsCount: 0
-                };
-                let threadItemJson = JSON.stringify(threadItem);
-
-                $.ajax({
-                    url: '/onlybalds-api/threads',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: threadItemJson,
-                    success: function(response) {
-                        console.log('Post successful:', response);
-                        location.reload();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Post failed:', error);
-                    }
-                });
-            });
-        }
-        
+        initializeMarketplace("ecwid-marketplace");
     </script>
 
 </body>

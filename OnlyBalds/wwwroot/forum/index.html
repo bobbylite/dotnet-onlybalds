@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	<title>Forum - Single | Only Balds</title>
+	<title>Forum | Only Balds</title>
 	<meta name="description" content="">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,10 +31,10 @@
 	<meta property="og:locale" content="en_US">
 
     <link rel="stylesheet" href="/app.css"/>
+    
+	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
 
-	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
-
-	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
+	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
 
 </head>
 <body>
@@ -102,6 +102,18 @@
             </div> 
 		</div>
 	</div><!--/comment -->
+	
+    <!-- BANNER
+    ============================================== -->
+    <div class="banner banner--fade-to-gray">
+        <div class="container">
+            <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">News Articles</h1>
+            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Catch up on the latest news and articles from the Only Balds community.</p>
+            <div class="banner__btn-holder" data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
+                <a id="write-new-post" class="btn btn--blue banner__btn">Write New Post</a>
+            </div>
+        </div>
+    </div><!--/banner -->
 
     <!-- FORUM LISTINGS
     ============================================== -->
@@ -110,57 +122,20 @@
             <div class="spinner-border" role="status" aria-label="Loading"></div>
         </div>
     </div>
-    
-    <div id="app-holder" class="section section--gray article" style="display: none;">
-        <div class="container article__container">
+    <div id="app-holder" class="section section--gray" style="display: none;">
+        <div class="container">
+            <ul id="threads-list" class="list-group list-group-flush list-unstyled">
 
-            <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h1 id="article-title" class="h2 article__heading">Health Checks Page</h1>
-                <div class="author-info">
-                    <div class="listing__meta-author">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
-                            class="bi bi-person-fill" viewBox="0 0 16 16">
-                            <path
-                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                        </svg>
-                    </div>
-                    <div class="author-info__content">
-                        <p id="article-author" class="author-info__name"></p>
-                        <p id="article-date" class="author-info__date"></p>
-                    </div>
-                </div>
-                <div id="article-content" class="article__body" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                </div>
-            </div>
-
-            <div class="article__comments" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h2 id="comments-count" class="h4 article__comment-count"></h2>
-
-                <ul id="comments-list" class="list-group list-group-flush list-unstyled">
-
+            </ul>
+            <nav class="pagination" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                <ul class="pagination__nav">
+                    <li class="pagination__item"><a href="#" class="pagination__link pagination__link--prev"><i class="fa fa-angle-left pagination__icon"></i> Prev</a></li>
+                    <li class="pagination__item"><a href="#" class="pagination__link pagination__link--is-active">1</a></li>
+                    <!--<li class="pagination__item"><a href="#" class="pagination__link">2</a></li>
+                    <li class="pagination__item"><a href="#" class="pagination__link">3</a></li>-->
+                    <li class="pagination__item"><a href="#" class="pagination__link pagination__link--next">Next <i class="fa fa-angle-right pagination__icon"></i></a></li>
                 </ul>
-
-                <!--<div class="comment">
-                    <div class="comment__author-info author-info">
-                        <div class="author-info__picture">
-                            <img src="https://picsum.photos/id/91/300/300" alt="" class="author-info__picture-src">
-                        </div>
-                        <div class="author-info__content">
-                            <p id="post-author" class="author-info__name">Posted by David May</p>
-                            <p class="author-info__date">October 25, 2025</p>
-                        </div>
-                    </div>
-                    <div class="comment__text">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ac dapibus eros. Ut mollis sollicitudin dolor, ut faucibus erat mollis sit amet. Cras euismod ex lobortis eros convallis, non rutrum libero feugiat.</p>
-                    </div>
-                </div>-->
-            </div>
-        
-            <form class="article__write-comment" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h2 class="h4 article__write-comment-heading">Leave A Comment</h2>
-                <textarea name="" id="" placeholder="Enter your message here..." class="article__comment-textarea"></textarea>
-                <button id="comment-button" class="btn btn--blue article__post-comment-btn">Post Comment</button>
-            </form>
+            </nav>
 
         </div>
     </div><!--forum listings -->
@@ -179,7 +154,7 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
-    <script src="assets/scripts/App-5379555225.js"></script>
+    <script src="/assets/scripts/App-5379555225.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -204,128 +179,127 @@
                     `);
                 },
                 error: function (xhr, status, error) {
+                    window.location.replace('/unauthorized');
                 }
             });
         });
     </script>
 
     <script>
-        let userId = '';
-
         $(() => {
-            const params = new URLSearchParams(window.location.search);
-            const postId = params.get("postId");
-
             $.ajax({
-                url: `/onlybalds-api/posts?postId=${postId}`,
+                url: "/identity-information",
                 method: "GET",
                 success: function (data) {
-                    let post = data[0];
-                    $("#article-title").text(post.title);
-                    $("#article-author").text(`Posted by ${post.author}`);
-                    $("#article-content").html(post.content);
-                    userId = post.userId;
-                    PopulateComments(postId, post);
-
-                    $('#app-holder').css('display', 'block');
-                    $('#spinner-holder').remove();
+                    user = data;
+                    GetThreads(user);
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error fetching thread:", error);
                 }
             });
         });
 
-        const PopulateComments = (postId, userData) => {
+        const GetThreads = (user) => 
+        {
             $.ajax({
-                url: `/onlybalds-api/comments?postId=${postId}`,
+                url: "/onlybalds-api/threads",
                 method: "GET",
-                dataType: "json",
                 success: function (data) {
-                    const filteredComments = data.filter(comment => comment.postId === postId);
-                    console.log("Filtered comments:", filteredComments);
-                    
-                    $('#comments-count').empty();
-                    $('#comments-count').text(`${filteredComments.length} Comment${filteredComments.length !== 1 ? 's' : ''}`);
-                    
-                    $("#comments-list").empty();
-                    filteredComments.forEach(comment => {
-                        console.log("Comment:", comment);
-                        $("#comments-list").append(
-                            `
-                            <div class="comment">
-                                <div class="comment__author-info author-info">
-                                    <div class="listing__meta-author">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
-                                            class="bi bi-person-fill" viewBox="0 0 16 16">
-                                            <path
-                                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                                        </svg>
-                                    </div>
-                                    <div class="author-info__content">
-                                        <p id="post-author" class="author-info__name">Posted by ${comment.author}</p>
-                                        <p class="author-info__date">${new Date(comment.postedOn).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                                <div class="comment__text">
-                                    <p>${comment.content}</p>
-                                </div>
-                            </div>
-                            `
-                        )
+                    console.log("Threads data:", data);
+                    if (data.every(thread => thread.name !== "NewsArticles")) {
+                        return CreateNewsArticleThread(user);
+                    }
+                    data.forEach(thread => {
+                        console.log("Thread Id:", thread.id);
+                        if (thread.name === "NewsArticles")
+                        {
+                            $('#write-new-post').attr('href', `/forum-new-post?threadId=${thread.id}`);
+                            GetPosts(thread.id);
+                        }
                     });
                 },
                 error: function (xhr, status, error) {
-                    console.error("Error fetching comments:", error);
+                    console.error("Error fetching threads:", error);
                 }
             });
-        };
+        }
 
-        $(document).ready(function () {
-            $('#comment-button').on('click', function (e) {
-                e.preventDefault();
-
+        const GetPosts = (threadId) =>
+        {
+            $(() => {
                 $.ajax({
-                    url: "/identity-information",
+                    url: `/onlybalds-api/posts?threadId=${threadId}`,
                     method: "GET",
                     success: function (data) {
-                        console.log("User data:", data);
-                        const userId = data.claims.sub;
-                        const params = new URLSearchParams(window.location.search);
-                        const postId = params.get('postId');
-
-                        let commentItem = 
-                        {
-                            id: crypto.randomUUID(),
-                            author: data.name,
-                            content: $(".article__comment-textarea").val(),
-                            postedOn: new Date().toISOString(),
-                            postId: postId,
-                            userId: userId
-                        };
-                        let commentItemJson = JSON.stringify(commentItem);
-
-                        $.ajax({
-                            url: '/onlybalds-api/comments',
-                            type: 'POST',
-                            contentType: 'application/json',
-                            data: commentItemJson,
-                            success: function(response) {
-                                console.log('Post successful:', response);
-                                location.reload();
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Post failed:', error);
+                        console.log(data);
+                        data.forEach(post => {
+                            console.log("Post:", post);
+                            if (threadId === post.threadId) {
+                                $("#threads-list").append(
+                                `
+                                <div class="listing"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                                    <h2 class="listing__title">${post.title}</h2>
+                                    <div class="listing__meta">
+                                        <div class="listing__meta-author">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                            </svg>
+                                        </div>
+                                        <div class="listing__meta-author-info">
+                                            <p class="listing__meta-author-name">Posted by ${post.author}</p>
+                                            <p class="listing__meta-post-date">${new Date(post.postedOn).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <div class="listing__content">
+                                        <p class="listing__snippet">${post.content}</p>
+                                        <a href="/forum-single?postId=${post.id}" class="text-link">Read Article</a>
+                                    </div>
+                                </div>
+                                `);
                             }
                         });
 
+                        $('#app-holder').css('display', 'block');
+                        $('#spinner-holder').remove();
                     },
                     error: function (xhr, status, error) {
+                        console.error("Error fetching thread:", error);
                     }
                 });
             });
-        });
+        }
 
+        const CreateNewsArticleThread = (user) => {
+            $(() => {
+                let threadItem = 
+                {
+                    id: crypto.randomUUID(),
+                    name: "NewsArticles",
+                    creator: user.name,
+                    startDate: new Date().toISOString(),
+                    summary: "This thread is for posting news articles related to the Only Balds community.",
+                    postsCount: 0
+                };
+                let threadItemJson = JSON.stringify(threadItem);
+
+                $.ajax({
+                    url: '/onlybalds-api/threads',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: threadItemJson,
+                    success: function(response) {
+                        console.log('Post successful:', response);
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Post failed:', error);
+                    }
+                });
+            });
+        }
+        
     </script>
 
 </body>

@@ -32,9 +32,9 @@
 
     <link rel="stylesheet" href="/app.css"/>
 
-	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
+	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
 
-	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
+	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
 
 </head>
 <body>
@@ -179,7 +179,7 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
-    <script src="assets/scripts/App-5379555225.js"></script>
+    <script src="/assets/scripts/App-5379555225.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -204,6 +204,7 @@
                     `);
                 },
                 error: function (xhr, status, error) {
+                    window.location.replace('/unauthorized');
                 }
             });
         });

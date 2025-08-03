@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	<title>Forum - Single | Only Balds</title>
+	<title>New Post | Only Balds</title>
 	<meta name="description" content="">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,12 +30,10 @@
 	<meta property="og:site_name" content="Site Name">
 	<meta property="og:locale" content="en_US">
 
-    <link rel="stylesheet" href="/app.css"/>
+	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
 
-	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
-
-	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
-
+	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
+    
 </head>
 <body>
 
@@ -102,68 +100,50 @@
             </div> 
 		</div>
 	</div><!--/comment -->
-
-    <!-- FORUM LISTINGS
+	
+    <!-- BANNER
     ============================================== -->
-    <div id="spinner-holder" class="box__holder">
-        <div class="flex-center">
-            <div class="spinner-border" role="status" aria-label="Loading"></div>
+    <div class="banner banner--fade-to-gray">
+        <div class="container">
+            <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">New Post</h1>
+            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">To make a new Forum post, fill out the form below!</p>
+        </div>
+    </div><!--/banner -->
+
+    <!-- BALDIE QUESTIONNAIRE
+    ============================================== -->
+    <div class="section section--gray">
+        <div class="container">
+            <div class="box box--with-top-lines"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                <div class="box__top-line box__top-line--light-blue"></div>
+                <div class="box__top-line box__top-line--blue"></div>
+                <div class="box__holder">
+                    <div class="box__section box__section--chat-frame">
+                        <form action="" id="baldie-questionnaire">
+                            <div class="grid">
+                                <div class="grid__column grid__column--12 control">
+                                    <label for="newPostTitle" class="control__label">Post Title</label>
+                                    <input type="text" id="newPostTitle" name="newPostTitle" class="control__input">
+                                </div>
+                                <div class="grid__column grid__column--12 control">
+                                    <label for="newPostContent" class="control__label">Post Content</label>
+                                    <textarea id="newPostContent" name="newPostContent" class="control__input" style="height:300px;"></textarea>
+                                </div>
+                                <div class="grid__column grid__column--12 control">
+                                    <button class="btn btn--blue" type="submit">Submit New Post!</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div id="app-holder" class="section section--gray article" style="display: none;">
-        <div class="container article__container">
-
-            <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h1 id="article-title" class="h2 article__heading">Health Checks Page</h1>
-                <div class="author-info">
-                    <div class="listing__meta-author">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
-                            class="bi bi-person-fill" viewBox="0 0 16 16">
-                            <path
-                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                        </svg>
-                    </div>
-                    <div class="author-info__content">
-                        <p id="article-author" class="author-info__name"></p>
-                        <p id="article-date" class="author-info__date"></p>
-                    </div>
-                </div>
-                <div id="article-content" class="article__body" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                </div>
-            </div>
-
-            <div class="article__comments" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h2 id="comments-count" class="h4 article__comment-count"></h2>
-
-                <ul id="comments-list" class="list-group list-group-flush list-unstyled">
-
-                </ul>
-
-                <!--<div class="comment">
-                    <div class="comment__author-info author-info">
-                        <div class="author-info__picture">
-                            <img src="https://picsum.photos/id/91/300/300" alt="" class="author-info__picture-src">
-                        </div>
-                        <div class="author-info__content">
-                            <p id="post-author" class="author-info__name">Posted by David May</p>
-                            <p class="author-info__date">October 25, 2025</p>
-                        </div>
-                    </div>
-                    <div class="comment__text">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ac dapibus eros. Ut mollis sollicitudin dolor, ut faucibus erat mollis sit amet. Cras euismod ex lobortis eros convallis, non rutrum libero feugiat.</p>
-                    </div>
-                </div>-->
-            </div>
-        
-            <form class="article__write-comment" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                <h2 class="h4 article__write-comment-heading">Leave A Comment</h2>
-                <textarea name="" id="" placeholder="Enter your message here..." class="article__comment-textarea"></textarea>
-                <button id="comment-button" class="btn btn--blue article__post-comment-btn">Post Comment</button>
-            </form>
 
         </div>
-    </div><!--forum listings -->
+    </div><!--/baldie questionnaire-->
+
 
 	    <div class="footer">
         <div class="container">
@@ -179,7 +159,7 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
-    <script src="assets/scripts/App-5379555225.js"></script>
+    <script src="/assets/scripts/App-5379555225.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
@@ -204,85 +184,15 @@
                     `);
                 },
                 error: function (xhr, status, error) {
+                    window.location.replace('/unauthorized');
                 }
             });
         });
     </script>
 
     <script>
-        let userId = '';
-
-        $(() => {
-            const params = new URLSearchParams(window.location.search);
-            const postId = params.get("postId");
-
-            $.ajax({
-                url: `/onlybalds-api/posts?postId=${postId}`,
-                method: "GET",
-                success: function (data) {
-                    let post = data[0];
-                    $("#article-title").text(post.title);
-                    $("#article-author").text(`Posted by ${post.author}`);
-                    $("#article-content").html(post.content);
-                    userId = post.userId;
-                    PopulateComments(postId, post);
-
-                    $('#app-holder').css('display', 'block');
-                    $('#spinner-holder').remove();
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching thread:", error);
-                }
-            });
-        });
-
-        const PopulateComments = (postId, userData) => {
-            $.ajax({
-                url: `/onlybalds-api/comments?postId=${postId}`,
-                method: "GET",
-                dataType: "json",
-                success: function (data) {
-                    const filteredComments = data.filter(comment => comment.postId === postId);
-                    console.log("Filtered comments:", filteredComments);
-                    
-                    $('#comments-count').empty();
-                    $('#comments-count').text(`${filteredComments.length} Comment${filteredComments.length !== 1 ? 's' : ''}`);
-                    
-                    $("#comments-list").empty();
-                    filteredComments.forEach(comment => {
-                        console.log("Comment:", comment);
-                        $("#comments-list").append(
-                            `
-                            <div class="comment">
-                                <div class="comment__author-info author-info">
-                                    <div class="listing__meta-author">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
-                                            class="bi bi-person-fill" viewBox="0 0 16 16">
-                                            <path
-                                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                                        </svg>
-                                    </div>
-                                    <div class="author-info__content">
-                                        <p id="post-author" class="author-info__name">Posted by ${comment.author}</p>
-                                        <p class="author-info__date">${new Date(comment.postedOn).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                                <div class="comment__text">
-                                    <p>${comment.content}</p>
-                                </div>
-                            </div>
-                            `
-                        )
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error fetching comments:", error);
-                }
-            });
-        };
-
         $(document).ready(function () {
-            $('#comment-button').on('click', function (e) {
+            $('.btn.btn--blue').on('click', function (e) {
                 e.preventDefault();
 
                 $.ajax({
@@ -292,27 +202,28 @@
                         console.log("User data:", data);
                         const userId = data.claims.sub;
                         const params = new URLSearchParams(window.location.search);
-                        const postId = params.get('postId');
+                        const threadId = params.get('threadId');
 
-                        let commentItem = 
+                        let postItem = 
                         {
                             id: crypto.randomUUID(),
-                            author: data.name,
-                            content: $(".article__comment-textarea").val(),
+                            title: $("#newPostTitle").val(),
+                            content: $("#newPostContent").val(),
                             postedOn: new Date().toISOString(),
-                            postId: postId,
+                            author: data.name,
+                            threadId: threadId,
                             userId: userId
                         };
-                        let commentItemJson = JSON.stringify(commentItem);
+                        let postItemJson = JSON.stringify(postItem);
 
                         $.ajax({
-                            url: '/onlybalds-api/comments',
+                            url: '/onlybalds-api/posts',
                             type: 'POST',
                             contentType: 'application/json',
-                            data: commentItemJson,
+                            data: postItemJson,
                             success: function(response) {
                                 console.log('Post successful:', response);
-                                location.reload();
+                                window.location.replace('/forum');
                             },
                             error: function(xhr, status, error) {
                                 console.error('Post failed:', error);

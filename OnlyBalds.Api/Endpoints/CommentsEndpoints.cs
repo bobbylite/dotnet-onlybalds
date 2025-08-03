@@ -51,9 +51,24 @@ public static class CommentsEndpoints
     /// </summary>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetComments([FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
+    public static IResult GetComments(
+        [FromQuery] string? postId,
+        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(commentsRepository);
+
+        if (string.IsNullOrEmpty(postId) is not true)
+        {
+            var comment = commentsRepository
+                .GetAll()
+                .Where(c => c.PostId == Guid.Parse(postId))
+                .ToList();
+
+            ArgumentNullException.ThrowIfNull(comment);
+
+            return Results.Ok(comment);
+        }
+
 
         var comments = commentsRepository.GetAll();
         ArgumentNullException.ThrowIfNull(comments);

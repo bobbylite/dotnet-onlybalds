@@ -84,22 +84,7 @@ public static class ReverseProxyBuilderExtensions
 
                 if (transformContext.ProxyRequest.Method.Method == HttpMethod.Post.Method)
                 {
-                    var proxyRequestjson = await transformContext.ProxyRequest.Content?.ReadAsStringAsync()!;
-                    var proxyRequestJsonDoc = JsonDocument.Parse(proxyRequestjson);
-                    var todoName = proxyRequestJsonDoc.RootElement.GetProperty("name").GetString();
-                    var todoDate = proxyRequestJsonDoc.RootElement.GetProperty("date").GetString();
-                    var identityName = transformContext.HttpContext.User.Claims.Single(c => c.Type == "nickname").Value;
-                    var profilePicture = transformContext.HttpContext.User.Claims.Single(c => c.Type == "picture").Value;
-                    var payload = new
-                    {
-                        name = todoName,
-                        date = todoDate,
-                        createdBy = identityName,
-                        profilePicture = profilePicture
-                    };
-
-                    var payloadContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, MediaTypeNames.Application.Json);
-                    transformContext.ProxyRequest.Content = payloadContent;
+                    return;
                 }
             });
         });
