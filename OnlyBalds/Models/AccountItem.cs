@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace OnlyBalds.Client.Models;
+namespace OnlyBalds.Models;
 
 public class AccountItem
 {

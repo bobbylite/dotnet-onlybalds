@@ -183,10 +183,6 @@ public static class WebApplicationBuilderExtensions
         webApplicationBuilder.Services.AddRefreshTokenSupport();
         webApplicationBuilder.Services.AddCascadingAuthenticationState();
         
-        // Add support for flowing the server authentication state to the WebAssembly client.
-        // Sync authentication state between server and client: https://auth0.com/blog/auth0-authentication-blazor-web-apps/
-        webApplicationBuilder.Services.AddScoped<AuthenticationStateProvider, PersistingAuthenticationStateProvider>();
-        
         return webApplicationBuilder;
     }
 

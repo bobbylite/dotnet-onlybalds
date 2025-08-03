@@ -1,10 +1,8 @@
-using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 using Flurl;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Yarp.ReverseProxy.Transforms;
 
 namespace OnlyBalds.Extensions;
