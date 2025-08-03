@@ -214,18 +214,18 @@
 
         $(() => {
             const params = new URLSearchParams(window.location.search);
-            const articleId = params.get("postId");
+            const postId = params.get("postId");
 
             $.ajax({
-                url: `/article?postId=${articleId}`,
+                url: `/onlybalds-api/posts?postId=${postId}`,
                 method: "GET",
                 success: function (data) {
-                    console.log(data);
-                    $("#article-title").text(data.title);
-                    $("#article-author").text(`Posted by ${data.author}`);
-                    $("#article-content").html(data.content);
-                    userId = data.userId;
-                    PopulateComments(articleId, data);
+                    let post = data[0];
+                    $("#article-title").text(post.title);
+                    $("#article-author").text(`Posted by ${post.author}`);
+                    $("#article-content").html(post.content);
+                    userId = post.userId;
+                    PopulateComments(postId, post);
 
                     $('#app-holder').css('display', 'block');
                     $('#spinner-holder').remove();
@@ -236,13 +236,13 @@
             });
         });
 
-        const PopulateComments = (articleId, userData) => {
+        const PopulateComments = (postId, userData) => {
             $.ajax({
-                url: `/article-comments?postId=${articleId}`,
+                url: `/onlybalds-api/comments?postId=${postId}`,
                 method: "GET",
                 dataType: "json",
                 success: function (data) {
-                    const filteredComments = data.filter(comment => comment.postId === articleId);
+                    const filteredComments = data.filter(comment => comment.postId === postId);
                     console.log("Filtered comments:", filteredComments);
                     
                     $('#comments-count').empty();
@@ -306,7 +306,7 @@
                         let commentItemJson = JSON.stringify(commentItem);
 
                         $.ajax({
-                            url: '/article-comments',
+                            url: '/onlybalds-api/comments',
                             type: 'POST',
                             contentType: 'application/json',
                             data: commentItemJson,

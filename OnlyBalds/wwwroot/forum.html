@@ -201,7 +201,7 @@
         const GetThreads = (user) => 
         {
             $.ajax({
-                url: "/threads",
+                url: "/onlybalds-api/threads",
                 method: "GET",
                 success: function (data) {
                     console.log("Threads data:", data);
@@ -227,7 +227,7 @@
         {
             $(() => {
                 $.ajax({
-                    url: `/articles?threadId=${threadId}`,
+                    url: `/onlybalds-api/posts?threadId=${threadId}`,
                     method: "GET",
                     success: function (data) {
                         console.log(data);
@@ -284,7 +284,7 @@
                 let threadItemJson = JSON.stringify(threadItem);
 
                 $.ajax({
-                    url: '/threads',
+                    url: '/onlybalds-api/threads',
                     type: 'POST',
                     contentType: 'application/json',
                     data: threadItemJson,
