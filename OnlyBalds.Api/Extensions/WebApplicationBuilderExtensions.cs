@@ -9,6 +9,7 @@ using OnlyBalds.Api.Models;
 using OnlyBalds.Api.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using OnlyBalds.Api.Constants;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace OnlyBalds.Api.Extensions;
 
@@ -120,16 +121,55 @@ public static class WebApplicationBuilderExtensions
         webApplicationBuilder.Services
             .AddAuthentication()
             .AddJwtBearer();
+
         webApplicationBuilder.Services.AddAuthorization(o =>
         {
             o.AddPolicy(AuthorizataionPolicyNames.UserAccess, p => p.
-                RequireAuthenticatedUser().
-                RequireClaim("scope", AuthorizataionPolicyNames.UserAccess));
+                RequireClaim("permissions", AuthorizataionPolicyNames.UserAccess));
             o.AddPolicy(AuthorizataionPolicyNames.AdminAccess, p => p.
-                RequireAuthenticatedUser().
-                RequireClaim("scope", AuthorizataionPolicyNames.AdminAccess));
+                RequireClaim("permissions", AuthorizataionPolicyNames.AdminAccess));
         });
+
         webApplicationBuilder.Services.AddHttpContextAccessor();
+
+        webApplicationBuilder.Services.PostConfigure<JwtBearerOptions>("Bearer", options =>
+        {
+            options.Events ??= new JwtBearerEvents();
+
+            options.Events.OnAuthenticationFailed = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+
+                logger.LogWarning("JWT authentication failed: {Message}", context.Exception.Message);
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnTokenValidated = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+
+                var claims = context.Principal?.Claims
+                    .Select(c => new { c.Type, c.Value })
+                    .ToList();
+                logger.LogInformation("Claims: {Claims}", claims);
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnForbidden = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+
+                logger.LogWarning("Forbidden access: {Message}", context.Response.StatusCode);
+                return Task.CompletedTask;
+            };
+        });
+
         
         return webApplicationBuilder;
     }

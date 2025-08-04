@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication;
 using OnlyBalds.Services.Token;
 
 namespace OnlyBalds.Http;
@@ -12,8 +14,9 @@ namespace OnlyBalds.Http;
 /// <seealso cref="DelegatingHandler" />
 public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
 {
-    private ILogger<OnlyBaldsApiAuthenticationHandler> _logger;
-    private ITokenService _tokenService;
+    private readonly ILogger<OnlyBaldsApiAuthenticationHandler> _logger;
+    private readonly ITokenService _tokenService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OnlyBaldsApiAuthenticationHandler"/> class.
@@ -25,10 +28,12 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
     /// </remarks>
     public OnlyBaldsApiAuthenticationHandler(
         ILogger<OnlyBaldsApiAuthenticationHandler> logger,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        IHttpContextAccessor httpContextAccessor)
     {
         _logger = logger;
         _tokenService = tokenService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     /// <summary>
@@ -42,13 +47,26 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
     /// </remarks>
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(_tokenService.Token))
+        _logger.LogDebug("Sending HTTP request");
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+
+        if (string.IsNullOrEmpty(accessToken))
         {
             _logger.LogInformation("No valid token found, requesting a new token");
             await _tokenService.AuthenticateAsync();
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _tokenService.Token);
+            return await base.SendAsync(request, cancellationToken);
         }
 
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _tokenService.Token);
+        _logger.LogDebug("Using existing access token for request");
+        _logger.LogDebug("The access token is '{AccessToken}'", accessToken);
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         return await base.SendAsync(request, cancellationToken);
     }
 }
