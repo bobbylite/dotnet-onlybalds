@@ -74,7 +74,7 @@ public static class PostsEndpoints
             return Results.Ok(posts);
         }
 
-        return Results.BadRequest("Post ID cannot be null or empty.");
+        return Results.BadRequest("Post ID and Thread ID cannot be null or empty.");
     }
 
     /// <summary>

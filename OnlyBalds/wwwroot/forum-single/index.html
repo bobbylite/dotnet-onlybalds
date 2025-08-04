@@ -116,7 +116,7 @@
 
             <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <h1 id="article-title" class="h2 article__heading"></h1>
-                <div class="article__actions2">
+                <div class="article__actions">
                     <button class="circle-btn" id="star-post" title="Star Post">
                         <i class="fa fa-heart"></i>
                     </button>
@@ -260,11 +260,19 @@
                                                 d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
                                         </svg>
                                     </div>
+
+                                    <div class="comment__delete-btn">
+                                        <button class="circle-btn delete-comment-btn" title="Delete Comment" data-id="${comment.id}">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+
                                     <div class="author-info__content">
                                         <p id="post-author" class="author-info__name">Posted by ${comment.author}</p>
                                         <p class="author-info__date">${new Date(comment.postedOn).toLocaleDateString()}</p>
                                     </div>
                                 </div>
+
                                 <div class="comment__text">
                                     <p>${comment.content}</p>
                                 </div>
@@ -334,10 +342,41 @@
                 type: 'DELETE',
                 success: function(response) {
                     console.log('Post deleted successfully:', response);
-                    window.location.href = '/forum';
+                    $.ajax({
+                        url: `/onlybalds-api/comments?postId=${postId}`,
+                        type: 'DELETE',
+                        success: function(response) {
+                            console.log('Post deleted successfully:', response);
+                            window.location.href = '/forum';
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error deleting post:', error);
+                        }
+                    });
                 },
                 error: function(xhr, status, error) {
                     console.error('Error deleting post:', error);
+                }
+            });
+        });
+
+        $(document).on('click', '.delete-comment-btn', function (e) {
+            e.preventDefault();
+            const commentId = $(this).data('id');
+            const $commentElement = $(this).closest('.comment');
+
+            $.ajax({
+                url: `/onlybalds-api/comments?commentId=${commentId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    console.log('Comment deleted:', response);
+                    $commentElement.fadeOut(300, () => $commentElement.remove());
+                    setTimeout(() => {
+                        location.reload();
+                    }, timeout = 300);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to delete comment:', error);
                 }
             });
         });
