@@ -54,7 +54,10 @@ public static class IdentityEndpoints
         var accountsResponse = await httpClient.GetAsync($"account?id={Uri.EscapeDataString(subject!)}");
         AccountItem? account = null;
 
-        if (accountsResponse.StatusCode is HttpStatusCode.NotFound)
+        if (accountsResponse.StatusCode is HttpStatusCode.NotFound || 
+            accountsResponse.StatusCode is HttpStatusCode.NoContent ||
+            accountsResponse.StatusCode is HttpStatusCode.Unauthorized ||
+            accountsResponse.StatusCode is HttpStatusCode.Forbidden)
         {
             await context.Response.WriteAsJsonAsync(new
             {

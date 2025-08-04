@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
 using Flurl;
@@ -38,8 +39,8 @@ public static class ReverseProxyBuilderExtensions
 
                 var idToken = await transformContext.HttpContext.GetTokenAsync("id_token");
                 var accessToken = await transformContext.HttpContext.GetTokenAsync("access_token");
-                
-                var httpClientFactory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
+
+                /*var httpClientFactory = services.BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
                 using var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBaldsAuthenticationToken);
 
                 var requestBody = new
@@ -69,12 +70,30 @@ public static class ReverseProxyBuilderExtensions
                 var apiAccessToken = jsonDoc.RootElement.GetProperty("access_token").GetString();
 
                 transformContext.ProxyRequest.Headers.Authorization = 
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiAccessToken);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiAccessToken);*/
+
+                transformContext.ProxyRequest.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
                 var originalUri = transformContext.Path.Value;
                 var updatedPath = originalUri?.Replace("/onlybalds-api", "", StringComparison.OrdinalIgnoreCase);
                 var queryString = transformContext.Query.QueryString.Value;
                 transformContext.ProxyRequest.RequestUri = new Uri($"{transformContext.DestinationPrefix}{updatedPath}{queryString}");
+                transformContext.ProxyRequest.Headers.Add("X-Access", accessToken);
+                transformContext.ProxyRequest.Headers.Add("X-Identity", idToken);
+
+                /*var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(accessToken);
+
+                foreach (var claim in jwt.Claims)
+                {
+                    Console.WriteLine($"{claim.Type}: {claim.Value}");
+                }
+
+                var subject = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+                var audience = jwt.Claims.Where(c => c.Type == "aud").Select(c => c.Value).ToList();
+                var scope = jwt.Claims.FirstOrDefault(c => c.Type == "scope")?.Value;
+                var permissions = jwt.Claims.Where(c => c.Type == "permissions").Select(c => c.Value).ToList();*/
 
                 if (transformContext.ProxyRequest.Method.Method == HttpMethod.Get.Method)
                 {

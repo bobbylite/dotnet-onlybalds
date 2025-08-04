@@ -1,4 +1,13 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 
@@ -9,8 +18,6 @@ namespace OnlyBalds.Api.Endpoints;
 /// </summary>
 public static class CommentsEndpoints
 {
-    private const string ThreadAuthorizationPolicyName = "Thread.ReadWrite";
-
     /// <summary>
     /// Maps the endpoints for the comments api.
     /// </summary>
@@ -21,22 +28,22 @@ public static class CommentsEndpoints
         app.MapGet("/comments", GetComments)
             .WithName(nameof(GetComments))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapPost("/comments", CreateCommentAsync)
             .WithName(nameof(CreateCommentAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapPatch("/comments", PatchCommentAsync)
             .WithName(nameof(PatchCommentAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapDelete("/comments", DeleteCommentAsync)
             .WithName(nameof(DeleteCommentAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         return app;
     }
@@ -111,7 +118,7 @@ public static class CommentsEndpoints
         }
 
         commentItem.PostedOn = DateTime.UtcNow.ToUniversalTime();
-        
+
         await commentsRepository.Add(commentItem);
 
         return Results.Created($"/threads/{commentItem.Id}", commentItem);
@@ -150,30 +157,20 @@ public static class CommentsEndpoints
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
     public static async Task<IResult> DeleteCommentAsync(
-        string? postId,
         string? commentId,
-        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
+        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(commentsRepository);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor);
 
-        if (string.IsNullOrEmpty(postId) is not true)
+        var accessJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Access"].SingleOrDefault();
+        var identityJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Identity"].SingleOrDefault();
+
+        if (string.IsNullOrEmpty(accessJwt) ||
+            string.IsNullOrEmpty(identityJwt))
         {
-            var comments = commentsRepository
-                .GetAll()
-                .Where(c => c.PostId == Guid.Parse(postId))
-                .ToList();
-
-            if (comments.Count == 0)
-            {
-                return Results.NotFound("Comments not found.");
-            }
-            
-            foreach (var comment in comments)
-            {
-                await commentsRepository.DeleteById(comment.Id);
-            }
-
-            return Results.NoContent();
+            return Results.Unauthorized();
         }
 
         if (string.IsNullOrEmpty(commentId) is not true)
@@ -182,11 +179,119 @@ public static class CommentsEndpoints
             var comment = commentsRepository.GetById(id);
             ArgumentNullException.ThrowIfNull(comment);
 
-            await commentsRepository.DeleteById(id);
+            var isAdmin = await IsAuthorizedAdminAsync(accessJwt);
+            if (isAdmin is true)
+            {
+                await commentsRepository.DeleteById(id);
+                return Results.NoContent();
+            }
 
-            return Results.NoContent();
+            var userId = await GetUserIdAsync(accessJwt);
+            if (comment.UserId.Equals(userId, StringComparison.InvariantCulture) is true)
+            {
+                await commentsRepository.DeleteById(id);
+                return Results.NoContent();
+            }
+
+            return Results.Unauthorized();
         }
 
-        return Results.BadRequest("Post ID and Comment ID cannot be null or empty.");
+        return Results.BadRequest("Comment ID cannot be null or empty.");
+    }
+
+    private static async Task<bool> IsAuthorizedAdminAsync(string? accessToken)
+    {
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return false;
+        }
+
+        var issuer = "https://onlybalds.us.auth0.com/";
+        var audience = "https://OnlyBaldsBackendForFrontendsApi";
+
+        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            $"{issuer}.well-known/openid-configuration",
+            new OpenIdConnectConfigurationRetriever()
+        );
+
+        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKeys = config.SigningKeys,
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true
+        };
+
+        var handler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
+
+            var permissions = principal.Claims
+                .Where(c => c.Type == "permissions")
+                .Select(c => c.Value)
+                .ToList();
+
+            var scope = principal.FindFirst("scope")?.Value ?? string.Empty;
+
+            foreach (var claim in principal.Claims)
+            {
+                Console.WriteLine($"{claim.Type}: {claim.Value}");
+            }
+
+            return permissions.Contains(AuthorizataionPolicyNames.AdminAccess) &&
+                scope.Contains(AuthorizataionPolicyNames.AdminAccess);
+        }
+        catch (SecurityTokenException ex)
+        {
+            Console.WriteLine($"Token validation failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static async Task<string> GetUserIdAsync(string accessToken)
+    {
+        var issuer = "https://onlybalds.us.auth0.com/";
+        var audience = "https://OnlyBaldsBackendForFrontendsApi";
+
+        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            $"{issuer}.well-known/openid-configuration",
+            new OpenIdConnectConfigurationRetriever()
+        );
+
+        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKeys = config.SigningKeys,
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true
+        };
+
+        var handler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
+
+            var userId = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            return userId ?? string.Empty;
+        }
+        catch (SecurityTokenException ex)
+        {
+            Console.WriteLine($"Token validation failed: {ex.Message}");
+            return string.Empty;
+        }
     }
 }
