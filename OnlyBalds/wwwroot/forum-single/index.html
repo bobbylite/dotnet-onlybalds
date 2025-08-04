@@ -116,7 +116,7 @@
 
             <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
                 <h1 id="article-title" class="h2 article__heading"></h1>
-                <div class="article__actions" style="float: right; margin-top: -40px; display: flex; gap: 8px;">
+                <div class="article__actions2">
                     <button class="circle-btn" id="star-post" title="Star Post">
                         <i class="fa fa-heart"></i>
                     </button>
@@ -321,6 +321,24 @@
                     error: function (xhr, status, error) {
                     }
                 });
+            });
+        });
+
+        $('#delete-post').on('click', function (e) {
+            e.preventDefault();
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('postId');
+
+            $.ajax({
+                url: `/onlybalds-api/posts?postId=${postId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    console.log('Post deleted successfully:', response);
+                    window.location.href = '/forum';
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error deleting post:', error);
+                }
             });
         });
 

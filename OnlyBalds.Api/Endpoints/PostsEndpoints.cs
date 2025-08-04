@@ -28,12 +28,12 @@ public static class PostsEndpoints
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
 
-        app.MapPut("/posts/{id}", UpdatePostAsync)
-            .WithName(nameof(UpdatePostAsync))
+        app.MapPatch("/posts", PatchPostAsync)
+            .WithName(nameof(PatchPostAsync))
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
 
-        app.MapDelete("/posts/{id}", DeletePostAsync)
+        app.MapDelete("/posts", DeletePostAsync)
             .WithName(nameof(DeletePostAsync))
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
@@ -83,7 +83,9 @@ public static class PostsEndpoints
     /// <param name="postItem"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreatePostAsync([FromBody] PostItem postItem, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+    public static async Task<IResult> CreatePostAsync(
+        [FromBody] PostItem postItem,
+        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postItem);
         ArgumentNullException.ThrowIfNull(postsRepository);
@@ -107,36 +109,49 @@ public static class PostsEndpoints
     /// <param name="postItem"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdatePostAsync(Guid id, [FromBody] PostItem postItem, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+    public static async Task<IResult> PatchPostAsync(
+        string? postId,
+        [FromBody] PostItem postItem,
+        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        ArgumentNullException.ThrowIfNull(postId);
         ArgumentNullException.ThrowIfNull(postItem);
         ArgumentNullException.ThrowIfNull(postsRepository);
 
-        var post = postsRepository.GetById(id);
-        ArgumentNullException.ThrowIfNull(post);
+        if (string.IsNullOrEmpty(postId) is not true)
+        {
+            var post = postsRepository.GetById(Guid.Parse(postId));
+            ArgumentNullException.ThrowIfNull(post);
 
-        post.Title = postItem.Title;
-        post.Content = postItem.Content;
+            post.Title = string.IsNullOrEmpty(postItem.Title) ? post.Title : postItem.Title;
+            post.Content = string.IsNullOrEmpty(postItem.Content) ? post.Content : postItem.Content;
 
-        await postsRepository.UpdateById(id);
+            await postsRepository.UpdateById(Guid.Parse(postId));
 
-        return Results.NoContent();
+            return Results.NoContent();
+        }
+
+        return Results.BadRequest("Post ID cannot be null or empty.");
     }
 
     /// <summary>
-    /// Deletes a post by its identifier.
+    /// Deletes post by post id from the repository.
     /// </summary>
-    /// <param name="id"></param>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeletePostAsync(Guid id, [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+    public static async Task<IResult> DeletePostAsync(
+        string? postId,
+        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
-        ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(postsRepository);
 
-        await postsRepository.DeleteById(id);
+        if (string.IsNullOrEmpty(postId) is not true)
+        {
+            await postsRepository.DeleteById(Guid.Parse(postId));
 
-        return Results.NoContent();
+            return Results.NoContent();
+        }
+
+        return Results.BadRequest("Post ID cannot be null or empty.");
     }
 }
