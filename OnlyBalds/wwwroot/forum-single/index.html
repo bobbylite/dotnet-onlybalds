@@ -324,6 +324,24 @@
             });
         });
 
+        $('#delete-post').on('click', function (e) {
+            e.preventDefault();
+            const params = new URLSearchParams(window.location.search);
+            const postId = params.get('postId');
+
+            $.ajax({
+                url: `/onlybalds-api/posts?postId=${postId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    console.log('Post deleted successfully:', response);
+                    window.location.href = '/forum';
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error deleting post:', error);
+                }
+            });
+        });
+
     </script>
 
 </body>
