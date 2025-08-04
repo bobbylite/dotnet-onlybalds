@@ -23,22 +23,17 @@ public static class CommentsEndpoints
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
 
-        app.MapGet("/comments/{id}", GetCommentsById)
-            .WithName(nameof(GetCommentsById))
-            .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
-
         app.MapPost("/comments", CreateCommentAsync)
             .WithName(nameof(CreateCommentAsync))
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
 
-        app.MapPut("/comments/{id}", UpdateCommentAsync)
-            .WithName(nameof(UpdateCommentAsync))
+        app.MapPatch("/comments", PatchCommentAsync)
+            .WithName(nameof(PatchCommentAsync))
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
 
-        app.MapDelete("/comments/{id}", DeleteCommentAsync)
+        app.MapDelete("/comments", DeleteCommentAsync)
             .WithName(nameof(DeleteCommentAsync))
             .WithOpenApi()
             .RequireAuthorization(ThreadAuthorizationPolicyName);
@@ -52,7 +47,8 @@ public static class CommentsEndpoints
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
     public static IResult GetComments(
-        [FromQuery] string? postId,
+        string? postId,
+        string? commentId,
         [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(commentsRepository);
@@ -69,11 +65,15 @@ public static class CommentsEndpoints
             return Results.Ok(comment);
         }
 
+        if (string.IsNullOrEmpty(commentId) is not true)
+        {
+            var comment = commentsRepository.GetById(Guid.Parse(commentId));
+            ArgumentNullException.ThrowIfNull(comment);
 
-        var comments = commentsRepository.GetAll();
-        ArgumentNullException.ThrowIfNull(comments);
+            return Results.Ok(comment);
+        }
 
-        return Results.Ok(comments);
+        return Results.BadRequest("Post ID and Comment ID cannot be null or empty.");
     }
 
     /// <summary>
@@ -98,7 +98,9 @@ public static class CommentsEndpoints
     /// <param name="commentItem"></param>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreateCommentAsync([FromBody] CommentItem commentItem, [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
+    public static async Task<IResult> CreateCommentAsync(
+        [FromBody] CommentItem commentItem,
+        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
         ArgumentNullException.ThrowIfNull(commentItem);
         ArgumentNullException.ThrowIfNull(commentsRepository);
@@ -122,18 +124,21 @@ public static class CommentsEndpoints
     /// <param name="commentItem"></param>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdateCommentAsync(Guid id, [FromBody] CommentItem commentItem, [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
+    public static async Task<IResult> PatchCommentAsync(
+        string? commentId,
+        [FromBody] CommentItem commentItem,
+        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
-        ArgumentNullException.ThrowIfNull(id);
+        ArgumentNullException.ThrowIfNull(commentId);
         ArgumentNullException.ThrowIfNull(commentItem);
         ArgumentNullException.ThrowIfNull(commentsRepository);
 
-        var comment = commentsRepository.GetById(id);
+        var comment = commentsRepository.GetById(Guid.Parse(commentId));
         ArgumentNullException.ThrowIfNull(comment);
 
         comment.Content = commentItem.Content;
 
-        await commentsRepository.UpdateById(id);
+        await commentsRepository.UpdateById(Guid.Parse(commentId));
 
         return Results.NoContent();
     }
@@ -144,13 +149,44 @@ public static class CommentsEndpoints
     /// <param name="id"></param>
     /// <param name="commentsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeleteCommentAsync(Guid id, [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
+    public static async Task<IResult> DeleteCommentAsync(
+        string? postId,
+        string? commentId,
+        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository)
     {
-        ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(commentsRepository);
 
-        await commentsRepository.DeleteById(id);
+        if (string.IsNullOrEmpty(postId) is not true)
+        {
+            var comments = commentsRepository
+                .GetAll()
+                .Where(c => c.PostId == Guid.Parse(postId))
+                .ToList();
 
-        return Results.NoContent();
+            if (comments.Count == 0)
+            {
+                return Results.NotFound("Comments not found.");
+            }
+            
+            foreach (var comment in comments)
+            {
+                await commentsRepository.DeleteById(comment.Id);
+            }
+
+            return Results.NoContent();
+        }
+
+        if (string.IsNullOrEmpty(commentId) is not true)
+        {
+            var id = Guid.Parse(commentId);
+            var comment = commentsRepository.GetById(id);
+            ArgumentNullException.ThrowIfNull(comment);
+
+            await commentsRepository.DeleteById(id);
+
+            return Results.NoContent();
+        }
+
+        return Results.BadRequest("Post ID and Comment ID cannot be null or empty.");
     }
 }
