@@ -372,8 +372,10 @@
                     console.log('Comment deleted:', response);
                     $commentElement.fadeOut(300, () => $commentElement.remove());
                     setTimeout(() => {
-                        location.reload();
-                    }, timeout = 300);
+                        let $count = $("#comments-count");
+                        let current = parseInt($count.text(), 10);
+                        $count.text(` ${current - 1} comments`);
+                    }, timeout = 350);
                 },
                 error: function(xhr, status, error) {
                     console.error('Failed to delete comment:', error);
