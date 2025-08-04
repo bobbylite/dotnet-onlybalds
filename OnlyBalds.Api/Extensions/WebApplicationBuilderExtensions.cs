@@ -8,6 +8,7 @@ using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 using OnlyBalds.Api.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using OnlyBalds.Api.Constants;
 
 namespace OnlyBalds.Api.Extensions;
 
@@ -121,10 +122,14 @@ public static class WebApplicationBuilderExtensions
             .AddJwtBearer();
         webApplicationBuilder.Services.AddAuthorization(o =>
         {
-            o.AddPolicy("Thread.ReadWrite", p => p.
+            o.AddPolicy(AuthorizataionPolicyNames.UserAccess, p => p.
                 RequireAuthenticatedUser().
-                RequireClaim("scope", "user:access"));
+                RequireClaim("scope", AuthorizataionPolicyNames.UserAccess));
+            o.AddPolicy(AuthorizataionPolicyNames.AdminAccess, p => p.
+                RequireAuthenticatedUser().
+                RequireClaim("scope", AuthorizataionPolicyNames.AdminAccess));
         });
+        webApplicationBuilder.Services.AddHttpContextAccessor();
         
         return webApplicationBuilder;
     }

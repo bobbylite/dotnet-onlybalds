@@ -58,6 +58,17 @@ public static class ServiceCollectionExtensions
             options.Scope.Add("email");
             options.Scope.Add("offline_access");
             options.Scope.Add("user:access");
+            options.Scope.Add("admin:access");
+
+            options.Events = new OpenIdConnectEvents
+            {
+                OnRedirectToIdentityProvider = context =>
+                {
+                    context.ProtocolMessage.SetParameter("audience", "https://OnlyBaldsBackendForFrontendsApi");
+
+                    return Task.CompletedTask;
+                }
+            };
 
             options.TokenValidationParameters = new()
             {

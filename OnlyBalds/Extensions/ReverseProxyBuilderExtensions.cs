@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
 using Flurl;
@@ -75,6 +76,21 @@ public static class ReverseProxyBuilderExtensions
                 var updatedPath = originalUri?.Replace("/onlybalds-api", "", StringComparison.OrdinalIgnoreCase);
                 var queryString = transformContext.Query.QueryString.Value;
                 transformContext.ProxyRequest.RequestUri = new Uri($"{transformContext.DestinationPrefix}{updatedPath}{queryString}");
+                transformContext.ProxyRequest.Headers.Add("X-Access", accessToken);
+                transformContext.ProxyRequest.Headers.Add("X-Identity", idToken);
+
+                /*var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(accessToken);
+
+                foreach (var claim in jwt.Claims)
+                {
+                    Console.WriteLine($"{claim.Type}: {claim.Value}");
+                }
+
+                var subject = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+                var audience = jwt.Claims.Where(c => c.Type == "aud").Select(c => c.Value).ToList();
+                var scope = jwt.Claims.FirstOrDefault(c => c.Type == "scope")?.Value;
+                var permissions = jwt.Claims.Where(c => c.Type == "permissions").Select(c => c.Value).ToList();*/
 
                 if (transformContext.ProxyRequest.Method.Method == HttpMethod.Get.Method)
                 {

@@ -1,4 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 
@@ -9,8 +15,6 @@ namespace OnlyBalds.Api.Endpoints;
 /// </summary>
 public static class PostsEndpoints
 {
-    private const string ThreadAuthorizationPolicyName = "Thread.ReadWrite";
-
     /// <summary>
     /// Maps the endpoints for the posts api.
     /// </summary>
@@ -21,22 +25,22 @@ public static class PostsEndpoints
         app.MapGet("/posts", GetPosts)
             .WithName(nameof(GetPosts))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapPost("/posts", CreatePostAsync)
             .WithName(nameof(CreatePostAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapPatch("/posts", PatchPostAsync)
             .WithName(nameof(PatchPostAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapDelete("/posts", DeletePostAsync)
             .WithName(nameof(DeletePostAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         return app;
     }
@@ -141,17 +145,159 @@ public static class PostsEndpoints
     /// <returns><see cref="IResult"/></returns>
     public static async Task<IResult> DeletePostAsync(
         string? postId,
-        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository,
+        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
+        ArgumentNullException.ThrowIfNull(commentsRepository);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor);
+
+        var accessJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Access"].FirstOrDefault();
+        var identityJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Identity"].FirstOrDefault();
+
+        if (string.IsNullOrEmpty(accessJwt) ||
+            string.IsNullOrEmpty(identityJwt))
+        {
+            return Results.Unauthorized();
+        }
 
         if (string.IsNullOrEmpty(postId) is not true)
         {
-            await postsRepository.DeleteById(Guid.Parse(postId));
+            var id = Guid.Parse(postId);
+            var post = postsRepository.GetById(id);
+            ArgumentNullException.ThrowIfNull(post);
 
-            return Results.NoContent();
+            var isAdmin = await IsAuthorizedAdminAsync(accessJwt);
+            if (isAdmin is true)
+            {
+                await postsRepository.DeleteById(id);
+
+                var comments = commentsRepository
+                    .GetAll()
+                    .Where(c => c.PostId == id)
+                    .ToList();
+
+                foreach (var comment in comments)
+                {
+                    await commentsRepository.DeleteById(comment.Id);
+                }
+
+                return Results.NoContent();
+            }
+
+            var userId = await GetUserIdAsync(accessJwt);
+            if (post.UserId.Equals(userId, StringComparison.InvariantCulture) is true)
+            {
+                await postsRepository.DeleteById(id);
+
+                var comments = commentsRepository
+                    .GetAll()
+                    .Where(c => c.PostId == id)
+                    .ToList();
+
+                foreach (var comment in comments)
+                {
+                    await commentsRepository.DeleteById(comment.Id);
+                }
+
+                return Results.NoContent();
+            }
+
+            return Results.Unauthorized();
         }
 
         return Results.BadRequest("Post ID cannot be null or empty.");
+    }
+
+    private static async Task<bool> IsAuthorizedAdminAsync(string? accessToken)
+    {
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return false;
+        }
+
+        var issuer = "https://onlybalds.us.auth0.com/";
+        var audience = "https://OnlyBaldsBackendForFrontendsApi";
+
+        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            $"{issuer}.well-known/openid-configuration",
+            new OpenIdConnectConfigurationRetriever()
+        );
+
+        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKeys = config.SigningKeys,
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true
+        };
+
+        var handler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
+
+            var permissions = principal.Claims
+                .Where(c => c.Type == "permissions")
+                .Select(c => c.Value)
+                .ToList();
+
+            var scope = principal.FindFirst("scope")?.Value ?? string.Empty;
+
+            return permissions.Contains(AuthorizataionPolicyNames.AdminAccess) &&
+                scope.Contains(AuthorizataionPolicyNames.AdminAccess);
+        }
+        catch (SecurityTokenException ex)
+        {
+            Console.WriteLine($"Token validation failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static async Task<string> GetUserIdAsync(string accessToken)
+    {
+        var issuer = "https://onlybalds.us.auth0.com/";
+        var audience = "https://OnlyBaldsBackendForFrontendsApi";
+
+        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            $"{issuer}.well-known/openid-configuration",
+            new OpenIdConnectConfigurationRetriever()
+        );
+
+        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKeys = config.SigningKeys,
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true
+        };
+
+        var handler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
+
+            var userId = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            return userId ?? string.Empty;
+        }
+        catch (SecurityTokenException ex)
+        {
+            Console.WriteLine($"Token validation failed: {ex.Message}");
+            return string.Empty;
+        }
     }
 }

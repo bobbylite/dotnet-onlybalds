@@ -249,7 +249,7 @@
                     $("#comments-list").empty();
                     filteredComments.forEach(comment => {
                         console.log("Comment:", comment);
-                        $("#comments-list").append(
+                        let newCommentHtml = 
                             `
                             <div class="comment">
                                 <div class="comment__author-info author-info">
@@ -277,8 +277,11 @@
                                     <p>${comment.content}</p>
                                 </div>
                             </div>
-                            `
-                        )
+                            `;
+
+                        const $newComment = $(newCommentHtml).hide();
+                        $("#comments-list").append($newComment);
+                        $newComment.fadeIn(700);
                     });
                 },
                 error: function (xhr, status, error) {
@@ -295,13 +298,11 @@
                     url: "/identity-information",
                     method: "GET",
                     success: function (data) {
-                        console.log("User data:", data);
                         const userId = data.claims.sub;
                         const params = new URLSearchParams(window.location.search);
                         const postId = params.get('postId');
 
-                        let commentItem = 
-                        {
+                        let commentItem = {
                             id: crypto.randomUUID(),
                             author: data.name,
                             content: $(".article__comment-textarea").val(),
@@ -309,27 +310,69 @@
                             postId: postId,
                             userId: userId
                         };
-                        let commentItemJson = JSON.stringify(commentItem);
 
                         $.ajax({
                             url: '/onlybalds-api/comments',
                             type: 'POST',
                             contentType: 'application/json',
-                            data: commentItemJson,
-                            success: function(response) {
+                            data: JSON.stringify(commentItem),
+                            success: function (response) {
                                 console.log('Post successful:', response);
-                                location.reload();
+
+                                const newCommentHtml = `
+                                    <div class="comment">
+                                        <div class="comment__author-info author-info">
+                                            <div class="listing__meta-author">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                                                    class="bi bi-person-fill" viewBox="0 0 16 16">
+                                                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                                </svg>
+                                            </div>
+
+                                            <div class="comment__delete-btn">
+                                                <button class="circle-btn delete-comment-btn" title="Delete Comment" data-id="${commentItem.id}">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="author-info__content">
+                                                <p id="post-author" class="author-info__name">Posted by ${commentItem.author}</p>
+                                                <p class="author-info__date">${new Date(commentItem.postedOn).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="comment__text">
+                                            <p>${commentItem.content}</p>
+                                        </div>
+                                    </div>
+                                `;
+
+                                const $newComment = $(newCommentHtml).hide();
+                                $("#comments-list").append($newComment);
+                                $newComment.fadeIn(300);
+
+                                const $commentsCount = $("#comments-count");
+
+                                const currentCommentsCount = Number($commentsCount.text().replace(/\D/g, '')); // Strip non-digits
+
+                                const updatedCommentsCount = currentCommentsCount + 1;
+
+                                $commentsCount.text(`${updatedCommentsCount} comment${updatedCommentsCount !== 1 ? 's' : ''}`);
+
+                                $(".article__comment-textarea").val('');
                             },
-                            error: function(xhr, status, error) {
+                            error: function (xhr, status, error) {
                                 console.error('Post failed:', error);
                             }
                         });
 
                     },
                     error: function (xhr, status, error) {
+                        console.error("User data error:", error);
                     }
                 });
             });
+
         });
 
         $('#delete-post').on('click', function (e) {
@@ -342,17 +385,7 @@
                 type: 'DELETE',
                 success: function(response) {
                     console.log('Post deleted successfully:', response);
-                    $.ajax({
-                        url: `/onlybalds-api/comments?postId=${postId}`,
-                        type: 'DELETE',
-                        success: function(response) {
-                            console.log('Post deleted successfully:', response);
-                            window.location.href = '/forum';
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error deleting post:', error);
-                        }
-                    });
+                    window.location.href = '/forum';
                 },
                 error: function(xhr, status, error) {
                     console.error('Error deleting post:', error);

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 
@@ -9,8 +10,6 @@ namespace OnlyBalds.Api.Endpoints;
 /// </summary>
 public static class ThreadsEndpoints
 {
-    private const string ThreadAuthorizationPolicyName = "Thread.ReadWrite";
-
     /// <summary>
     /// Maps the endpoints for the threads api.
     /// </summary>
@@ -21,27 +20,27 @@ public static class ThreadsEndpoints
         app.MapGet("/threads", GetThreads)
             .WithName(nameof(GetThreads))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapGet("/threads/{id}", GetThreadById)
             .WithName(nameof(GetThreadById))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapPost("/threads", CreateThreadAsync)
             .WithName(nameof(CreateThreadAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapPut("/threads/{id}", UpdateThreadAsync)
             .WithName(nameof(UpdateThreadAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         app.MapDelete("/threads/{id}", DeleteThreadAsync)
             .WithName(nameof(DeleteThreadAsync))
             .WithOpenApi()
-            .RequireAuthorization(ThreadAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
 
         return app;
     }
