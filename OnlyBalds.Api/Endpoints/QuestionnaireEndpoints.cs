@@ -20,27 +20,27 @@ public static class QuestionnaireEndpoints
         app.MapGet("/questionnaire", GetQuestionnaires)
             .WithName(nameof(GetQuestionnaires))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapGet("/questionnaire/{id}", GetQuestionnaireById)
             .WithName(nameof(GetQuestionnaireById))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPost("/questionnaire", CreateQuestionnaireAsync)
             .WithName(nameof(CreateQuestionnaireAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPut("/questionnaire/{id}", UpdateQuestionnaireAsync)
             .WithName(nameof(UpdateQuestionnaireAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapDelete("/questionnaire/{id}", DeleteQuestionnaireAsync)
             .WithName(nameof(DeleteQuestionnaireAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         return app;
     }

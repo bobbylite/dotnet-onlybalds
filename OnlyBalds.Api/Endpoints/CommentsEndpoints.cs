@@ -28,22 +28,22 @@ public static class CommentsEndpoints
         app.MapGet("/comments", GetComments)
             .WithName(nameof(GetComments))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPost("/comments", CreateCommentAsync)
             .WithName(nameof(CreateCommentAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPatch("/comments", PatchCommentAsync)
             .WithName(nameof(PatchCommentAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapDelete("/comments", DeleteCommentAsync)
             .WithName(nameof(DeleteCommentAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         return app;
     }
@@ -245,8 +245,8 @@ public static class CommentsEndpoints
                 Console.WriteLine($"{claim.Type}: {claim.Value}");
             }
 
-            return permissions.Contains(AuthorizataionPolicyNames.AdminAccess) &&
-                scope.Contains(AuthorizataionPolicyNames.AdminAccess);
+            return permissions.Contains(AuthorizationPolicies.AdminAccess) &&
+                scope.Contains(AuthorizationPolicies.AdminAccess);
         }
         catch (SecurityTokenException ex)
         {
