@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OnlyBalds.Api.Data;
 using OnlyBalds.Api.Endpoints;
-using OnlyBalds.Api.Models;
 
 namespace OnlyBalds.Api.Extensions;
 
@@ -37,27 +36,19 @@ public static class WebApplicationExtensions
 
         var optionsMonitor = webApplication.Services.GetRequiredService<IOptionsMonitor<SwaggerOptions>>();
         var swaggerOptions = optionsMonitor.CurrentValue;
-        
+
         if (webApplication.Environment.IsDevelopment())
         {
             webApplication.UseSwagger();
             webApplication.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint(swaggerOptions.Endpoint, swaggerOptions.APIName);
-                c.OAuth2RedirectUrl(swaggerOptions.OAuth2RedirectUrl);
-                c.OAuthClientId(swaggerOptions.OAuthClientId);
-                c.OAuthClientSecret(swaggerOptions.OAuthClientSecret);
-                c.OAuthRealm(swaggerOptions.OAuthRealm);
-                c.OAuthAppName(swaggerOptions.OAuthAppName);
-                if (swaggerOptions.OAuthUsePkce)
-                {
-                    c.OAuthUsePkce();
-                }
             });
         }
-        
+
         return webApplication;
     }
+
 
     /// <summary>
     /// Maps OnlyBalds endpoints.
