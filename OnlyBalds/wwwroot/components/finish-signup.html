@@ -1,108 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-
-	<title>Questionnaire | Only Balds</title>
-	<meta name="description" content="">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
-	<!--[if lt IE 9]>
-	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-	<![endif]-->   
-	
-	<link rel="icon" href="/images/favicon-16.png" sizes="16x16" type="image/png">
-	<link rel="icon" href="/images/favicon-32.png" sizes="32x32" type="image/png">
-	<link rel="icon" href="/images/favicon-48.png" sizes="48x48" type="image/png">
-	<link rel="icon" href="/images/favicon-62.png" sizes="62x62" type="image/png">
-	<link rel="apple-touch-icon" href="apple-touch-icon.png">
-	<meta property="og:url" content="https://example.com/page.html">
-	<meta property="og:type" content="website">
-	<meta property="og:title" content="Content Title">
-	<meta property="og:image" content="https://example.com/image.jpg">
-	<meta property="og:description" content="Description Here">
-	<meta property="og:site_name" content="Site Name">
-	<meta property="og:locale" content="en_US">
-
-	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
-
-	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
-
-</head>
-<body>
-
-	<!-- COMMENT
-	================================================== -->
-	<div class="navbar">
-		<div class="navbar__left">
-			<a href="/" class="navbar__logo">
-                <img src="/assets/images/logo.png" alt="Only Balds" >
-            </a>
-		</div>
-		<nav class="navbar__nav">
-			<ul class="nav main-nav">
-				<li class="nav__item"><a href="/about" class="nav__link">About</a></li>
-				<li class="nav__item"><a href="/forum" class="nav__link">Forum</a></li>
-				<li class="nav__item"><a href="/chat-room" class="nav__link">Chat Room</a></li>
-				<li class="nav__item"><a href="/marketplace" class="nav__link">Marketplace</a></li>
-				<li class="nav__item dropdown">
-					<a href="#" class="nav__link dropdown__toggle" role="button">Social
-						<i class="fa fa-angle-down dropdown__toggle-icon"></i>
-					</a>
-					<ul class="dropdown__nav">
-						<li class="dropdown__item"><a href="#" class="dropdown__link dropdown__link--icon" target="_blank"><i class="fa fa-facebook-square"></i> Facebook</a></li>
-						<li class="dropdown__item"><a href="https://www.instagram.com/onlybaldsllc/" class="dropdown__link dropdown__link--icon" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li>
-					</ul>
-				</li>
-			</ul>
-		</nav>
-		<div class="navbar__right dropdown">
-			<a href="#" class="navbar__user-dropdown">
-                <div class="navbar__user-profile-abbrev">
-                    <div class="navbar__user-profile-abbrev-text">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-top: 5px;" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-                        </svg>
-                    </div>
-                </div> 
-                <span class="navbar__mobile-hide">My </span>Account <i class="fa fa-angle-down dropdown__toggle-icon"></i>
-            </a>
-            <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
-                <li class="dropdown__item dropdown__item--title greeting"></li>
-                <li class="dropdown__item">
-                    <a href="/account-questionnaire" class="dropdown__link dropdown__link--icon">
-                        <i class="fa fa-edit"></i> 
-                        Questionnaire
-                    </a>
-                </li>
-                <li class="dropdown__item sign-in">
-                    <a href="/auth/login" class="dropdown__link dropdown__link--icon">
-                        <i class="fa fa-sign-in"></i> 
-                        Sign In
-                    </a>
-                </li>
-            </ul>
-            <div class="navbar__mobile-buttons">
-                <button class="navbar__toggle navicon">
-                    <div class="navicon__holder">
-                        <div class="navicon__line"></div>
-                        <div class="navicon__line"></div>
-                        <div class="navicon__line"></div>
-                    </div>
-                </button>
-            </div> 
-		</div>
-	</div><!--/comment -->
-	
     <!-- BANNER
     ============================================== -->
     <div class="banner banner--fade-to-gray">
@@ -276,206 +171,223 @@
         </div>
     </div><!--/baldie questionnaire-->
 
-	    <div class="footer">
-        <div class="container">
-            <div class="footer__buttons">
-                <ul class="footer__button-links">
-                    <li><a href="/forum" class="btn btn--rounded btn--faded">Forum</a></li>
-                    <li><a href="/chat-room" class="btn btn--rounded btn--faded">Chat Room</a></li>
-                    <li><a href="/marketplace" class="btn btn--rounded btn--faded">Marketplace</a></li>
-                    <li class="footer__right-list-item"><a href="/account-questionnaire" class="btn btn--rounded btn--white">Become A Member</a></li>
-                </ul>
-            </div>
-        </div>
-        <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
-    </div>
+<script>
+    $.ajax({
+        url: "/identity-information",
+        method: "GET",
+        success: function (data) {
+            user = data;
+            let userName = user.name;
 
-    <script src="/assets/scripts/App-5379555225.js"></script>
+            $(".sign-in").remove();
+            $(".greeting").empty().append(`Hi, ${userName}`);
+            $("#menu-options").append(`
+                <li class="dropdown__item sign-out">
+                    <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
+                        <i class="fa fa-sign-out"></i> 
+                        Sign Out
+                    </a>
+                </li>
+            `);
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+            handleSubmitQuestionnaire(user.account);
 
-    <script>
-        $(() => {
-            $.ajax({
-                url: "/identity-information",
-                method: "GET",
-                success: function (data) {
-                    user = data;
-                    let userName = user.name;
+            if (user.account == null || user.account == undefined) {
+                return;
+            }
 
-                    $(".sign-in").remove();
-                    $(".greeting").empty().append(`Hi, ${userName}`);
-                    $("#menu-options").append(`
-                        <li class="dropdown__item sign-out">
-                            <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
-                                <i class="fa fa-sign-out"></i> 
-                                Sign Out
-                            </a>
-                        </li>
-                    `);
+            if (user.account.hasSubmittedQuistionnaire == true)
+            {
+                window.location.replace('/');
+            }
+        },
+        error: function (xhr, status, error) {
+            window.location.replace('/unauthorized');
+        }
+    });
 
-                    handleSubmitQuestionnaire(user.account);
+    const handleSubmitQuestionnaire = (account) => {
+        $('#submit-questionnaire').click(async function (event) {
+            event.preventDefault();
 
-                    if (user.account.hasSubmittedQuistionnaire == true)
-                    {
-                        window.location.replace('/');
-                    }
-                },
-                error: function (xhr, status, error) {
-                }
-            });
-        });
+            console.log("Submitting questionnaire for account:", account);
 
-        const handleSubmitQuestionnaire = (account) => {
-            $('#submit-questionnaire').click(async function (event) {
-                event.preventDefault();
+            const baldType = $('#baldType').val();
 
-                console.log("Submitting questionnaire for account:", account);
-
-                const baldType = $('#baldType').val();
-
-                const answers = {
-                    firstName: $('#firstName').val(),
-                    lastName: $('#lastName').val(),
-                    displayName: $('#displayName').val(),
-                    address: $('#address').val(),
-                    isCompleted: true,
-                    data: {
-                        questions: [
-                            {
-                            title: "How did you hear about us?",
-                                answer: $('#hearAbout').val()
-                            },
-                            {
-                                title: "Where do you usually buy products?",
-                                answer: $('#whereYouBuy').val()
-                            },
-                            {
-                                title: "Apparel size",
-                                answer: $('#apparelSize').val()
-                            },
-                            {
-                                title: "Monthly spend on grooming products",
-                                answer: $('#monthlySpend').val()
-                            },
-                            {
-                                title: "Are you open to trying new products/routines?",
-                                answer: $('input[name="newRoutine"]:checked').val()
-                            },
-                            {
-                                title: "Are you an active baldie?",
-                                answer: $('input[name="activeBaldie"]:checked').val()
-                            },
-                            {
-                                title: "Type of bald",
-                                answer: baldType
-                            }
-                        ],
-                        baldingOptions: [
+            const answers = {
+                id: crypto.randomUUID(),
+                firstName: $('#firstName').val(),
+                lastName: $('#lastName').val(),
+                displayName: $('#displayName').val(),
+                address: $('#address').val(),
+                isCompleted: true,
+                data: {
+                    questions: [
                         {
-                            option: [
+                        title: "How did you hear about us?",
+                            answer: $('#hearAbout').val()
+                        },
+                        {
+                            title: "Where do you usually buy products?",
+                            answer: $('#whereYouBuy').val()
+                        },
+                        {
+                            title: "Apparel size",
+                            answer: $('#apparelSize').val()
+                        },
+                        {
+                            title: "Monthly spend on grooming products",
+                            answer: $('#monthlySpend').val()
+                        },
+                        {
+                            title: "Are you open to trying new products/routines?",
+                            answer: $('input[name="newRoutine"]:checked').val()
+                        },
+                        {
+                            title: "Are you an active baldie?",
+                            answer: $('input[name="activeBaldie"]:checked').val()
+                        },
+                        {
+                            title: "Type of bald",
+                            answer: baldType
+                        }
+                    ],
+                    baldingOptions: [
+                    {
+                        option: [
+                        {
+                            baldingOptionTitle: "Beard Baldie",
+                            questions: [
                             {
-                                baldingOptionTitle: "Beard Baldie",
-                                questions: [
-                                {
-                                    title: "What type of beard do you have?",
-                                    answer: $('#typeOfBeard').val()
-                                }
-                                ]
-                            },
-                            {
-                                baldingOptionTitle: "Rookie Baldie",
-                                questions: [
-                                {
-                                    title: "Do you have a beard?",
-                                    answer: $('#haveABeard').val()
-                                },
-                                {
-                                    title: "Are you looking for recommendations?",
-                                    answer: $('#lookingForRecommendations').val()
-                                }
-                                ]
-                            },
-                            {
-                                baldingOptionTitle: "Denier Baldie",
-                                questions: [
-                                {
-                                    title: "Are you self-conscious about being bald?",
-                                    answer: $('#selfConscious').val()
-                                },
-                                {
-                                    title: "Reason?",
-                                    answer: $('#selfConsciousReason').val()
-                                }
-                                ]
-                            },
-                            {
-                                baldingOptionTitle: "Confident Baldie",
-                                questions: [
-                                {
-                                    title: "Do you shave or buzz?",
-                                    answer: $('#shaveOrBuzz').val()
-                                },
-                                {
-                                    title: "How long have you been bald?",
-                                    answer: $('#howLong').val()
-                                },
-                                {
-                                    title: "Do you have the chrome cap?",
-                                    answer: $('#chromeCap').val()
-                                }
-                                ]
-                            },
-                            {
-                                baldingOptionTitle: "Not a Baldie",
-                                questions: [
-                                {
-                                    title: "Not a Baldie?",
-                                    answer: $('#typeOfNotBald').val()
-                                }
-                                ]
+                                title: "What type of beard do you have?",
+                                answer: $('#typeOfBeard').val()
                             }
                             ]
-                        }]
-                    }
-                };
-
-                try {
-                    console.log('Submitting form:', answers);
-
-                    $.ajax({
-                        url: "/account-questionnaire",
-                        method: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(answers),
-                        success: function (response) {
-                            console.log("Success:", response);
-                            window.location.replace('/');
                         },
-                        error: function (xhr, status, error) {
-                            console.error("Error:", status, error);
+                        {
+                            baldingOptionTitle: "Rookie Baldie",
+                            questions: [
+                            {
+                                title: "Do you have a beard?",
+                                answer: $('#haveABeard').val()
+                            },
+                            {
+                                title: "Are you looking for recommendations?",
+                                answer: $('#lookingForRecommendations').val()
+                            }
+                            ]
+                        },
+                        {
+                            baldingOptionTitle: "Denier Baldie",
+                            questions: [
+                            {
+                                title: "Are you self-conscious about being bald?",
+                                answer: $('#selfConscious').val()
+                            },
+                            {
+                                title: "Reason?",
+                                answer: $('#selfConsciousReason').val()
+                            }
+                            ]
+                        },
+                        {
+                            baldingOptionTitle: "Confident Baldie",
+                            questions: [
+                            {
+                                title: "Do you shave or buzz?",
+                                answer: $('#shaveOrBuzz').val()
+                            },
+                            {
+                                title: "How long have you been bald?",
+                                answer: $('#howLong').val()
+                            },
+                            {
+                                title: "Do you have the chrome cap?",
+                                answer: $('#chromeCap').val()
+                            }
+                            ]
+                        },
+                        {
+                            baldingOptionTitle: "Not a Baldie",
+                            questions: [
+                            {
+                                title: "Not a Baldie?",
+                                answer: $('#typeOfNotBald').val()
+                            }
+                            ]
                         }
-                    });
-                } catch (error) {
-                    console.error('Error submitting form:', error);
+                        ]
+                    }]
                 }
-            });
-        }
-    </script>
+            };
 
-    <script>
-    function initAutocomplete() {
-        const input = document.getElementById('address');
-        const options = {
-            types: ['address'],
-            componentRestrictions: { country: 'us' }
-        };
+            try {
+                console.log('Submitting form:', answers);
 
-        new google.maps.places.Autocomplete(input, options);
+                $.ajax({
+                    url: "/identity-information",
+                    method: "GET",
+                    success: function (data) {
+                        user = data;
+
+                        $.ajax({
+                            url: "/onlybalds-api/questionnaire",
+                            method: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify(answers),
+                            success: function (response) {
+                                let account = 
+                                {
+                                    questionnaireId: answers.id,
+                                    hasSubmittedQuistionnaire: true,
+                                    identityProviderId: user.claims.sub,
+                                    firstName: $('#firstName').val(),
+                                    lastName: $('#lastName').val(),
+                                    displayName: $('#displayName').val(),
+                                    address: $('#address').val(),
+                                    email: user.claims.email,
+                                    username: user.claims.nickname,
+                                };
+
+                                $.ajax({
+                                    url: "/onlybalds-api/account",
+                                    method: "POST",
+                                    contentType: "application/json",
+                                    data: JSON.stringify(account),
+                                    success: function (response) {
+                                        console.log("Account Success:", response);
+                                        window.location.replace('/');
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Error:", status, error);
+                                    }
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error:", status, error);
+                            }
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+            } catch (error) {
+                console.error('Error submitting form:', error);
+            }
+        });
     }
-
-    //window.addEventListener('load', initAutocomplete);
 </script>
 
-</body>
-</html>
+<script>
+function initAutocomplete() {
+    const input = document.getElementById('address');
+    const options = {
+        types: ['address'],
+        componentRestrictions: { country: 'us' }
+    };
+
+    new google.maps.places.Autocomplete(input, options);
+}
+
+//window.addEventListener('load', initAutocomplete);
+</script>

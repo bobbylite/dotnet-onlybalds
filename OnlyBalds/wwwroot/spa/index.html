@@ -87,9 +87,9 @@
             <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
                 <li class="dropdown__item dropdown__item--title greeting"></li>
                 <li class="dropdown__item">
-                    <a href="/account-questionnaire" class="dropdown__link dropdown__link--icon">
+                    <a class="dropdown__link dropdown__link--icon finish-signup" style="width: 100%;">
                         <i class="fa fa-edit"></i> 
-                        Questionnaire
+                        Questionnaire 
                     </a>
                 </li>
                 <li class="dropdown__item sign-in">
@@ -116,6 +116,7 @@
     <div id="forum-placeholder"></div>
     <div id="chat-room-placeholder"></div>
     <div id="marketplace-placeholder"></div>
+    <div id="finish-signup-placeholder"></div>
 	<div class="footer" style="display: none;">
         <div class="container">
             <div class="footer__buttons">
@@ -179,12 +180,33 @@
 
     <script>
         $(function () {
+            loadSignUp();
             loadAbout();
             loadHome();
             loadForum();
+            loadWriteNewPost();
             loadChatRoom();
             loadMarketplace();
         });
+
+        const loadSignUp = () => {
+            $('.finish-signup').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#finish-signup-placeholder').load('components/finish-signup.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
 
         const loadAbout = () => {
             $('.about').on('click', function (e) {
@@ -252,6 +274,25 @@
             });
         };
 
+        const loadWriteNewPost = () => {
+            $('#write-new-post').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#forum-placeholder').load('components/forum-new-post.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
         const loadChatRoom = () => {
             $('.chat-room').on('click', function (e) {
                 e.preventDefault();
@@ -296,6 +337,8 @@
         }
 
         function emptyComponents() {
+            window.app.scripts.clearQueryParams();
+
             $('#about-placeholder').empty();
             $('#home-placeholder').empty();
             $('#forum-placeholder').empty();
@@ -303,6 +346,42 @@
             $('#chat-room-placeholder').empty();
         }
 
+    </script>
+
+    <script>
+        window.app = window.app || {};
+        window.app.scripts = {
+            updateQueryParam: (key, value) => {
+                const url = new URL(window.location.href);
+
+                for (const param of url.searchParams.keys()) {
+                    url.searchParams.delete(param);
+                }
+
+                url.searchParams.set(key, value);
+
+                window.history.replaceState({}, '', url);
+            },
+            clearQueryParams: () => {
+                const url = new URL(window.location.href);
+                url.search = '';
+                window.history.replaceState({}, '', url);
+            },
+            loadHome: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#home-placeholder').load('components/home.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            loadForum: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#forum-placeholder').load('components/forum.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            }
+        };
     </script>
 
 </body>
