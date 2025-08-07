@@ -42,11 +42,19 @@
         $('.btn.btn--blue').on('click', function (e) {
             e.preventDefault();
 
+            var $btn = $(this);
+            $btn.html(`<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...`);
+            $btn.prop('disabled', true);
+
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
                 success: function (data) {
                     console.log("User data:", data);
+                    
+                    $btn.html("Send Message");
+                    $btn.prop('disabled', false);
+
                     const userId = data.claims.sub;
                     const params = new URLSearchParams(window.location.search);
                     const threadId = params.get('threadId');

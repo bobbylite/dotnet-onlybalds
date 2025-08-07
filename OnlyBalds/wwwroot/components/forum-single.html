@@ -146,6 +146,10 @@
         $('#comment-button').on('click', function (e) {
             e.preventDefault();
 
+            var $btn = $(this);
+            $btn.html(`<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...`);
+            $btn.prop('disabled', true);
+
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
@@ -170,6 +174,9 @@
                         data: JSON.stringify(commentItem),
                         success: function (response) {
                             console.log('Post successful:', response);
+
+                            $btn.html("Send Message");
+                            $btn.prop('disabled', false);
 
                             var newCommentHtml = `
                                 <div class="comment">
