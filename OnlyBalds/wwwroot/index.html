@@ -148,7 +148,7 @@
                 url: "/identity-information",
                 method: "GET",
                 success: function (data) {
-                    user = data;
+                    const user = data;
                     let userName = user.name;
                     console.log("User name:", userName);
                     $(".sign-in").remove();
@@ -190,7 +190,6 @@
             loadChatRoom();
             loadMarketplace();
             loadNewPost();
-            loadReadPost();
         });
 
         const loadSignUp = () => {
@@ -300,24 +299,7 @@
             });
         };
 
-        const loadReadPost = () => {
-            $('.read-post').on('click', function (e) {
-                e.preventDefault();
 
-                emptyComponents();
-
-                $('.footer').hide();
-                $('#forum-placeholder').load('components/forum-new-post.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
-            });
-        };
 
         const loadChatRoom = () => {
             $('.chat-room').on('click', function (e) {
@@ -416,7 +398,7 @@
                 closeNavbar();
             },
             registerReadPostClick: (postId) => {
-                $('.read-post').on('click', function (e) {
+                $(`.read-post-${postId}`).on('click', function (e) {
                     e.preventDefault();
                     window.app.scripts.updateQueryParam('postId', postId);
                     emptyComponents();

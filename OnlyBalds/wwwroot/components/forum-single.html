@@ -92,6 +92,8 @@
             success: function (data) {
                 var filteredComments = data.filter(comment => comment.postId === postId);
                 console.log("Filtered comments:", filteredComments);
+                console.log("Calling PopulateComments()");
+
                 
                 $('#comments-count').empty();
                 $('#comments-count').text(`${filteredComments.length} Comment${filteredComments.length !== 1 ? 's' : ''}`);
@@ -99,7 +101,7 @@
                 $("#comments-list").empty();
                 filteredComments.forEach(comment => {
                     console.log("Comment:", comment);
-                    var newCommentHtml = 
+                    let newCommentHtml = 
                         `
                         <div class="comment">
                             <div class="comment__author-info author-info">
@@ -129,7 +131,7 @@
                         </div>
                         `;
 
-                    var $newComment = $(newCommentHtml).hide();
+                    let $newComment = $(newCommentHtml).hide();
                     $("#comments-list").append($newComment);
                     $newComment.fadeIn(700);
                 });
