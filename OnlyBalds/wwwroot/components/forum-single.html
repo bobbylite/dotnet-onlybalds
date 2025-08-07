@@ -1,0 +1,281 @@
+<!-- FORUM LISTINGS
+============================================== -->
+<div id="spinner-holder" class="box__holder">
+    <div class="flex-center">
+        <div class="spinner-border" role="status" aria-label="Loading"></div>
+    </div>
+</div>
+
+<div id="app-holder" class="section section--gray article" style="display: none;">
+    <div class="container article__container">
+
+        <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+            <h1 id="article-title" class="h2 article__heading"></h1>
+            <div class="article__actions">
+                <button class="circle-btn" id="star-post" title="Star Post">
+                    <i class="fa fa-heart"></i>
+                </button>
+                <button class="circle-btn" id="edit-post" title="Edit Post">
+                    <i class="fa fa-pencil"></i>
+                </button>
+                <button class="circle-btn" id="delete-post" title="Delete Post">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+            <div class="author-info">
+                <div class="listing__meta-author">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                        class="bi bi-person-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                    </svg>
+                </div>
+                <div class="author-info__content">
+                    <p id="article-author" class="author-info__name"></p>
+                    <p id="article-date" class="author-info__date"></p>
+                </div>
+            </div>
+            <div id="article-content" class="article__body" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+            </div>
+        </div>
+
+        <div class="article__comments" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+            <h2 id="comments-count" class="h4 article__comment-count"></h2>
+
+            <ul id="comments-list" class="list-group list-group-flush list-unstyled">
+
+            </ul>
+        </div>
+    
+        <form class="article__write-comment" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+            <h2 class="h4 article__write-comment-heading">Leave A Comment</h2>
+            <textarea name="" id="" placeholder="Enter your message here..." class="article__comment-textarea"></textarea>
+            <button id="comment-button" class="btn btn--blue article__post-comment-btn">Post Comment</button>
+        </form>
+
+    </div>
+</div><!--forum listings -->
+
+<script>
+    var userId = '';
+
+    $(document).ready(() => {
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get("postId");
+
+        $.ajax({
+            url: `/onlybalds-api/posts?postId=${postId}`,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                let post = data;
+                $("#article-title").text(post.title);
+                $("#article-author").text(`Posted by ${post.author}`);
+                $("#article-content").html(post.content);
+                userId = post.userId;
+                PopulateComments(postId, post);
+
+                $('#app-holder').css('display', 'block');
+                $('#spinner-holder').remove();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching thread:", error);
+            }
+        });
+    });
+
+    function PopulateComments(postId, userData) {
+        $.ajax({
+            url: `/onlybalds-api/comments?postId=${postId}`,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                var filteredComments = data.filter(comment => comment.postId === postId);
+                console.log("Filtered comments:", filteredComments);
+                
+                $('#comments-count').empty();
+                $('#comments-count').text(`${filteredComments.length} Comment${filteredComments.length !== 1 ? 's' : ''}`);
+                
+                $("#comments-list").empty();
+                filteredComments.forEach(comment => {
+                    console.log("Comment:", comment);
+                    var newCommentHtml = 
+                        `
+                        <div class="comment">
+                            <div class="comment__author-info author-info">
+                                <div class="listing__meta-author">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                                        class="bi bi-person-fill" viewBox="0 0 16 16">
+                                        <path
+                                            d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                    </svg>
+                                </div>
+
+                                <div class="comment__delete-btn">
+                                    <button class="circle-btn delete-comment-btn" title="Delete Comment" data-id="${comment.id}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <div class="author-info__content">
+                                    <p id="post-author" class="author-info__name">Posted by ${comment.author}</p>
+                                    <p class="author-info__date">${new Date(comment.postedOn).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+
+                            <div class="comment__text">
+                                <p>${comment.content}</p>
+                            </div>
+                        </div>
+                        `;
+
+                    var $newComment = $(newCommentHtml).hide();
+                    $("#comments-list").append($newComment);
+                    $newComment.fadeIn(700);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching comments:", error);
+            }
+        });
+    };
+
+    $(document).ready(function () {
+        $('#comment-button').on('click', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "/identity-information",
+                method: "GET",
+                success: function (data) {
+                    var userId = data.claims.sub;
+                    var params = new URLSearchParams(window.location.search);
+                    var postId = params.get('postId');
+
+                    var commentItem = {
+                        id: crypto.randomUUID(),
+                        author: data.name,
+                        content: $(".article__comment-textarea").val(),
+                        postedOn: new Date().toISOString(),
+                        postId: postId,
+                        userId: userId
+                    };
+
+                    $.ajax({
+                        url: '/onlybalds-api/comments',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(commentItem),
+                        success: function (response) {
+                            console.log('Post successful:', response);
+
+                            var newCommentHtml = `
+                                <div class="comment">
+                                    <div class="comment__author-info author-info">
+                                        <div class="listing__meta-author">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="50" height="50" fill="currentColor"
+                                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                            </svg>
+                                        </div>
+
+                                        <div class="comment__delete-btn">
+                                            <button class="circle-btn delete-comment-btn" title="Delete Comment" data-id="${commentItem.id}">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="author-info__content">
+                                            <p id="post-author" class="author-info__name">Posted by ${commentItem.author}</p>
+                                            <p class="author-info__date">${new Date(commentItem.postedOn).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="comment__text">
+                                        <p>${commentItem.content}</p>
+                                    </div>
+                                </div>
+                            `;
+
+                            var $newComment = $(newCommentHtml).hide();
+                            $("#comments-list").append($newComment);
+                            $newComment.fadeIn(300);
+
+                            var $commentsCount = $("#comments-count");
+
+                            var currentCommentsCount = Number($commentsCount.text().replace(/\D/g, '')); // Strip non-digits
+
+                            var updatedCommentsCount = currentCommentsCount + 1;
+
+                            $commentsCount.text(`${updatedCommentsCount} comment${updatedCommentsCount !== 1 ? 's' : ''}`);
+
+                            $(".article__comment-textarea").val('');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Post failed:', error);
+                        }
+                    });
+
+                },
+                error: function (xhr, status, error) {
+                    console.error("User data error:", error);
+                }
+            });
+        });
+
+    });
+
+    $('#delete-post').on('click', function (e) {
+        e.preventDefault();
+        var params = new URLSearchParams(window.location.search);
+        var postId = params.get('postId');
+
+        $.ajax({
+            url: `/onlybalds-api/posts?postId=${postId}`,
+            type: 'DELETE',
+            success: function(response) {
+                console.log('Post deleted successfully:', response);
+                window.app.scripts.loadForum();
+            },
+            error: function(xhr, status, error) {
+                console.error('Error deleting post:', error);
+            }
+        });
+    });
+
+    $(document).off('click', '.delete-comment-btn').on('click', '.delete-comment-btn', function (e) {
+        e.preventDefault();
+
+        const $btn = $(this);
+        const commentId = $btn.data('id');
+        const $commentElement = $btn.closest('.comment');
+
+        console.log("Deleting comment with ID:", commentId);
+
+        $btn.prop('disabled', true); // prevent double clicking
+
+        $.ajax({
+            url: `/onlybalds-api/comments?commentId=${commentId}`,
+            type: 'DELETE',
+            success: function (response) {
+                console.log('Comment deleted:', response);
+
+                $commentElement.fadeOut(300, function () {
+                    $(this).remove();
+
+                    // Update comment count
+                    const $count = $("#comments-count");
+                    const current = parseInt($count.text().replace(/\D/g, ''), 10);
+                    const updated = Math.max(current - 1, 0);
+                    $count.text(`${updated} comment${updated !== 1 ? 's' : ''}`);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Failed to delete comment:', error);
+                $btn.prop('disabled', false); // re-enable on error
+            }
+        });
+    });
+
+
+</script>

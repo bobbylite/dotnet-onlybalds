@@ -114,9 +114,12 @@
     <div id="about-placeholder"></div>
     <div id="home-placeholder"></div>
     <div id="forum-placeholder"></div>
+    <div id="new-post-placeholder"></div>
+    <div id="read-post-placeholder"></div>
     <div id="chat-room-placeholder"></div>
     <div id="marketplace-placeholder"></div>
     <div id="finish-signup-placeholder"></div>
+    <div id="unauthorized-placeholder"></div>
 	<div class="footer" style="display: none;">
         <div class="container">
             <div class="footer__buttons">
@@ -184,15 +187,17 @@
             loadAbout();
             loadHome();
             loadForum();
-            loadWriteNewPost();
             loadChatRoom();
             loadMarketplace();
+            loadNewPost();
+            loadReadPost();
         });
 
         const loadSignUp = () => {
             $('.finish-signup').on('click', function (e) {
                 e.preventDefault();
 
+                window.app.scripts.clearQueryParams();
                 emptyComponents();
 
                 $('.footer').hide();
@@ -212,6 +217,7 @@
             $('.about').on('click', function (e) {
                 e.preventDefault();
 
+                window.app.scripts.clearQueryParams();
                 emptyComponents();
 
                 $('.footer').hide();
@@ -240,6 +246,7 @@
             $('.navbar__logo').on('click', function (e) {
                 e.preventDefault();
 
+                window.app.scripts.clearQueryParams();
                 emptyComponents();
 
                 $('.footer').hide();
@@ -274,8 +281,27 @@
             });
         };
 
-        const loadWriteNewPost = () => {
-            $('#write-new-post').on('click', function (e) {
+        const loadNewPost = () => {
+            $('.new-post').on('click', function (e) {
+                e.preventDefault();
+                console.log("New post button clicked");
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#new-post-placeholder').load('components/forum-new-post.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadReadPost = () => {
+            $('.read-post').on('click', function (e) {
                 e.preventDefault();
 
                 emptyComponents();
@@ -297,6 +323,7 @@
             $('.chat-room').on('click', function (e) {
                 e.preventDefault();
 
+                window.app.scripts.clearQueryParams();
                 emptyComponents();
 
                 $('.footer').hide();
@@ -316,6 +343,7 @@
             $('.marketplace').on('click', function (e) {
                 e.preventDefault();
 
+                window.app.scripts.clearQueryParams();
                 emptyComponents();
 
                 $('.footer').hide();
@@ -336,12 +364,11 @@
             $('.navbar__toggle').removeClass('navicon--toggle');
         }
 
-        function emptyComponents() {
-            window.app.scripts.clearQueryParams();
-            
+        function emptyComponents() {            
             $('#about-placeholder').empty();
             $('#home-placeholder').empty();
             $('#forum-placeholder').empty();
+            $('#read-post-placeholder').empty();
             $('#marketplace-placeholder').empty();
             $('#chat-room-placeholder').empty();
         }
@@ -378,6 +405,38 @@
                 emptyComponents();
                 $('.footer').hide();
                 $('#forum-placeholder').load('components/forum.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            loadNewPost: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#new-post-placeholder').load('components/forum-new-post.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            registerReadPostClick: (postId) => {
+                $('.read-post').on('click', function (e) {
+                    e.preventDefault();
+                    window.app.scripts.updateQueryParam('postId', postId);
+                    emptyComponents();
+
+                    $('.footer').hide();
+                    $('#read-post-placeholder').load('components/forum-single.html');
+                    $('.footer').fadeIn(400);
+
+                    setTimeout(function () {
+                        $('.navbar__nav').removeClass('navbar__nav--is-open');
+                        $('.navbar__toggle').removeClass('navicon--toggle');
+                    }, 250);
+
+                    closeNavbar();
+                });
+            },
+            loadUnauthorized: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#unauthorized-placeholder').load('components/unauthorized.html');
                 $('.footer').fadeIn(400);
                 closeNavbar();
             }

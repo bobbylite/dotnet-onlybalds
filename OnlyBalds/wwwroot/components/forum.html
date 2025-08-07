@@ -78,6 +78,8 @@
 
                             closeNavbar();
                         });
+
+                        window.app.scripts.updateQueryParam('threadId', thread.id);
                         GetPosts(thread.id);
                     }
                 });
@@ -116,10 +118,12 @@
                             </div>
                             <div class="listing__content">
                                 <p class="listing__snippet">${post.content}</p>
-                                <a href="/forum-single?postId=${post.id}" class="text-link">Read Article</a>
+                                <button class="text-link read-post">Read Article</button>
                             </div>
                         </div>
                         `);
+
+                        window.app.scripts.registerReadPostClick(post.id);
                     }
                 });
 
@@ -151,7 +155,6 @@
             data: threadItemJson,
             success: function(response) {
                 console.log('Post successful:', response);
-                location.reload();
             },
             error: function(xhr, status, error) {
                 console.error('Post failed:', error);
