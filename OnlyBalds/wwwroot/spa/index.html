@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html style="background-color: white;">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<title>Only Balds</title>
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->   
+	
+    <link rel="icon" href="/favicon.png" />
+	<link rel="icon" href="/images/favicon-16.png" sizes="16x16" type="image/png">
+	<link rel="icon" href="/images/favicon-32.png" sizes="32x32" type="image/png">
+	<link rel="icon" href="/images/favicon-48.png" sizes="48x48" type="image/png">
+	<link rel="icon" href="/images/favicon-62.png" sizes="62x62" type="image/png">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+	<meta property="og:url" content="https://example.com/page.html">
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Content Title">
+	<meta property="og:image" content="https://example.com/image.jpg">
+	<meta property="og:description" content="Description Here">
+	<meta property="og:site_name" content="Site Name">
+	<meta property="og:locale" content="en_US">
+
+    <link rel="stylesheet" href="/app.css"/>
+
+	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
+
+	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
+
+</head>
+<body>
+
+	<!-- COMMENT
+	================================================== -->
+	<div class="navbar">
+		<div class="navbar__left">
+			<button class="navbar__logo">
+                <img src="/assets/images/logo.png" alt="Only Balds" >
+            </button>
+		</div>
+		<nav class="navbar__nav">
+			<ul class="nav main-nav">
+				<li class="nav__item"><button class="nav__link about">About</button></li>
+				<li class="nav__item"><button class="nav__link forum">Forum</button></li>
+				<li class="nav__item"><button class="nav__link chat-room">Chat Room</button></li>
+				<li class="nav__item"><button class="nav__link marketplace">Marketplace</button></li>
+				<li class="nav__item dropdown">
+					<a href="#" class="nav__link dropdown__toggle" role="button">Social
+						<i class="fa fa-angle-down dropdown__toggle-icon"></i>
+					</a>
+					<ul class="dropdown__nav">
+						<li class="dropdown__item"><a href="#" class="dropdown__link dropdown__link--icon" target="_blank"><i class="fa fa-facebook-square"></i> Facebook</a></li>
+						<li class="dropdown__item"><a href="https://www.instagram.com/onlybaldsllc/" class="dropdown__link dropdown__link--icon" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+		<div class="navbar__right dropdown">
+			<a href="#" class="navbar__user-dropdown">
+                <div class="navbar__user-profile-abbrev">
+                    <div class="navbar__user-profile-abbrev-text">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-top: 5px;" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                        </svg>
+                    </div>
+                </div> 
+                <span class="navbar__mobile-hide">My </span>Account <i class="fa fa-angle-down dropdown__toggle-icon"></i>
+            </a>
+            <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
+                <li class="dropdown__item dropdown__item--title greeting"></li>
+                <li class="dropdown__item">
+                    <a href="/account-questionnaire" class="dropdown__link dropdown__link--icon">
+                        <i class="fa fa-edit"></i> 
+                        Questionnaire
+                    </a>
+                </li>
+                <li class="dropdown__item sign-in">
+                    <a href="/auth/login" class="dropdown__link dropdown__link--icon">
+                        <i class="fa fa-sign-in"></i> 
+                        Sign In
+                    </a>
+                </li>
+            </ul>
+            <div class="navbar__mobile-buttons">
+                <button class="navbar__toggle navicon">
+                    <div class="navicon__holder">
+                        <div class="navicon__line"></div>
+                        <div class="navicon__line"></div>
+                        <div class="navicon__line"></div>
+                    </div>
+                </button>
+            </div> 
+		</div>
+	</div><!--/comment -->
+
+    <div id="about-placeholder"></div>
+    <div id="home-placeholder"></div>
+    <div id="forum-placeholder"></div>
+    <div id="chat-room-placeholder"></div>
+    <div id="marketplace-placeholder"></div>
+    <!--<div id="spacial-content-placeholdedr">
+        <div id="marketplace-placeholder"></div>
+            <div class="banner banner--fade-to-gray">
+                <div class="container">
+                    <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0"></h1>
+                    <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0"></p>
+                    <div class="banner__btn-holder" data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
+                    </div>
+                </div>
+            </div>
+
+            <div id="app-holder-dummy" class="section section--gray" >
+                <div class="container">
+                    <ul id="threads-list" class="list-group list-group-flush list-unstyled">
+
+                    </ul>
+                    <nav class="pagination" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                        <ul class="pagination__nav">
+                        </ul>
+                    </nav>
+
+                </div>
+            </div>
+        </div>
+    </div>-->
+	<div class="footer" style="display: none;">
+        <div class="container">
+            <div class="footer__buttons">
+                <ul class="footer__button-links">
+                    <li><a href="/forum" class="btn btn--rounded btn--faded">Forum</a></li>
+                    <li><a href="/chat-room" class="btn btn--rounded btn--faded">Chat Room</a></li>
+                    <li><a href="/marketplace" class="btn btn--rounded btn--faded">Marketplace</a></li>
+                    <li class="footer__right-list-item"><a href="/account-questionnaire" class="btn btn--rounded btn--white">Become A Member</a></li>
+                </ul>
+            </div>
+        </div>
+        <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
+    </div>
+
+    <script src="/assets/scripts/App-5379555225.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+        });
+
+        $(() => {
+            $.ajax({
+                url: "/identity-information",
+                method: "GET",
+                success: function (data) {
+                    user = data;
+                    let userName = user.name;
+                    console.log("User name:", userName);
+                    $(".sign-in").remove();
+                    $(".greeting").empty().append(`Hi, ${userName}`);
+                    $("#menu-options").append(`
+                        <li class="dropdown__item sign-out">
+                            <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
+                                <i class="fa fa-sign-out"></i> 
+                                Sign Out
+                            </a>
+                        </li>
+                    `);
+
+                    var account = user.account;
+
+                    if (account === null || account === undefined) {
+                        window.location.replace('/account-questionnaire');
+                        return;
+                    }
+                    
+                    if (account.hasSubmittedQuistionnaire !== true) {
+                        window.location.replace('/account-questionnaire');
+                        return;
+                    }
+                    
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            loadAbout();
+            loadHome();
+            loadForum();
+            loadChatRoom();
+            loadMarketplace();
+        });
+
+        const loadAbout = () => {
+            $('.about').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#about-placeholder').load('components/about.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                    $('.navbar__nav').css('display', 'block');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadHome = () => {
+            $('.footer').hide();
+            $('#home-placeholder').load('components/home.html');
+            $('.footer').fadeIn(400);
+
+            setTimeout(function () {
+                $('.navbar__nav').removeClass('navbar__nav--is-open');
+                $('.navbar__toggle').removeClass('navicon--toggle');
+                $('.navbar__nav').css('display', 'block');
+            }, 250);
+
+            closeNavbar();
+
+            $('.navbar__logo').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#home-placeholder').load('components/home.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                    $('.navbar__nav').css('display', 'block');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadForum = () => {
+            $('.forum').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#forum-placeholder').load('components/forum.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                    $('.navbar__nav').css('display', 'block');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadChatRoom = () => {
+            $('.chat-room').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#chat-room-placeholder').load('components/chat-room.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                    $('.navbar__nav').css('display', 'block');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadMarketplace = () => {
+            $('.marketplace').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#marketplace-placeholder').load('components/marketplace.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                    $('.navbar__nav').css('display', 'block');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        function closeNavbar() {
+            $('.navbar__nav').slideUp(200);
+        }
+
+        function emptyComponents() {
+            $('#about-placeholder').empty();
+            $('#home-placeholder').empty();
+            $('#forum-placeholder').empty();
+            $('#marketplace-placeholder').empty();
+            $('#chat-room-placeholder').empty();
+        }
+
+    </script>
+
+</body>
+</html>
