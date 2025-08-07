@@ -110,31 +110,6 @@
     <div id="forum-placeholder"></div>
     <div id="chat-room-placeholder"></div>
     <div id="marketplace-placeholder"></div>
-    <!--<div id="spacial-content-placeholdedr">
-        <div id="marketplace-placeholder"></div>
-            <div class="banner banner--fade-to-gray">
-                <div class="container">
-                    <h1 class="banner__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0"></h1>
-                    <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0"></p>
-                    <div class="banner__btn-holder" data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
-                    </div>
-                </div>
-            </div>
-
-            <div id="app-holder-dummy" class="section section--gray" >
-                <div class="container">
-                    <ul id="threads-list" class="list-group list-group-flush list-unstyled">
-
-                    </ul>
-                    <nav class="pagination" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
-                        <ul class="pagination__nav">
-                        </ul>
-                    </nav>
-
-                </div>
-            </div>
-        </div>
-    </div>-->
 	<div class="footer" style="display: none;">
         <div class="container">
             <div class="footer__buttons">
@@ -218,7 +193,6 @@
                 setTimeout(function () {
                     $('.navbar__nav').removeClass('navbar__nav--is-open');
                     $('.navbar__toggle').removeClass('navicon--toggle');
-                    $('.navbar__nav').css('display', 'block');
                 }, 250);
 
                 closeNavbar();
@@ -233,7 +207,6 @@
             setTimeout(function () {
                 $('.navbar__nav').removeClass('navbar__nav--is-open');
                 $('.navbar__toggle').removeClass('navicon--toggle');
-                $('.navbar__nav').css('display', 'block');
             }, 250);
 
             closeNavbar();
@@ -250,7 +223,6 @@
                 setTimeout(function () {
                     $('.navbar__nav').removeClass('navbar__nav--is-open');
                     $('.navbar__toggle').removeClass('navicon--toggle');
-                    $('.navbar__nav').css('display', 'block');
                 }, 250);
 
                 closeNavbar();
@@ -270,7 +242,6 @@
                 setTimeout(function () {
                     $('.navbar__nav').removeClass('navbar__nav--is-open');
                     $('.navbar__toggle').removeClass('navicon--toggle');
-                    $('.navbar__nav').css('display', 'block');
                 }, 250);
 
                 closeNavbar();
@@ -290,7 +261,6 @@
                 setTimeout(function () {
                     $('.navbar__nav').removeClass('navbar__nav--is-open');
                     $('.navbar__toggle').removeClass('navicon--toggle');
-                    $('.navbar__nav').css('display', 'block');
                 }, 250);
 
                 closeNavbar();
@@ -310,7 +280,6 @@
                 setTimeout(function () {
                     $('.navbar__nav').removeClass('navbar__nav--is-open');
                     $('.navbar__toggle').removeClass('navicon--toggle');
-                    $('.navbar__nav').css('display', 'block');
                 }, 250);
 
                 closeNavbar();
@@ -318,7 +287,14 @@
         };
 
         function closeNavbar() {
-            $('.navbar__nav').slideUp(200);
+            if (window.innerWidth < 768) {
+                $('.navbar__nav').slideUp(200);
+            } else {
+                $('.navbar__nav').show();
+            }
+
+            $('.navbar__nav').removeClass('navbar__nav--is-open');
+            $('.navbar__toggle').removeClass('navicon--toggle');
         }
 
         function emptyComponents() {
