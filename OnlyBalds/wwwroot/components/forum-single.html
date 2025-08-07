@@ -1,3 +1,16 @@
+<style>
+.thread-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.thread-actions {
+    align-self: flex-end;
+}
+
+</style>
 <!-- FORUM LISTINGS
 ============================================== -->
 <div id="spinner-holder" class="box__holder">
@@ -9,9 +22,9 @@
 <div id="app-holder" class="section section--gray article" style="display: none;">
     <div class="container article__container">
 
-        <div class="article__content" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+        <div class="article__content thread-header" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
             <h1 id="article-title" class="h2 article__heading"></h1>
-            <div class="article__actions">
+            <div class="article__actions thread-actions">
                 <button class="circle-btn" id="star-post" title="Star Post">
                     <i class="fa fa-heart"></i>
                 </button>
@@ -294,5 +307,114 @@
         });
     });
 
+    var isEditing = false;
+    var originalTitle = '';
+    var originalContent = '';
 
+    $('#edit-post').on('click', function () {
+        console.log("Edit post clicked");
+        if (isEditing) return;
+
+        const currentUserId = window.loggedInUserId;
+        const postOwnerId = userId;
+
+        if (currentUserId !== postOwnerId) {
+            window.app.scripts.showToast("You can only edit your own post");
+            return;
+        }
+
+        isEditing = true;
+
+        const $titleEl = $('#article-title');
+        const $contentEl = $('#article-content');
+
+        originalTitle = $titleEl.text();
+        originalContent = $contentEl.html();
+
+        // Replace with styled input/textarea
+        $titleEl.replaceWith(`
+            <input 
+                type="text" 
+                id="edit-title" 
+                class="article__heading input-title" 
+                style="width: 100%; font-size: 2rem; font-weight: bold; margin-bottom: 1rem; margin-top: 100px;" 
+                value="${originalTitle}"
+            >
+        `);
+
+        $contentEl.replaceWith(`
+            <textarea 
+                id="edit-content" 
+                class="article__body input-content" 
+                style="width: 100%; height: 300px; font-size: 1.1rem; padding: 1rem; resize: vertical;"
+            >${originalContent.replace(/<\/?[^>]+(>|$)/g, "")}</textarea>
+        `);
+
+        // Save and Cancel buttons
+        $('.article__actions').append(`
+            <button class="circle-btn" id="save-post" title="Save Post">
+                <i class="fa fa-check"></i>
+            </button>
+            <button class="circle-btn" id="cancel-edit" title="Cancel Edit">
+                <i class="fa fa-times"></i>
+            </button>
+        `);
+    });
+
+
+    // Save handler
+    $(document).on('click', '#save-post', function () {
+        const updatedTitle = $('#edit-title').val().trim();
+        const updatedContent = $('#edit-content').val().trim();
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get('postId');
+
+        if (!updatedTitle || !updatedContent) {
+            window.app.scripts.showToast("Title and content cannot be empty");
+            return;
+        }
+
+        $.ajax({
+            url: `/onlybalds-api/posts?postId=${postId}`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                postId,
+                title: updatedTitle,
+                content: updatedContent
+            }),
+            success: function (res) {
+                $('#edit-title').replaceWith(`<h1 id="article-title" class="h2 article__heading">${updatedTitle}</h1>`);
+                $('#edit-content').replaceWith(`<div id="article-content" class="article__body">${updatedContent}</div>`);
+                $('#save-post, #cancel-edit').remove();
+                isEditing = false;
+
+                window.app.scripts.showToast("Post updated successfully");
+            },
+            error: function (xhr) {
+                if (xhr.status === 401) {
+                    window.app.scripts.showToast("You can only edit your own post");
+                } else {
+                    window.app.scripts.showToast("Failed to update post");
+                }
+            }
+        });
+    });
+
+    // Cancel handler
+    $(document).on('click', '#cancel-edit', function () {
+        $('#edit-title').replaceWith(`<h1 id="article-title" class="h2 article__heading">${originalTitle}</h1>`);
+        $('#edit-content').replaceWith(`<div id="article-content" class="article__body">${originalContent}</div>`);
+        $('#save-post, #cancel-edit').remove();
+        isEditing = false;
+    });
+
+    // Fetch logged-in user on load
+    $.ajax({
+        url: "/identity-information",
+        method: "GET",
+        success: function (data) {
+            window.loggedInUserId = data.claims.sub;
+        }
+    });
 </script>
