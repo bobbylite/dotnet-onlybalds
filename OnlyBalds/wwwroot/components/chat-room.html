@@ -110,84 +110,79 @@
     var activeUsers = [];
 
     function connectToChatHub(user) {
+        console.debug("HubConnection state before creation:", hubConnection ? hubConnection.state : "No connection");
 
-        if (hubConnection) {
-            try {
-                hubConnection.off("ReceiveMessage");
-                hubConnection.off("UserCountChanged");
+        if (!hubConnection || hubConnection.state === signalR.HubConnectionState.Disconnected)
+        {
+            hubConnection = new signalR.HubConnectionBuilder()
+                .withUrl(`/chathub?username=${encodeURIComponent(user)}`)
+                .build();
 
-                if (hubConnection.state === signalR.HubConnectionState.Connected) {
-                    hubConnection.stop();
+            hubConnection.on("ReceiveMessage", function (username, message) {
+                var chatMessage = {
+                    user: username,
+                    content: message,
+                    timestamp: new Date()
+                };
+
+                console.log("Received message:", chatMessage);
+                messages.push(chatMessage);
+
+                if (messages.length > 5) {
+                    messages = messages.slice(-5);
                 }
-            } catch (err) {
-                console.warn("Error cleaning up previous hub connection:", err);
-            }
-        }
 
-        hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(`/chathub?username=${encodeURIComponent(user)}`)
-            .build();
-
-        hubConnection.on("ReceiveMessage", function (username, message) {
-            var chatMessage = {
-                user: username,
-                content: message,
-                timestamp: new Date()
-            };
-
-            console.log("Received message:", chatMessage);
-            messages.push(chatMessage);
-
-            if (messages.length > 5) {
-                messages = messages.slice(-5);
-            }
-
-            onStateChanged();
-        });
-
-        hubConnection.on("UserCountChanged", function (count, users) {
-            console.log("Connected users:", count);
-            activeUsers = JSON.parse(users);
-            
-            $("#userCount").text(`${count} Members Are Here!`);
-            var $chatList = $("#activeUsers");
-            $chatList.empty();
-            activeUsers.forEach(activeUser => {
-                $chatList.append(`
-                    <li class="user-list__item">
-                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
-                                class="bi bi-person-fill" viewBox="0 0 16 16">
-                                <path
-                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                            </svg>
-                        </div>                            
-                        <span class="user-list__name">${activeUser}</span>
-                    </li>
-                `);
+                onStateChanged();
             });
-        });
 
-        hubConnection.start().then(function () {
-            if (typeof onChatHubConnected === "function") {
-                onChatHubConnected();
-            }
-        }).catch(function (err) {
-            console.error("SignalR connection error:", err.toString());
-        });
+            hubConnection.on("UserCountChanged", function (count, users) {
+                activeUsers = JSON.parse(users);
+                
+                $("#userCount").text(`${count} Members Are Here!`);
+                var $chatList = $("#activeUsers");
+                $chatList.empty();
+                activeUsers.forEach(activeUser => {
+                    $chatList.append(`
+                        <li class="user-list__item">
+                            <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                    class="bi bi-person-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                                </svg>
+                            </div>                            
+                            <span class="user-list__name">${activeUser}</span>
+                        </li>
+                    `);
+                });
+            });
+
+            hubConnection.start().then(function () {
+                if (typeof onChatHubConnected === "function") {
+                        window.state = {
+                            isUserOnline: true
+                        };
+                    onChatHubConnected();
+                }
+            }).catch(function (err) {
+                console.error("SignalR connection error:", err.toString());
+            });
+        }
+        else {
+            onChatHubConnected();
+        }
     }
 
     function onStateChanged() {
         var $btn = $("#sendButton");
+
         $btn.html("Send Message");
         $btn.prop('disabled', false);
+
         var $chatList = $("#chatMessages");
         $chatList.empty();
-        console.log("Messages array:", messages);
-        messages.forEach(msg => {
-            console.log("Message:", msg);
-            console.log("Current user:", user);
 
+        messages.forEach(msg => {
             var currentUsername = user.name;
             var messageTemplate = '';
             if (msg.user === currentUsername)
@@ -235,6 +230,28 @@
                 `;
             }
             else if (msg.user === "Moderator" && msg.content.includes("has left."))
+            {
+                messageTemplate = `
+                <li class="list-group-item d-flex justify-content-center">
+                    <div class="chat-item chat-item--joined d-flex align-items-center" style="max-width: 600px; width: 100%;">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>
+                        <div class="chat-item__text">
+                            <span class="chat-item__author"><b>${msg.user}</b></span>
+                            <div class="chat-item__message">
+                                ${msg.content}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                `;
+            }
+            else if (msg.user === "Moderator" && msg.content.includes("rejoined the chat room."))
             {
                 messageTemplate = `
                 <li class="list-group-item d-flex justify-content-center">
@@ -332,23 +349,38 @@
     }
 
     function onChatHubConnected() {
-        console.log("Connected to chat hub!");
-        // Add any UI feedback here
+        if (window.state.isUserOnline) {
+            var chatMessage = {
+                user: user.name,
+                content: "Rejoining the chat room.",
+                timestamp: new Date()
+            };
+
+            onStateChanged();
+        }
+        else {
+            var chatMessage = {
+                user: "Moderator",
+                content: `${user.name} rejoined the chat room.`,
+                timestamp: new Date()
+            };
+            
+            messages.push(chatMessage);
+            onStateChanged();
+        }
     }
 
-    $(document).ready(() => {
-        $.ajax({
-            url: "/identity-information",
-            method: "GET",
-            success: function (data) {
-                user = data;
-                let userName = user.name;
-                connectToChatHub(userName);
-            },
-            error: function (xhr, status, error) {
-                console.error("Failed to get identity info:", error);
-            }
-        });
+    $.ajax({
+        url: "/identity-information",
+        method: "GET",
+        success: function (data) {
+            user = data;
+            let userName = user.name;
+            connectToChatHub(userName);
+        },
+        error: function (xhr, status, error) {
+            console.error("Failed to get identity info:", error);
+        }
     });
 
     function sendMessageToHub(messageToSend) {
@@ -379,4 +411,5 @@
         sendMessageToHub(message);
         $('#messageInput').val('');
     });
+
 </script>
