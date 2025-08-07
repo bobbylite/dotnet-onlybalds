@@ -140,15 +140,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
     <script>
-        $(document).ready(function() {
-        });
+        var user = {};
 
         $(() => {
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
                 success: function (data) {
-                    const user = data;
+                    user = data;
                     let userName = user.name;
                     console.log("User name:", userName);
                     $(".sign-in").remove();
@@ -223,6 +222,7 @@
                 e.preventDefault();
 
                 window.app.scripts.clearQueryParams();
+
                 emptyComponents();
 
                 $('.footer').hide();
@@ -446,7 +446,7 @@
                 closeNavbar();
             },
             isAuthorizedForPage: () => {
-                if (typeof user === "undefined")
+                if (typeof user.isAuthenticated === "undefined")
                 {
                     console.log("User is not defined, loading unauthorized page");
                     emptyComponents();
@@ -462,6 +462,5 @@
             },
         };
     </script>
-
 </body>
 </html>
