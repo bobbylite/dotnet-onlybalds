@@ -247,7 +247,11 @@
                 window.app.scripts.loadForum();
             },
             error: function(xhr, status, error) {
-                console.error('Error deleting post:', error);
+                if (xhr.status === 401) {
+                    window.app.scripts.showToast("You can only delete your own post");
+                } else {
+                    window.app.scripts.showToast("An unexpected error occurred.");
+                }
             }
         });
     });
@@ -261,7 +265,7 @@
 
         console.log("Deleting comment with ID:", commentId);
 
-        $btn.prop('disabled', true); // prevent double clicking
+        $btn.prop('disabled', true);
 
         $.ajax({
             url: `/onlybalds-api/comments?commentId=${commentId}`,
@@ -272,7 +276,6 @@
                 $commentElement.fadeOut(300, function () {
                     $(this).remove();
 
-                    // Update comment count
                     const $count = $("#comments-count");
                     const current = parseInt($count.text().replace(/\D/g, ''), 10);
                     const updated = Math.max(current - 1, 0);
@@ -280,8 +283,13 @@
                 });
             },
             error: function (xhr, status, error) {
-                console.error('Failed to delete comment:', error);
-                $btn.prop('disabled', false); // re-enable on error
+                $btn.prop('disabled', false);
+                
+                if (xhr.status === 401) {
+                    window.app.scripts.showToast("You can only delete your own comment");
+                } else {
+                    window.app.scripts.showToast("An unexpected error occurred.");
+                }
             }
         });
     });
