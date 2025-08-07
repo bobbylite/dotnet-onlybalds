@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 
@@ -9,8 +10,6 @@ namespace OnlyBalds.Api.Endpoints;
 /// </summary>
 public static class QuestionnaireEndpoints
 {
-    private const string QuestionnaireAuthorizationPolicyName = "Thread.ReadWrite";
-
     /// <summary>
     /// Maps the endpoints for the questionnaire api.
     /// </summary>
@@ -21,27 +20,27 @@ public static class QuestionnaireEndpoints
         app.MapGet("/questionnaire", GetQuestionnaires)
             .WithName(nameof(GetQuestionnaires))
             .WithOpenApi()
-            .RequireAuthorization(QuestionnaireAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapGet("/questionnaire/{id}", GetQuestionnaireById)
             .WithName(nameof(GetQuestionnaireById))
             .WithOpenApi()
-            .RequireAuthorization(QuestionnaireAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPost("/questionnaire", CreateQuestionnaireAsync)
             .WithName(nameof(CreateQuestionnaireAsync))
             .WithOpenApi()
-            .RequireAuthorization(QuestionnaireAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPut("/questionnaire/{id}", UpdateQuestionnaireAsync)
             .WithName(nameof(UpdateQuestionnaireAsync))
             .WithOpenApi()
-            .RequireAuthorization(QuestionnaireAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapDelete("/questionnaire/{id}", DeleteQuestionnaireAsync)
             .WithName(nameof(DeleteQuestionnaireAsync))
             .WithOpenApi()
-            .RequireAuthorization(QuestionnaireAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         return app;
     }

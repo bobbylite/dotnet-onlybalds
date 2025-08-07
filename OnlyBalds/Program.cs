@@ -48,13 +48,7 @@ app.UseHttpsRedirection();
 app.UseStaticFilesOnClient();
 app.UseOnlyBaldsAccessControl();
 app.UseBffReverseProxy();
-
-app.MapAppEndpoints();
 app.MapIdentityEndpoints();
-app.MapForumEndpoints();
-app.MapChatRoomEndpoints();
-app.MapMarketplaceEndpoints();
-app.MapQuestionnaireEndpoints();
 
 app.MapChatHub();
 

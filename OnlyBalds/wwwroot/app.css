@@ -55,3 +55,82 @@ h1:focus {
 .btn:focus {
     box-shadow: none;
 }
+
+ul#chatMessages li::marker,
+ol#chatMessages li::marker {
+    display: none;
+    content: "";
+}
+
+.circle-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: black;
+    color: white;
+    border: none;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s ease;
+}
+
+.circle-btn:hover {
+    background-color: #333;
+}
+
+.article__actions {
+    float: right;
+    margin-top: -20px;
+    display: flex;
+    gap: 8px;
+}
+
+.comment {
+    position: relative;
+    padding-top: 10px;
+}
+
+.comment__delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+}
+
+
+#spinner-holder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px; 
+}
+
+.spinner-border {
+    width: 6rem;
+    height: 6rem;
+    display: inline-block;
+    vertical-align: middle;
+    border: 0.5rem solid #f3f3f3; 
+    border-top: 0.5rem solid #1762fb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    vertical-align: middle;
+    border: 0.5rem solid #f3f3f3; 
+    border-top: 0.5rem solid #1762fb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+to { transform: rotate(360deg); }
+}

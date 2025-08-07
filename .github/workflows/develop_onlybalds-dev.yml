@@ -22,7 +22,7 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
-      - name: Inject build info into build-info.html
+      - name: Inject build info into build-info page
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
           BUILD_DATE=$(date +"%Y-%m-%d %H:%M:%S")
@@ -33,10 +33,10 @@ jobs:
           echo "Branch: $BRANCH"
 
           # Injecting data into existing build-info.html
-          sed -i "s|<div id='build-version'></div>|<div id='build-version'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/build-info.html
-          sed -i "s|<div id='build-date'></div>|<div id='build-date'>$BUILD_DATE</div>|g" ./OnlyBalds/wwwroot/build-info.html
-          sed -i "s|<div id='commit-hash'></div>|<div id='commit-hash'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/build-info.html
-          sed -i "s|<div id='branch'></div>|<div id='branch'>$BRANCH</div>|g" ./OnlyBalds/wwwroot/build-info.html
+          sed -i "s|<div id='build-version'></div>|<div id='build-version'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/BuildInfo/index.html
+          sed -i "s|<div id='build-date'></div>|<div id='build-date'>$BUILD_DATE</div>|g" ./OnlyBalds/wwwroot/BuildInfo/index.html
+          sed -i "s|<div id='commit-hash'></div>|<div id='commit-hash'>$COMMIT_HASH</div>|g" ./OnlyBalds/wwwroot/BuildInfo/index.html
+          sed -i "s|<div id='branch'></div>|<div id='branch'>$BRANCH</div>|g" ./OnlyBalds/wwwroot/BuildInfo/index.html
 
       - name: Build with dotnet
         run: cd OnlyBalds;dotnet build --configuration Release

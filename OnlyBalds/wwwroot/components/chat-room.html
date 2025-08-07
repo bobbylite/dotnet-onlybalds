@@ -1,0 +1,382 @@
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* dark background */
+    z-index: 9999; /* high z-index to appear on top */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    position: relative;
+}
+</style>
+
+<!-- BANNER
+============================================== -->
+<div class="banner banner--fade-to-gray">
+    <div class="container">
+        <h1 class="banner__heading"  data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">Chat With The Community</h1>
+        <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Join our members-only chat and see what our community is talking about.</p>
+    </div>
+</div><!--/banner -->
+
+<!-- MARKETPLACE
+============================================== -->
+<div class="section section--gray">
+    <div class="container">
+        <div class="box box--with-top-lines"  data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+            <div class="box__top-line box__top-line--light-blue"></div>
+            <div class="box__top-line box__top-line--blue"></div>
+
+
+            <div id="spinner-holder" class="box__holder">
+                <div class="flex-center">
+                    <div class="spinner-border" role="status" aria-label="Loading"></div>
+                </div>
+            </div>
+
+            <div id="app-holder" class="box__holder" style="display:none;">
+                <ul class="box__header">
+                    <li class="box__header-item box__header-item--title">
+                        <div id="userCount"></div> 
+                    </li>
+                    <li class="box__header-item">
+                        <button id="show-chat-users" class="box-header__button ui-button chat-users-online-trigger">See Who's Online</button>
+                    </li>
+                </ul>
+                <div class="box__section box__section--chat-frame">
+
+                    <!--<button class="chat-scroll-btn">New Messages!</button>-->
+                    <ul id="chatMessages" class="list-group list-group-flush list-unstyled">
+
+                    </ul>
+                </div>
+                <div class="box__section box__section--form-box box__section--top-border" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                    <textarea id="messageInput" name="" placeholder="Enter your message here..."></textarea>
+                    <button id="sendButton" class="btn btn--blue">Send Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL OVERLAY -->
+<div id="chat-users-container" class="modal-overlay" style="display: none;">
+    <div class="modal-content popup" id="chat-users-online">
+        <div class="popup__header">
+            <h2 class="popup__heading">Chat Room Users Online</h2>
+            <button class="popup__close">&times;</button>
+        </div>
+        <div class="popup__content">
+            <ul id="activeUsers" class="user-list"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#show-chat-users').on('click', function () {
+            $('#chat-users-container').fadeIn(200);
+        });
+
+        $('.popup__close').on('click', function () {
+            $('#chat-users-container').fadeOut(200);
+        });
+
+        $('#chat-users-container').on('click', function (e) {
+            if ($(e.target).is('#chat-users-container')) {
+                $(this).fadeOut(200);
+            }
+        });
+    });
+</script>
+
+<script>
+    var hubConnection;
+    var messages = [];
+    var user = null;
+    var activeUsers = [];
+
+    function connectToChatHub(user) {
+
+        if (hubConnection) {
+            try {
+                hubConnection.off("ReceiveMessage");
+                hubConnection.off("UserCountChanged");
+
+                if (hubConnection.state === signalR.HubConnectionState.Connected) {
+                    hubConnection.stop();
+                }
+            } catch (err) {
+                console.warn("Error cleaning up previous hub connection:", err);
+            }
+        }
+
+        hubConnection = new signalR.HubConnectionBuilder()
+            .withUrl(`/chathub?username=${encodeURIComponent(user)}`)
+            .build();
+
+        hubConnection.on("ReceiveMessage", function (username, message) {
+            var chatMessage = {
+                user: username,
+                content: message,
+                timestamp: new Date()
+            };
+
+            console.log("Received message:", chatMessage);
+            messages.push(chatMessage);
+
+            if (messages.length > 5) {
+                messages = messages.slice(-5);
+            }
+
+            onStateChanged();
+        });
+
+        hubConnection.on("UserCountChanged", function (count, users) {
+            console.log("Connected users:", count);
+            activeUsers = JSON.parse(users);
+            
+            $("#userCount").text(`${count} Members Are Here!`);
+            var $chatList = $("#activeUsers");
+            $chatList.empty();
+            activeUsers.forEach(activeUser => {
+                $chatList.append(`
+                    <li class="user-list__item">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>                            
+                        <span class="user-list__name">${activeUser}</span>
+                    </li>
+                `);
+            });
+        });
+
+        hubConnection.start().then(function () {
+            if (typeof onChatHubConnected === "function") {
+                onChatHubConnected();
+            }
+        }).catch(function (err) {
+            console.error("SignalR connection error:", err.toString());
+        });
+    }
+
+    function onStateChanged() {
+        var $btn = $("#sendButton");
+        $btn.html("Send Message");
+        $btn.prop('disabled', false);
+        var $chatList = $("#chatMessages");
+        $chatList.empty();
+        console.log("Messages array:", messages);
+        messages.forEach(msg => {
+            console.log("Message:", msg);
+            console.log("Current user:", user);
+
+            var currentUsername = user.name;
+            var messageTemplate = '';
+            if (msg.user === currentUsername)
+            {
+                messageTemplate = `
+                <li class="list-group-item d-flex justify-content-center">
+                    <div class="chat-item chat-item--message chat-item--is-you d-flex align-items-center" style="max-width: 600px; width: 100%;">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>
+                        <div class="chat-item__text">
+                            <span class="chat-item__author"><b>${msg.user}</b></span>
+                            <div class="chat-item__message">
+                                ${msg.content}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                `;
+            }
+            else if (msg.user === "Moderator" && msg.content.includes("has joined."))
+            {
+                messageTemplate = `
+                <li class="list-group-item d-flex justify-content-center">
+                    <div class="chat-item chat-item--joined d-flex align-items-center" style="max-width: 600px; width: 100%;">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>
+                        <div class="chat-item__text">
+                            <span class="chat-item__author"><b>${msg.user}</b></span>
+                            <div class="chat-item__message">
+                                ${msg.content}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                `;
+            }
+            else if (msg.user === "Moderator" && msg.content.includes("has left."))
+            {
+                messageTemplate = `
+                <li class="list-group-item d-flex justify-content-center">
+                    <div class="chat-item chat-item--joined d-flex align-items-center" style="max-width: 600px; width: 100%;">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>
+                        <div class="chat-item__text">
+                            <span class="chat-item__author"><b>${msg.user}</b></span>
+                            <div class="chat-item__message">
+                                ${msg.content}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                `;
+            }
+            else if (msg.user === "Moderator" && msg.content.includes("blocked"))
+            {
+                messageTemplate = `
+                <li class="list-group-item d-flex justify-content-center">
+                    <div class="chat-item chat-item--left d-flex align-items-center" style="max-width: 600px; width: 100%;">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>
+                        <div class="chat-item__text">
+                            <span class="chat-item__author"><b>${msg.user}</b></span>
+                            <div class="chat-item__message">
+                                ${msg.content}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                `;
+            }
+            else if (msg.user === "Moderator")
+            {
+                messageTemplate = `
+                <li class="list-group-item d-flex justify-content-center">
+                    <div class="chat-item chat-item--message d-flex align-items-center" style="max-width: 600px; width: 100%;">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>
+                        <div class="chat-item__text">
+                            <span class="chat-item__author"><b>${msg.user}</b></span>
+                            <div class="chat-item__message">
+                                ${msg.content}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                `;
+            }
+            else
+            {
+                messageTemplate = 
+                `
+                <li class="list-group-item d-flex justify-content-center">
+                    <div class="chat-item chat-item--message d-flex align-items-center" style="max-width: 600px; width: 100%;">
+                        <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                                class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path
+                                    d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                            </svg>
+                        </div>
+                        <div class="chat-item__text">
+                            <span class="chat-item__author"><b>${msg.user}</b></span>
+                            <div class="chat-item__message">
+                                ${msg.content}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                `;
+            }
+
+            $('#app-holder').css('display', 'block');
+            $('#spinner-holder').remove();
+
+            $chatList.append(messageTemplate);
+        });
+    }
+
+    function onChatHubConnected() {
+        console.log("Connected to chat hub!");
+        // Add any UI feedback here
+    }
+
+    $(document).ready(() => {
+        $.ajax({
+            url: "/identity-information",
+            method: "GET",
+            success: function (data) {
+                user = data;
+                let userName = user.name;
+                connectToChatHub(userName);
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to get identity info:", error);
+            }
+        });
+    });
+
+    function sendMessageToHub(messageToSend) {
+        if (!hubConnection || hubConnection.state !== signalR.HubConnectionState.Connected) {
+            console.warn("Hub connection is not established.");
+            return;
+        }
+
+        hubConnection.invoke("SendMessage", user.name, messageToSend)
+            .then(() => {
+                onStateChanged();
+            })
+            .catch(function (err) {
+                console.error("Error sending message:", err.toString());
+            });
+    }
+
+    $('#sendButton').on('click', function () {
+        var $btn = $(this);
+        var originalText = $btn.html();
+        var message = $('#messageInput').val();
+
+        if (!message.trim()) return;
+
+        $btn.html(`<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...`);
+        $btn.prop('disabled', true);
+
+        sendMessageToHub(message);
+        $('#messageInput').val('');
+    });
+</script>

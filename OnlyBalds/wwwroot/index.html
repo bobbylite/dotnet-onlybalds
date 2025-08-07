@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="background-color: white;">
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -8,8 +8,8 @@
 	<meta name="description" content="">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
 	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
@@ -18,11 +18,12 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->   
 	
-	<link rel="icon" href="images/favicon-16.png" sizes="16x16" type="image/png">
-	<link rel="icon" href="images/favicon-32.png" sizes="32x32" type="image/png">
-	<link rel="icon" href="images/favicon-48.png" sizes="48x48" type="image/png">
-	<link rel="icon" href="images/favicon-62.png" sizes="62x62" type="image/png">
-	<link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" href="/favicon.png" />
+	<link rel="icon" href="/images/favicon-16.png" sizes="16x16" type="image/png">
+	<link rel="icon" href="/images/favicon-32.png" sizes="32x32" type="image/png">
+	<link rel="icon" href="/images/favicon-48.png" sizes="48x48" type="image/png">
+	<link rel="icon" href="/images/favicon-62.png" sizes="62x62" type="image/png">
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 	<meta property="og:url" content="https://example.com/page.html">
 	<meta property="og:type" content="website">
 	<meta property="og:title" content="Content Title">
@@ -31,9 +32,39 @@
 	<meta property="og:site_name" content="Site Name">
 	<meta property="og:locale" content="en_US">
 
-	<link rel="stylesheet" href="assets/styles/styles-1d9c2d7206.css"/>
+    <link rel="stylesheet" href="/app.css"/>
 
-	<script src="assets/scripts/Vendor-07ad14d4d0.js"></script>
+	<link rel="stylesheet" href="/assets/styles/styles-1d9c2d7206.css"/>
+
+	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
+
+    <style>
+        html, body {
+            overflow-y: scroll;
+        }
+        .custom-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #1f2937;
+            color: #f9fafb;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            font-size: 15px;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+        .custom-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            cursor: pointer;
+        }
+    </style>
 
 </head>
 <body>
@@ -42,16 +73,16 @@
 	================================================== -->
 	<div class="navbar">
 		<div class="navbar__left">
-			<a href="/" class="navbar__logo">
+			<button class="navbar__logo">
                 <img src="/assets/images/logo.png" alt="Only Balds" >
-            </a>
+            </button>
 		</div>
 		<nav class="navbar__nav">
 			<ul class="nav main-nav">
-				<li class="nav__item"><a href="/about" class="nav__link">About</a></li>
-				<li class="nav__item"><a href="/forum" class="nav__link">Forum</a></li>
-				<li class="nav__item"><a href="/chat-room" class="nav__link">Chat Room</a></li>
-				<li class="nav__item"><a href="/marketplace" class="nav__link">Marketplace</a></li>
+				<li class="nav__item"><button class="nav__link about">About</button></li>
+				<li class="nav__item"><button class="nav__link forum">Forum</button></li>
+				<li class="nav__item"><button class="nav__link chat-room">Chat Room</button></li>
+				<li class="nav__item"><button class="nav__link marketplace">Marketplace</button></li>
 				<li class="nav__item dropdown">
 					<a href="#" class="nav__link dropdown__toggle" role="button">Social
 						<i class="fa fa-angle-down dropdown__toggle-icon"></i>
@@ -76,12 +107,12 @@
                 <span class="navbar__mobile-hide">My </span>Account <i class="fa fa-angle-down dropdown__toggle-icon"></i>
             </a>
             <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
-                <li class="dropdown__item dropdown__item--title greeting">Hi, David May</li>
+                <li class="dropdown__item dropdown__item--title greeting"></li>
                 <li class="dropdown__item">
-                    <a href="/questionnaire" class="dropdown__link dropdown__link--icon">
+                    <button class="dropdown__link dropdown__link--icon finish-signup" style="width: 100%;">
                         <i class="fa fa-edit"></i> 
-                        Questionnaire
-                    </a>
+                        Complete Signup
+                    </button>
                 </li>
                 <li class="dropdown__item sign-in">
                     <a href="/auth/login" class="dropdown__link dropdown__link--icon">
@@ -101,135 +132,38 @@
             </div> 
 		</div>
 	</div><!--/comment -->
-	
-    <!-- HERO
-    ============================================== -->
-	<div class="hero">
-        <div class="hero__content">
-            <div class="hero__content-holder">
-                <h1 class="hero__heading" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">Where Bald People Connect</h1>
-                <!-- <a href="#" class="hero__button btn btn--blue" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Become A Member</a> -->
-            </div>
-        </div>
-        <div class="hero__aside"  data-aos="fade-left" data-aos-delay="100" data-aos-offset="0">
-            <div class="hero__figure">
-                <img src="/assets/images/banner-image.jpg" alt="John, Founder of Only Balds" class="hero__image"  data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
-                <!-- <div class="hero__circle-feature circle-feature">
-                    Join Over <span class="circle-feature__bold">3,000</span> Balds
-                </div> -->
-            </div>
-        </div>
-    </div><!--/hero -->
 
-    <!-- CROP BOX
-    ============================================== -->
-    <div class="crop-box">
-        <div class="crop-box__container">
-            <div class="crop-box__box">
-                <div class="crop-box__content"  data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">
-                    <p class="pre-heading crop-box__pre-heading">The Community</p>
-                    <h2 class="crop-box__heading">Be A Pro at Being Bald</h2>
-                    <p class="crop-box__description">Get the inside scoop on the latest bald topic: insights from the community and upcoming events and gatherings.</p>
-                    <!-- <div class="crop-box__link">
-                        <a href="#" class="text-link text-link--white">Visit the Forum</a>
-                    </div> -->
-                </div>
-                <div class="crop-box__aside">
-                    <a href="/forum" class="link-box"  data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
-                        <img src="/assets/images/filler-forum-thumb.jpg" alt="Preview of forum page" class="link-box__background">
-                        <h3 class="link-box__title">Join the Forum</h3>
-                        <span class="link-box__arrow"><img src="/assets/images/white-arrow-right.png" alt=""></span>
-                    </a>
-                    <a href="/chat-room" class="link-box"  data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
-                        <img src="/assets/images/chat-room.jpg" alt="Preview of chat room page" class="link-box__background">
-                        <h3 class="link-box__title">Visit the Chat Room</h3>
-                        <span class="link-box__arrow"><img src="/assets/images/white-arrow-right.png" alt=""></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div><!--/crop box -->
-
-    <!-- PRODUCTS
-    ============================================== -->
-    <div class="section" style="display:none;">
-        <div class="container container--centered">
-            <div class="section__header section__header--is-centered"  data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">
-                <h2 class="section__heading">The <span class="heading-highlight">Products</span> You Need</h2>
-                <p class="lead section__lead">No matter what stage of balding, we have the products for you.</p>
-                <a href="/marketplace" class="text-link text-link--blue">View All Products</a>
-                <span class="section__header-large-sub-text">Shop Now</span>
-            </div>
-
-            <div class="product-grid">
-                <div class="product-grid__item product-grid__item--light-blue" data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">
-                    <img src="/assets/images/filler-product-1.png" alt="">
-                </div>
-                 <div class="product-grid__item product-grid__item--gray" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">
-                    <img src="/assets/images/filler-product-2.png" alt="">
-                </div>
-                 <div class="product-grid__item product-grid__item--blue" data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
-                    <img src="/assets/images/filler-product-3.png" alt="">
-                </div>
-            </div>
-        </div>
-    </div><!--/products -->
-
-    <!-- PRODUCTS
-    ============================================== -->
-    <div class="section">
-        <div class="container container--centered">
-            <div class="product-row">
-                 <span class="large-sub-text product-row__large-sub-text">Shop Now</span>
-                <div class="product-row__content">
-                    <h2 class="section__heading">The <span class="heading-highlight">Products</span> You Need</h2>
-                    <p class="lead">No matter what stage of balding, we have the products for you.</p>
-                    <a href="/marketplace" class="text-link text-link--blue">View All Products</a>
-                </div>
-                 <div class="product-row__images">
-                    <img src="/assets/images/cleanser-product.jpg" alt="cleanser bottle with pump top" class="product-row__image">
-                    <img src="/assets/images/apparel-products.jpg" alt="Only Balds embroidered shirt, backpack and bag" class="product-row__image">
-                </div>
-            </div>
-        </div>
-    </div><!--/products -->
-
-    <!-- JOIN THE BALDS
-    ============================================== -->
-    <div class="bottom-cta">
-        <div class="container bottom-cta__container"  data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">
-            <div class="bottom-cta__blue-box" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0"></div>
-            <div class="bottom-cta__light-blue-box" data-aos="fade-up" data-aos-delay="300" data-aos-offset="0"></div>
-            <div class="bottom-cta__box">
-                <div class="quote bottom-cta__quote">
-                    <p class="quote__text">Going bald isn’t the end—it’s the beginning of owning who you are. We’re just here to make it smoother… literally.</p>
-                    <p class="quote__author">John
-                        <span class="quote__author-meta">Founder of Only Balds</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div><!--/join the balds -->
-
-	    <div class="footer">
+    <div id="about-placeholder"></div>
+    <div id="home-placeholder"></div>
+    <div id="forum-placeholder"></div>
+    <div id="new-post-placeholder"></div>
+    <div id="read-post-placeholder"></div>
+    <div id="chat-room-placeholder"></div>
+    <div id="marketplace-placeholder"></div>
+    <div id="finish-signup-placeholder"></div>
+    <div id="unauthorized-placeholder"></div>
+	<div class="footer" style="display: none;">
         <div class="container">
             <div class="footer__buttons">
                 <ul class="footer__button-links">
                     <li><a href="/forum" class="btn btn--rounded btn--faded">Forum</a></li>
                     <li><a href="/chat-room" class="btn btn--rounded btn--faded">Chat Room</a></li>
                     <li><a href="/marketplace" class="btn btn--rounded btn--faded">Marketplace</a></li>
-                    <li class="footer__right-list-item"><a href="/questionnaire" class="btn btn--rounded btn--white">Become A Member</a></li>
+                    <li class="footer__right-list-item"><a href="/account-questionnaire" class="btn btn--rounded btn--white">Become A Member</a></li>
                 </ul>
             </div>
         </div>
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
-    <script src="assets/scripts/App-5379555225.js"></script>
+    <script src="/assets/scripts/App-5379555225.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
     <script>
+        var user = {};
+
         $(() => {
             $.ajax({
                 url: "/identity-information",
@@ -248,6 +182,19 @@
                             </a>
                         </li>
                     `);
+
+                    var account = user.account;
+
+                    if (account === null || account === undefined) {
+                        window.app.scripts.loadFinishSignUp();
+                        return;
+                    }
+                    
+                    if (account.hasSubmittedQuistionnaire !== true) {
+                        window.app.scripts.loadFinishSignUp();
+                        return;
+                    }
+                    
                 },
                 error: function (xhr, status, error) {
                 }
@@ -255,5 +202,310 @@
         });
     </script>
 
+    <script>
+        $(function () {
+            loadSignUp();
+            loadAbout();
+            loadHome();
+            loadForum();
+            loadChatRoom();
+            loadMarketplace();
+            loadNewPost();
+        });
+
+        const loadSignUp = () => {
+            $('.finish-signup').on('click', function (e) {
+                e.preventDefault();
+
+                window.app.scripts.clearQueryParams();
+
+                emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+
+                $('.footer').hide();
+                $('#finish-signup-placeholder').load('components/finish-signup.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadAbout = () => {
+            $('.about').on('click', function (e) {
+                e.preventDefault();
+
+                window.app.scripts.clearQueryParams();
+
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#about-placeholder').load('components/about.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadHome = () => {
+            $('.footer').hide();
+            $('#home-placeholder').load('components/home.html');
+            $('.footer').fadeIn(400);
+
+            $('.navbar__nav').removeClass('navbar__nav--is-open');
+            $('.navbar__toggle').removeClass('navicon--toggle');
+
+            closeNavbar();
+
+            $('.navbar__logo').on('click', function (e) {
+                e.preventDefault();
+
+                window.app.scripts.clearQueryParams();
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#home-placeholder').load('components/home.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadForum = () => {
+            $('.forum').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+
+                $('.footer').hide();
+                $('#forum-placeholder').load('components/forum.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadNewPost = () => {
+            $('.new-post').on('click', function (e) {
+                e.preventDefault();
+
+                emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+
+                $('.footer').hide();
+                $('#new-post-placeholder').load('components/forum-new-post.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+
+
+        const loadChatRoom = () => {
+            $('.chat-room').on('click', function (e) {
+                e.preventDefault();
+
+                window.app.scripts.clearQueryParams();
+
+                emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+
+                $('.footer').hide();
+                $('#chat-room-placeholder').load('components/chat-room.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        const loadMarketplace = () => {
+            $('.marketplace').on('click', function (e) {
+                e.preventDefault();
+
+                window.app.scripts.clearQueryParams();
+                emptyComponents();
+
+                $('.footer').hide();
+                $('#marketplace-placeholder').load('components/marketplace.html');
+                $('.footer').fadeIn(400);
+
+                setTimeout(function () {
+                    $('.navbar__nav').removeClass('navbar__nav--is-open');
+                    $('.navbar__toggle').removeClass('navicon--toggle');
+                }, 250);
+
+                closeNavbar();
+            });
+        };
+
+        function closeNavbar() {
+            $('.navbar__nav').removeClass('navbar__nav--is-open');
+            $('.navbar__toggle').removeClass('navicon--toggle');
+        }
+
+        function emptyComponents() {            
+            $('#about-placeholder').empty();
+            $('#home-placeholder').empty();
+            $('#forum-placeholder').empty();
+            $('#read-post-placeholder').empty();
+            $('#marketplace-placeholder').empty();
+            $('#chat-room-placeholder').empty();
+            $('#unauthorized-placeholder').empty();
+            $('#finish-signup-placeholder').empty();
+        }
+
+    </script>
+
+    <script>
+        window.app = window.app || {};
+        window.app.scripts = {
+            updateQueryParam: (key, value) => {
+                const url = new URL(window.location.href);
+
+                for (const param of url.searchParams.keys()) {
+                    url.searchParams.delete(param);
+                }
+
+                url.searchParams.set(key, value);
+
+                window.history.replaceState({}, '', url);
+            },
+            clearQueryParams: () => {
+                const url = new URL(window.location.href);
+                url.search = '';
+                window.history.replaceState({}, '', url);
+            },
+            loadHome: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#home-placeholder').load('components/home.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            loadForum: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#forum-placeholder').load('components/forum.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            loadNewPost: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#new-post-placeholder').load('components/forum-new-post.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            registerReadPostClick: (postId) => {
+                $(`.read-post-${postId}`).on('click', function (e) {
+                    e.preventDefault();
+                    window.app.scripts.updateQueryParam('postId', postId);
+                    emptyComponents();
+
+                    $('.footer').hide();
+                    $('#read-post-placeholder').load('components/forum-single.html');
+                    $('.footer').fadeIn(400);
+
+                    setTimeout(function () {
+                        $('.navbar__nav').removeClass('navbar__nav--is-open');
+                        $('.navbar__toggle').removeClass('navicon--toggle');
+                    }, 250);
+
+                    closeNavbar();
+                });
+            },
+            loadFinishSignUp: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#finish-signup-placeholder').load('components/finish-signup.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            loadUnauthorized: () => {
+                emptyComponents();
+                $('.footer').hide();
+                $('#unauthorized-placeholder').load('components/unauthorized.html');
+                $('.footer').fadeIn(400);
+                closeNavbar();
+            },
+            isAuthorizedForPage: () => {
+                if (typeof user.isAuthenticated === "undefined")
+                {
+                    console.log("User is not defined, loading unauthorized page");
+                    emptyComponents();
+                    $('.footer').hide();
+                    $('#unauthorized-placeholder').load('components/unauthorized.html');
+                    $('.footer').fadeIn(400);
+                    closeNavbar();
+                    return false;
+                }
+        
+                console.log("Authorized User:", user);
+                return true;
+            },
+            showToast: (message) => {
+                const $toast = $('#custom-toast');
+                $toast.text(message).addClass('show');
+
+                const timeout = setTimeout(() => {
+                    $toast.removeClass('show');
+                }, 3000);
+
+                $toast.one('click', function () {
+                    clearTimeout(timeout);
+                    $(this).removeClass('show');
+                });
+            }
+        };
+    </script>
+
+    <div id="custom-toast" class="custom-toast">You can only perform that action on your own post</div>
 </body>
 </html>

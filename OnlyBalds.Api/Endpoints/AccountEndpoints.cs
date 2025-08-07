@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Data;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
@@ -11,8 +12,6 @@ namespace OnlyBalds.Api.Endpoints;
 /// </summary>
 public static class AccountEndpoints
 {
-    private const string AccountsAuthorizationPolicyName = "Thread.ReadWrite";
-
     /// <summary>
     /// Map accounts endpoints to the application.
     /// </summary>
@@ -25,27 +24,27 @@ public static class AccountEndpoints
         app.MapGet("/accounts", GetAccountsAsync)
             .WithName(nameof(GetAccountsAsync))
             .WithOpenApi()
-            .RequireAuthorization(AccountsAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapGet("/account", GetAccountByIdAsync)
             .WithName(nameof(GetAccountByIdAsync))
             .WithOpenApi()
-            .RequireAuthorization(AccountsAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPost("/account", CreateAccountAsync)
             .WithName(nameof(CreateAccountAsync))
             .WithOpenApi()
-            .RequireAuthorization(AccountsAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPut("/account/{id}", UpdateAccountAsync)
             .WithName(nameof(UpdateAccountAsync))
             .WithOpenApi()
-            .RequireAuthorization(AccountsAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapDelete("/account/{id}", DeleteAccountAsync)
             .WithName(nameof(DeleteAccountAsync))
             .WithOpenApi()
-            .RequireAuthorization(AccountsAuthorizationPolicyName);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         return app;
     }

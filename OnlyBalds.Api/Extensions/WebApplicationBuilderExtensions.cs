@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OnlyBalds.Api.Data;
 using OnlyBalds.Api.Health;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 using OnlyBalds.Api.Repositories;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using OnlyBalds.Api.Constants;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace OnlyBalds.Api.Extensions;
 
@@ -50,60 +50,44 @@ public static class WebApplicationBuilderExtensions
             .BindConfiguration(SwaggerOptions.SectionKey);
 
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
+
         webApplicationBuilder.Services.AddSwaggerGen(c =>
         {
-            var serviceProvider = webApplicationBuilder.Services.BuildServiceProvider();
-            var swaggerOptions = serviceProvider.GetService<IOptionsMonitor<SwaggerOptions>>();
-
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Only Balds API", Version = "v1" });
-
-            // Configure OAuth2 with Authorization Code Flow (PKCE)
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    AuthorizationCode = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri(swaggerOptions?.CurrentValue.AuthorizationUrl!),
-                        TokenUrl = new Uri(swaggerOptions?.CurrentValue.TokenUrl!),
-                        Scopes = new Dictionary<string, string>
-                        {
-                            { "Threads.Read", "Read access to threads API" },
-                            { "Threads.Write", "Write access to threads API" }
-                        },
-                    }
-                },
+                Title = "Only Balds API",
+                Version = "v1"
             });
 
-            c.OperationFilter<SecurityRequirementsOperationFilter>();
+            var securityScheme = new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Description = "Enter 'Bearer' followed by your JWT token",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            };
+
+            c.AddSecurityDefinition("Bearer", securityScheme);
+
+            var securityRequirement = new OpenApiSecurityRequirement
+            {
+                {
+                    securityScheme,
+                    Array.Empty<string>()
+                }
+            };
+
+            c.AddSecurityRequirement(securityRequirement);
         });
 
         return webApplicationBuilder;
-    }
-
-    public class SecurityRequirementsOperationFilter : IOperationFilter
-    {
-        public void Apply(OpenApiOperation operation, OperationFilterContext context)
-        {
-            // Ensure the security requirements are added to each operation
-            operation.Security = new List<OpenApiSecurityRequirement>
-            {
-                new OpenApiSecurityRequirement
-                {
-                    [
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "oauth2"
-                            }
-                        }
-                    ] = new[] { "api://onlybalds/Threads.Read", "api://onlybalds/Threads.Write" }
-                }
-            };
-        }
     }
 
     /// <summary>
@@ -119,12 +103,55 @@ public static class WebApplicationBuilderExtensions
         webApplicationBuilder.Services
             .AddAuthentication()
             .AddJwtBearer();
+
         webApplicationBuilder.Services.AddAuthorization(o =>
         {
-            o.AddPolicy("Thread.ReadWrite", p => p.
-                RequireAuthenticatedUser().
-                RequireClaim("scope", "user:access"));
+            o.AddPolicy(AuthorizationPolicies.UserAccess, p =>
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.UserAccess));
+            o.AddPolicy(AuthorizationPolicies.AdminAccess, p =>
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.AdminAccess));
         });
+
+        webApplicationBuilder.Services.AddHttpContextAccessor();
+
+        webApplicationBuilder.Services.PostConfigure<JwtBearerOptions>("Bearer", options =>
+        {
+            options.Events ??= new JwtBearerEvents();
+
+            options.Events.OnAuthenticationFailed = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+
+                logger.LogWarning("JWT authentication failed: {Message}", context.Exception.Message);
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnTokenValidated = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+
+                var claims = context.Principal?.Claims
+                    .Select(c => new { c.Type, c.Value })
+                    .ToList();
+                logger.LogInformation("Claims: {Claims}", claims);
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnForbidden = context =>
+            {
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILoggerFactory>()
+                    .CreateLogger("JwtAuth");
+
+                logger.LogWarning("Forbidden access: {Message}", context.Response.StatusCode);
+                return Task.CompletedTask;
+            };
+        });
+
         
         return webApplicationBuilder;
     }
