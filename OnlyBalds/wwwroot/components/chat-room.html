@@ -1,4 +1,27 @@
+<style>
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* dark background */
+    z-index: 9999; /* high z-index to appear on top */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    position: relative;
+}
+</style>
 
 <!-- BANNER
 ============================================== -->
@@ -30,7 +53,7 @@
                         <div id="userCount"></div> 
                     </li>
                     <li class="box__header-item">
-                        <a href="#chat-users-online" class="box-header__button ui-button chat-users-online-trigger">See Who's Online</a>
+                        <button id="show-chat-users" class="box-header__button ui-button chat-users-online-trigger">See Who's Online</button>
                     </li>
                 </ul>
                 <div class="box__section box__section--chat-frame">
@@ -49,18 +72,40 @@
     </div>
 </div>
 
-<div style="display:none">
-    <div class="popup" id="chat-users-online">
+<!-- MODAL OVERLAY -->
+<div id="chat-users-container" class="modal-overlay" style="display: none;">
+    <div class="modal-content popup" id="chat-users-online">
         <div class="popup__header">
             <h2 class="popup__heading">Chat Room Users Online</h2>
             <button class="popup__close">&times;</button>
         </div>
         <div class="popup__content">
-            <ul id="activeUsers" class="user-list">
-            </ul>
+            <ul id="activeUsers" class="user-list"></ul>
         </div>
     </div>
 </div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#show-chat-users').on('click', function () {
+            console.log("Show chat users clicked");
+            $('#chat-users-container').fadeIn(200);
+        });
+
+        $('.popup__close').on('click', function () {
+            $('#chat-users-container').fadeOut(200);
+        });
+
+        $('#chat-users-container').on('click', function (e) {
+            if ($(e.target).is('#chat-users-container')) {
+                $(this).fadeOut(200);
+            }
+        });
+    });
+</script>
+
+
 
 <script>
     var hubConnection;
