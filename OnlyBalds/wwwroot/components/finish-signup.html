@@ -210,7 +210,9 @@
         $('#submit-questionnaire').click(async function (event) {
             event.preventDefault();
 
-            console.log("Submitting questionnaire for account:", account);
+            var $btn = $(this);
+            $btn.html(`<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...`);
+            $btn.prop('disabled', true);
 
             const baldType = $('#baldType').val();
 
@@ -336,6 +338,10 @@
                             contentType: "application/json",
                             data: JSON.stringify(answers),
                             success: function (response) {
+
+                                $btn.html("Send Message");
+                                $btn.prop('disabled', false);
+                                
                                 let account = 
                                 {
                                     questionnaireId: answers.id,
