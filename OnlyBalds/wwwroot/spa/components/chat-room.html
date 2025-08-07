@@ -70,16 +70,6 @@
             success: function (data) {
                 user = data;
                 let userName = user.name;
-                $(".sign-in").remove();
-                $(".greeting").empty().append(`Hi, ${userName}`);
-                $("#menu-options").append(`
-                    <li class="dropdown__item sign-out">
-                        <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
-                            <i class="fa fa-sign-out"></i> 
-                            Sign Out
-                        </a>
-                    </li>
-                `);
             },
             error: function (xhr, status, error) {
                 window.location.replace('/unauthorized');
@@ -122,6 +112,11 @@
 
             console.log("Received message:", chatMessage);
             messages.push(chatMessage);
+
+            if (messages.length > 5) {
+                messages = messages.slice(-5);
+            }
+
             onStateChanged();
         });
 

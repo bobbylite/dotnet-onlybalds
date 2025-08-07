@@ -38,6 +38,12 @@
 
 	<script src="/assets/scripts/Vendor-07ad14d4d0.js"></script>
 
+    <style>
+        html, body {
+            overflow-y: scroll;
+        }
+    </style>
+
 </head>
 <body>
 
@@ -204,10 +210,8 @@
             $('#home-placeholder').load('components/home.html');
             $('.footer').fadeIn(400);
 
-            setTimeout(function () {
-                $('.navbar__nav').removeClass('navbar__nav--is-open');
-                $('.navbar__toggle').removeClass('navicon--toggle');
-            }, 250);
+            $('.navbar__nav').removeClass('navbar__nav--is-open');
+            $('.navbar__toggle').removeClass('navicon--toggle');
 
             closeNavbar();
 
@@ -287,13 +291,6 @@
         };
 
         function closeNavbar() {
-            if (window.innerWidth < 768) {
-                $('.navbar__nav').slideUp(200);
-                $('.navbar__nav').css('display', 'block');
-            } else {
-                $('.navbar__nav').show();
-            }
-
             $('.navbar__nav').removeClass('navbar__nav--is-open');
             $('.navbar__toggle').removeClass('navicon--toggle');
         }
