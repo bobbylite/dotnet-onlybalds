@@ -25,22 +25,22 @@ public static class PostsEndpoints
         app.MapGet("/posts", GetPosts)
             .WithName(nameof(GetPosts))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPost("/posts", CreatePostAsync)
             .WithName(nameof(CreatePostAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPatch("/posts", PatchPostAsync)
             .WithName(nameof(PatchPostAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapDelete("/posts", DeletePostAsync)
             .WithName(nameof(DeletePostAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         return app;
     }
@@ -251,8 +251,8 @@ public static class PostsEndpoints
 
             var scope = principal.FindFirst("scope")?.Value ?? string.Empty;
 
-            return permissions.Contains(AuthorizataionPolicyNames.AdminAccess) &&
-                scope.Contains(AuthorizataionPolicyNames.AdminAccess);
+            return permissions.Contains(AuthorizationPolicies.AdminAccess) &&
+                scope.Contains(AuthorizationPolicies.AdminAccess);
         }
         catch (SecurityTokenException ex)
         {

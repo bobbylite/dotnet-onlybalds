@@ -20,27 +20,27 @@ public static class ThreadsEndpoints
         app.MapGet("/threads", GetThreads)
             .WithName(nameof(GetThreads))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapGet("/threads/{id}", GetThreadById)
             .WithName(nameof(GetThreadById))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPost("/threads", CreateThreadAsync)
             .WithName(nameof(CreateThreadAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPut("/threads/{id}", UpdateThreadAsync)
             .WithName(nameof(UpdateThreadAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapDelete("/threads/{id}", DeleteThreadAsync)
             .WithName(nameof(DeleteThreadAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         return app;
     }

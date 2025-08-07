@@ -3,7 +3,7 @@ namespace OnlyBalds.Api.Constants;
 /// <summary>
 /// Constants representing the names of authorization policies.
 /// </summary>
-public static class AuthorizataionPolicyNames
+public static class AuthorizationPolicies
 {
     /// <summary>
     /// The name of the authorization policy for standard user access.

@@ -106,10 +106,10 @@ public static class WebApplicationBuilderExtensions
 
         webApplicationBuilder.Services.AddAuthorization(o =>
         {
-            o.AddPolicy(AuthorizataionPolicyNames.UserAccess, p => p.
-                RequireClaim("permissions", AuthorizataionPolicyNames.UserAccess));
-            o.AddPolicy(AuthorizataionPolicyNames.AdminAccess, p => p.
-                RequireClaim("permissions", AuthorizataionPolicyNames.AdminAccess));
+            o.AddPolicy(AuthorizationPolicies.UserAccess, p =>
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.UserAccess));
+            o.AddPolicy(AuthorizationPolicies.AdminAccess, p =>
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.AdminAccess));
         });
 
         webApplicationBuilder.Services.AddHttpContextAccessor();

@@ -24,27 +24,27 @@ public static class AccountEndpoints
         app.MapGet("/accounts", GetAccountsAsync)
             .WithName(nameof(GetAccountsAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapGet("/account", GetAccountByIdAsync)
             .WithName(nameof(GetAccountByIdAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPost("/account", CreateAccountAsync)
             .WithName(nameof(CreateAccountAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapPut("/account/{id}", UpdateAccountAsync)
             .WithName(nameof(UpdateAccountAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         app.MapDelete("/account/{id}", DeleteAccountAsync)
             .WithName(nameof(DeleteAccountAsync))
             .WithOpenApi()
-            .RequireAuthorization(AuthorizataionPolicyNames.UserAccess);
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
         return app;
     }
