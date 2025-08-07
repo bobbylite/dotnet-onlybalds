@@ -197,7 +197,13 @@
                 e.preventDefault();
 
                 window.app.scripts.clearQueryParams();
+
                 emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
 
                 $('.footer').hide();
                 $('#finish-signup-placeholder').load('components/finish-signup.html');
@@ -267,6 +273,11 @@
 
                 emptyComponents();
 
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+
                 $('.footer').hide();
                 $('#forum-placeholder').load('components/forum.html');
                 $('.footer').fadeIn(400);
@@ -283,8 +294,13 @@
         const loadNewPost = () => {
             $('.new-post').on('click', function (e) {
                 e.preventDefault();
-                console.log("New post button clicked");
+
                 emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
 
                 $('.footer').hide();
                 $('#new-post-placeholder').load('components/forum-new-post.html');
@@ -306,7 +322,13 @@
                 e.preventDefault();
 
                 window.app.scripts.clearQueryParams();
+
                 emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
 
                 $('.footer').hide();
                 $('#chat-room-placeholder').load('components/chat-room.html');
@@ -353,6 +375,7 @@
             $('#read-post-placeholder').empty();
             $('#marketplace-placeholder').empty();
             $('#chat-room-placeholder').empty();
+            $('#unauthorized-placeholder').empty();
         }
 
     </script>
@@ -421,7 +444,22 @@
                 $('#unauthorized-placeholder').load('components/unauthorized.html');
                 $('.footer').fadeIn(400);
                 closeNavbar();
-            }
+            },
+            isAuthorizedForPage: () => {
+                if (typeof user === "undefined")
+                {
+                    console.log("User is not defined, loading unauthorized page");
+                    emptyComponents();
+                    $('.footer').hide();
+                    $('#unauthorized-placeholder').load('components/unauthorized.html');
+                    $('.footer').fadeIn(400);
+                    closeNavbar();
+                    return false;
+                }
+        
+                console.log("Authorized User:", user);
+                return true;
+            },
         };
     </script>
 
