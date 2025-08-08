@@ -133,6 +133,39 @@
 		</div>
 	</div><!--/comment -->
 
+    <!-- BANNER
+    ============================================== -->
+    <div class="banner banner--fade-to-gray">
+        <div class="container">
+            <h1 class="banner__heading"  data-aos="fade-up" data-aos-delay="100" data-aos-offset="0">You will be signed out</h1>
+            <p class="lead banner__paragraph" data-aos="fade-up" data-aos-delay="200" data-aos-offset="0">Please sign out and sign back in to continue.</p>
+        </div>
+    </div><!--/banner -->
+
+    <!-- MARKETPLACE
+    ============================================== -->
+    <div class="section section--gray">
+        <div class="container">
+            <div class="box box--with-top-lines" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
+                <div class="box__top-line box__top-line--light-blue"></div>
+                <div class="box__top-line box__top-line--blue"></div>
+                <div class="box__holder">
+                    <div class="box__section">
+                        <p class="card-text">
+                            Thank you for verifying your identity! 
+                        </p>
+                        <p class="card-text">
+                            To continue creating your account, please sign out and then sign back in. 
+                            The next step is short, easy, and will get you one step closer to joining our community of like-minded individuals.
+                        </p>
+                        <div class="box__buttons">
+                            <a href="/auth/logout" class="btn btn--rounded btn--blue">Sign Out Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 	<div class="footer" style="display: none;">
         <div class="container">
@@ -375,11 +408,11 @@
         if (supportForgotPassword === "true") toastMessage += " Forgot Password";
         }
 
-        window.app.scripts.showToast(toastMessage);
+        window.app.scripts.showToast("Identity Verified Successfully");
 
         setTimeout(() => {
-            window.location.href = "/auth/logout";
-        }, 1000);
+            //window.location.href = "/auth/logout";
+        }, 5000);
     </script>
 </body>
 </html>
