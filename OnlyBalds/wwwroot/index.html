@@ -160,6 +160,27 @@
         var user = {};
 
         $(() => {
+            const message = urlParams.get('message');
+            const success = urlParams.get('success');
+
+            if (message && success) {
+                if (success === "true") {
+                    $.ajax({
+                        url: '/refresh-token',
+                        method: 'GET',
+                        success: function(data) {
+                            console.log('Token refreshed:', data);
+                            window.app.scripts.showToast(message);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Failed to refresh token:', error);
+                        }
+                    });
+                } else {
+                    window.app.scripts.showToast("Error: " + message);
+                }
+            }
+
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
@@ -211,7 +232,7 @@
                     console.log("Error fetching user data:", error);
 
                     $(".complete-signup").remove();
-                    window.app.scripts.showToast("Hey there! Please log in for full access.")
+                    window.app.scripts.showToast("Hey there! Please log in for full access.");
                 }
             });
 
