@@ -160,8 +160,9 @@
         var user = {};
 
         $(() => {
-            const message = urlParams.get('message');
-            const success = urlParams.get('success');
+            var urlParams = new URLSearchParams(window.location.search);
+            var message = urlParams.get('message');
+            var success = urlParams.get('success');
 
             if (message && success) {
                 if (success === "true") {
