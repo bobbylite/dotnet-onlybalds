@@ -1,5 +1,9 @@
 using System.Net;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using OnlyBalds.Identity;
 using OnlyBalds.Models;
 
 namespace OnlyBalds.Endpoints;
@@ -19,10 +23,58 @@ public static class IdentityEndpoints
         ArgumentNullException.ThrowIfNull(endpoints);
 
         endpoints
-        .MapGet("/identity-information", GetIdentityInformation)
-        .RequireAuthorization();
+            .MapGet("/identity-information", GetIdentityInformation)
+            .RequireAuthorization();
+
+        endpoints
+            .MapGet("/refresh-token", RefreshToken)
+            .RequireAuthorization();
 
         return endpoints;
+    }
+
+    private static async Task RefreshToken(
+        HttpContext context,
+        [FromServices] AccessTokenRefresher refresher,
+        [FromServices] IAuthenticationSchemeProvider schemeProvider,
+        [FromServices] IOptionsMonitor<CookieAuthenticationOptions> optionsMonitor)
+    {
+        const string schemeName = CookieAuthenticationDefaults.AuthenticationScheme;
+
+        var scheme = await schemeProvider.GetSchemeAsync(schemeName);
+        if (scheme == null)
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync("Authentication scheme not found.");
+            return;
+        }
+
+        var cookieOptions = optionsMonitor.Get(schemeName);
+
+        var authResult = await context.AuthenticateAsync(schemeName);
+        if (!authResult.Succeeded || authResult.Principal == null)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return;
+        }
+
+        var ticket = new AuthenticationTicket(authResult.Principal, authResult.Properties, schemeName);
+        var cookieContext = new CookieValidatePrincipalContext(
+            context,
+            scheme,
+            cookieOptions,
+            ticket
+        );
+
+        await refresher.RefreshAccessTokenAsync(cookieContext, "OpenIdConnect");
+
+        if (cookieContext.ShouldRenew)
+        {
+            await context.SignInAsync(schemeName, cookieContext.Principal!, cookieContext.Properties);
+        }
+
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new { refreshed = true });
     }
 
     private static async Task GetIdentityInformation(
@@ -54,7 +106,7 @@ public static class IdentityEndpoints
         var accountsResponse = await httpClient.GetAsync($"account?id={Uri.EscapeDataString(subject!)}");
         AccountItem? account = null;
 
-        if (accountsResponse.StatusCode is HttpStatusCode.NotFound || 
+        if (accountsResponse.StatusCode is HttpStatusCode.NotFound ||
             accountsResponse.StatusCode is HttpStatusCode.NoContent ||
             accountsResponse.StatusCode is HttpStatusCode.Unauthorized ||
             accountsResponse.StatusCode is HttpStatusCode.Forbidden)
