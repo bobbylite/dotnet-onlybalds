@@ -40,6 +40,7 @@
         success: function (data) {
             console.log("User data:", data);
             user = data;
+            
             GetThreads(user);
         },
         error: function (xhr, status, error) {
@@ -83,7 +84,12 @@
                 });
             },
             error: function (xhr, status, error) {
-                console.error("Error fetching threads:", error);
+                console.error("Error fetching threads:", xhr);
+                if (xhr.status === 403) {
+                    console.log("Email not verified, redirecting to verify page.");
+                    window.app.scripts.loadFinishSignUp();
+                    return;
+                }
             }
         });
     }
