@@ -171,8 +171,43 @@
                         method: 'GET',
                         success: function(data) {
                             console.log('Token refreshed:', data);
+
+                            var user = data;
+                            var account = data.account;
+
+                            $(".sign-in").remove();
+                            $(".greeting").empty().append(`Hi, ${user.name}`);
+                            $("#menu-options").append(`
+                                <li class="dropdown__item sign-out">
+                                    <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
+                                        <i class="fa fa-sign-out"></i> 
+                                        Sign Out
+                                    </a>
+                                </li>
+                            `);
+
                             window.app.scripts.showToast(message);
-                            bootstrapPage();
+
+                            if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
+                                window.app.scripts.loadFinishSignUp();
+                                return;
+                            }
+
+                            if (user.claims.email_verified === "false") {
+                                console.log("Email not verified, redirecting to verify page.");
+                                window.app.scripts.loadVerify();
+                                return;
+                            }
+
+                            if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
+                                window.app.scripts.loadFinishSignUp();
+                                return;
+                            }
+
+                            if (account.hasSubmittedQuistionnaire !== true) {
+                                window.app.scripts.loadFinishSignUp();
+                                return;
+                            }
                         },
                         error: function(xhr, status, error) {
                             console.error('Failed to refresh token:', error);
