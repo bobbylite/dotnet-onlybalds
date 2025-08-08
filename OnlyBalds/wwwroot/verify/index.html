@@ -397,9 +397,9 @@
         }
 
         if (success === "true" && code === "success") {
-        toastMessage += " 🎉";
+        toastMessage += " ";
         } else if (success === "false") {
-        toastMessage += " ❌";
+        toastMessage += "";
         }
 
         if (supportSignUp === "true" || supportForgotPassword === "true") {
@@ -411,7 +411,7 @@
         window.app.scripts.showToast("Identity Verified Successfully");
 
         setTimeout(() => {
-            //window.location.href = "/auth/logout";
+            window.location.href = "/auth/logout";
         }, 5000);
     </script>
 </body>
