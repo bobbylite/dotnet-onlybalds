@@ -114,7 +114,8 @@ public static class IdentityEndpoints
             Account = account,
             IsAuthenticated = user.Identity?.IsAuthenticated,
             Name = user.Identity?.Name,
-            Claims = claims
+            Claims = claims,
+            refreshed = true 
         });
     }
 
