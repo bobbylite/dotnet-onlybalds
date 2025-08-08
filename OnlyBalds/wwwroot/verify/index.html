@@ -133,7 +133,6 @@
 		</div>
 	</div><!--/comment -->
 
-    <div id="component-placeholder" style="background-color: white;"></div>
 
 	<div class="footer" style="display: none;">
         <div class="container">
@@ -155,71 +154,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-
-    <script>
-        var user = {};
-
-        $(() => {
-            $.ajax({
-                url: "/identity-information",
-                method: "GET",
-                success: function (data) {
-                    user = data;
-
-                    let userName = user.name;
-                    console.log("User data:", user);
-                    console.log("User name:", userName);
-                    $(".sign-in").remove();
-                    $(".greeting").empty().append(`Hi, ${userName}`);
-                    $("#menu-options").append(`
-                        <li class="dropdown__item sign-out">
-                            <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
-                                <i class="fa fa-sign-out"></i> 
-                                Sign Out
-                            </a>
-                        </li>
-                    `);
-
-                    var account = user.account;
-
-                    console.log("User claims:", user.claims);
-                    console.log("User account:", account);
-
-                    if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
-                        window.app.scripts.loadFinishSignUp();
-                        return;
-                    }
-
-                    if (user.claims.email_verified === "false") {
-                        console.log("Email not verified, redirecting to verify page.");
-                        window.app.scripts.loadVerify();
-                        return;
-                    }
-
-                    if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
-                        window.app.scripts.loadFinishSignUp();
-                        return;
-                    }
-
-                    if (account.hasSubmittedQuistionnaire !== true) {
-                        window.app.scripts.loadFinishSignUp();
-                        return;
-                    }
-
-                },
-                error: function (xhr, status, error) {
-                    console.log("Error fetching user data:", error);
-
-                    $(".complete-signup").remove();
-                    window.app.scripts.showToast("Hey there! Please log in for full access.")
-                }
-            });
-
-            window.onpopstate = function(event) {
-                window.app.scripts.loadComponent(event.state.component, event.state.componentPlaceholder);
-            };
-        });
-    </script>
 
     <script>
         $(() => {
@@ -412,6 +346,40 @@
                 });
             }
         };
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        const supportSignUp = urlParams.get('supportSignUp');
+        const supportForgotPassword = urlParams.get('supportForgotPassword');
+        const message = urlParams.get('message');
+        const success = urlParams.get('success');
+        const code = urlParams.get('code');
+
+        let toastMessage = "";
+
+        if (message) {
+        toastMessage += message;
+        } else {
+        toastMessage = "Action completed.";
+        }
+
+        if (success === "true" && code === "success") {
+        toastMessage += " 🎉";
+        } else if (success === "false") {
+        toastMessage += " ❌";
+        }
+
+        if (supportSignUp === "true" || supportForgotPassword === "true") {
+        toastMessage += "\nSupport features enabled:";
+        if (supportSignUp === "true") toastMessage += " Sign Up";
+        if (supportForgotPassword === "true") toastMessage += " Forgot Password";
+        }
+
+        window.app.scripts.showToast(toastMessage);
+
+        setTimeout(() => {
+            window.location.href = "/auth/logout";
+        }, 1000);
     </script>
 </body>
 </html>
