@@ -172,6 +172,7 @@
                         success: function(data) {
                             console.log('Token refreshed:', data);
                             window.app.scripts.showToast(message);
+                            bootstrapPage();
                         },
                         error: function(xhr, status, error) {
                             console.error('Failed to refresh token:', error);
@@ -181,7 +182,12 @@
                     window.app.scripts.showToast("Error: " + message);
                 }
             }
+            else {
+                bootstrapPage();
+            }
+        });
 
+        const bootstrapPage = () => {
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
@@ -240,7 +246,7 @@
             window.onpopstate = function(event) {
                 window.app.scripts.loadComponent(event.state.component, event.state.componentPlaceholder);
             };
-        });
+        }
     </script>
 
     <script>
