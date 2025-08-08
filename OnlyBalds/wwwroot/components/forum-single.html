@@ -71,6 +71,17 @@
 
 <script>
     var userId = '';
+    var isEditing = false;
+    var originalTitle = '';
+    var originalContent = '';
+
+    $.ajax({
+        url: "/identity-information",
+        method: "GET",
+        success: function (data) {
+            window.loggedInUserId = data.claims.sub;
+        }
+    });
 
     $(document).ready(() => {
         const params = new URLSearchParams(window.location.search);
@@ -307,10 +318,6 @@
         });
     });
 
-    var isEditing = false;
-    var originalTitle = '';
-    var originalContent = '';
-
     $('#edit-post').on('click', function () {
         console.log("Edit post clicked");
         if (isEditing) return;
@@ -331,7 +338,6 @@
         originalTitle = $titleEl.text();
         originalContent = $contentEl.html();
 
-        // Replace with styled input/textarea
         $titleEl.replaceWith(`
             <input 
                 type="text" 
@@ -350,7 +356,6 @@
             >${originalContent.replace(/<\/?[^>]+(>|$)/g, "")}</textarea>
         `);
 
-        // Save and Cancel buttons
         $('.article__actions').append(`
             <button class="circle-btn" id="save-post" title="Save Post">
                 <i class="fa fa-check"></i>
@@ -361,8 +366,6 @@
         `);
     });
 
-
-    // Save handler
     $(document).on('click', '#save-post', function () {
         const updatedTitle = $('#edit-title').val().trim();
         const updatedContent = $('#edit-content').val().trim();
@@ -401,20 +404,10 @@
         });
     });
 
-    // Cancel handler
     $(document).on('click', '#cancel-edit', function () {
         $('#edit-title').replaceWith(`<h1 id="article-title" class="h2 article__heading">${originalTitle}</h1>`);
         $('#edit-content').replaceWith(`<div id="article-content" class="article__body">${originalContent}</div>`);
         $('#save-post, #cancel-edit').remove();
         isEditing = false;
-    });
-
-    // Fetch logged-in user on load
-    $.ajax({
-        url: "/identity-information",
-        method: "GET",
-        success: function (data) {
-            window.loggedInUserId = data.claims.sub;
-        }
     });
 </script>
