@@ -108,7 +108,7 @@
             </a>
             <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
                 <li class="dropdown__item dropdown__item--title greeting"></li>
-                <li class="dropdown__item">
+                <li class="dropdown__item complete-signup">
                     <button class="dropdown__link dropdown__link--icon finish-signup" style="width: 100%;">
                         <i class="fa fa-edit"></i> 
                         Complete Signup
@@ -189,9 +189,11 @@
                         window.app.scripts.loadFinishSignUp();
                         return;
                     }
-                    
+
+                    $(".complete-signup").remove();
                 },
                 error: function (xhr, status, error) {
+                    $(".complete-signup").remove();
                 }
             });
 
@@ -203,20 +205,18 @@
 
     <script>
         $(() => {
+            registerHome();
             registerSignUp();
             registerAbout();
-            registerHome();
             registerForum();
             registerChatRoom();
             registerMarketplace();
-            registerNewPost();
         });
 
         const registerSignUp = () => {
             $('.finish-signup').on('click', function (e) {
                 e.preventDefault();
 
-                //window.app.scripts.clearQueryParams();
                 emptyComponents();
 
                 let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
@@ -232,7 +232,6 @@
             $('.about').on('click', function (e) {
                 e.preventDefault();
                 
-                //window.app.scripts.clearQueryParams();
                 emptyComponents();
                 window.app.scripts.loadAbout();
             });
@@ -244,7 +243,6 @@
             $('.navbar__logo').on('click', function (e) {
                 e.preventDefault();
 
-                //window.app.scripts.clearQueryParams();
                 emptyComponents();
                 window.app.scripts.loadHome();
             });
@@ -269,8 +267,6 @@
             $('.chat-room').on('click', function (e) {
                 e.preventDefault();
 
-                //window.app.scripts.clearQueryParams();
-
                 emptyComponents();
 
                 let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
@@ -286,24 +282,8 @@
             $('.marketplace').on('click', function (e) {
                 e.preventDefault();
 
-                //window.app.scripts.clearQueryParams();
                 emptyComponents();
                 window.app.scripts.loadMarketplace();
-            });
-        };
-
-        const registerNewPost = () => {
-            $('.new-post').on('click', function (e) {
-                e.preventDefault();
-
-                emptyComponents();
-
-                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
-                if (!isAuthorizedForPage) {
-                    return;
-                }
-
-                window.app.scripts.loadNewPost();
             });
         };
 
@@ -313,15 +293,6 @@
         }
 
         function emptyComponents() {            
-            $('#about-placeholder').empty();
-            $('#home-placeholder').empty();
-            $('#forum-placeholder').empty();
-            $('#read-post-placeholder').empty();
-            $('#marketplace-placeholder').empty();
-            $('#chat-room-placeholder').empty();
-            $('#unauthorized-placeholder').empty();
-            $('#finish-signup-placeholder').empty();
-
             window.state = 
             {
                 isUserOnline: false
@@ -376,7 +347,7 @@
             loadForum: () => window.app.scripts.loadComponent('forum', 'forum-placeholder'),
             loadChatRoom: () => window.app.scripts.loadComponent('chat-room', 'chat-room-placeholder'),
             loadMarketplace: () => window.app.scripts.loadComponent('marketplace', 'marketplace-placeholder'),
-            loadNewPost: () => window.app.scripts.loadComponent('new-post', 'new-post-placeholder'),
+            loadNewPost: () => window.app.scripts.loadComponent('forum-new-post', 'new-post-placeholder'),
             loadFinishSignUp: () => window.app.scripts.loadComponent('finish-signup', 'finish-signup-placeholder'),
             loadUnauthorized: () => window.app.scripts.loadComponent('unauthorized', 'unauthorized-placeholder'),
             registerReadPostClick: (postId) => {
@@ -386,6 +357,16 @@
                     console.log("Read post clicked:", postId);
 
                     window.app.scripts.loadComponent('forum-single', 'read-post-placeholder', 'postId', postId);
+                });
+            },
+            registerNewPostClick: () => {
+                $('.write-new-post').on('click', function (e) {
+                    e.preventDefault();
+
+                    console.log("New post clicked");
+
+                    window.app.scripts.loadComponent('forum-new-post', 'new-post-placeholder');
+                    
                 });
             },
             isAuthorizedForPage: () => {
