@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="background-color: white;">
+<html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -133,15 +133,8 @@
 		</div>
 	</div><!--/comment -->
 
-    <div id="about-placeholder"></div>
-    <div id="home-placeholder"></div>
-    <div id="forum-placeholder"></div>
-    <div id="new-post-placeholder"></div>
-    <div id="read-post-placeholder"></div>
-    <div id="chat-room-placeholder"></div>
-    <div id="marketplace-placeholder"></div>
-    <div id="finish-signup-placeholder"></div>
-    <div id="unauthorized-placeholder"></div>
+    <div id="component-placeholder" style="background-color: white;"></div>
+
 	<div class="footer" style="display: none;">
         <div class="container">
             <div class="footer__buttons">
@@ -155,6 +148,8 @@
         </div>
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
+
+    <div id="custom-toast" class="custom-toast">You can only perform that action on your own post</div>
 
     <script src="/assets/scripts/App-5379555225.js"></script>
 
@@ -199,26 +194,29 @@
                 error: function (xhr, status, error) {
                 }
             });
+
+            window.onpopstate = function(event) {
+                window.app.scripts.loadComponent(event.state.component, event.state.componentPlaceholder);
+            };
         });
     </script>
 
     <script>
-        $(function () {
-            loadSignUp();
-            loadAbout();
-            loadHome();
-            loadForum();
-            loadChatRoom();
-            loadMarketplace();
-            loadNewPost();
+        $(() => {
+            registerSignUp();
+            registerAbout();
+            registerHome();
+            registerForum();
+            registerChatRoom();
+            registerMarketplace();
+            registerNewPost();
         });
 
-        const loadSignUp = () => {
+        const registerSignUp = () => {
             $('.finish-signup').on('click', function (e) {
                 e.preventDefault();
 
-                window.app.scripts.clearQueryParams();
-
+                //window.app.scripts.clearQueryParams();
                 emptyComponents();
 
                 let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
@@ -226,70 +224,33 @@
                     return;
                 }
 
-                $('.footer').hide();
-                $('#finish-signup-placeholder').load('components/finish-signup.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadFinishSignUp();
             });
         };
 
-        const loadAbout = () => {
+        const registerAbout = () => {
             $('.about').on('click', function (e) {
                 e.preventDefault();
-
-                window.app.scripts.clearQueryParams();
-
+                
+                //window.app.scripts.clearQueryParams();
                 emptyComponents();
-
-                $('.footer').hide();
-                $('#about-placeholder').load('components/about.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadAbout();
             });
         };
 
-        const loadHome = () => {
-            $('.footer').hide();
-            $('#home-placeholder').load('components/home.html');
-            $('.footer').fadeIn(400);
-
-            $('.navbar__nav').removeClass('navbar__nav--is-open');
-            $('.navbar__toggle').removeClass('navicon--toggle');
-
-            closeNavbar();
+        const registerHome = () => {
+            window.app.scripts.loadHome();
 
             $('.navbar__logo').on('click', function (e) {
                 e.preventDefault();
 
-                window.app.scripts.clearQueryParams();
+                //window.app.scripts.clearQueryParams();
                 emptyComponents();
-
-                $('.footer').hide();
-                $('#home-placeholder').load('components/home.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadHome();
             });
         };
 
-        const loadForum = () => {
+        const registerForum = () => {
             $('.forum').on('click', function (e) {
                 e.preventDefault();
 
@@ -300,20 +261,38 @@
                     return;
                 }
 
-                $('.footer').hide();
-                $('#forum-placeholder').load('components/forum.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadForum();
             });
         };
 
-        const loadNewPost = () => {
+        const registerChatRoom = () => {
+            $('.chat-room').on('click', function (e) {
+                e.preventDefault();
+
+                //window.app.scripts.clearQueryParams();
+
+                emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+
+                window.app.scripts.loadChatRoom();
+            });
+        };
+
+        const registerMarketplace = () => {
+            $('.marketplace').on('click', function (e) {
+                e.preventDefault();
+
+                //window.app.scripts.clearQueryParams();
+                emptyComponents();
+                window.app.scripts.loadMarketplace();
+            });
+        };
+
+        const registerNewPost = () => {
             $('.new-post').on('click', function (e) {
                 e.preventDefault();
 
@@ -324,64 +303,7 @@
                     return;
                 }
 
-                $('.footer').hide();
-                $('#new-post-placeholder').load('components/forum-new-post.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
-            });
-        };
-
-
-
-        const loadChatRoom = () => {
-            $('.chat-room').on('click', function (e) {
-                e.preventDefault();
-
-                window.app.scripts.clearQueryParams();
-
-                emptyComponents();
-
-                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
-                if (!isAuthorizedForPage) {
-                    return;
-                }
-
-                $('.footer').hide();
-                $('#chat-room-placeholder').load('components/chat-room.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
-            });
-        };
-
-        const loadMarketplace = () => {
-            $('.marketplace').on('click', function (e) {
-                e.preventDefault();
-
-                window.app.scripts.clearQueryParams();
-                emptyComponents();
-
-                $('.footer').hide();
-                $('#marketplace-placeholder').load('components/marketplace.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadNewPost();
             });
         };
 
@@ -412,83 +334,64 @@
         window.app = window.app || {};
         window.app.scripts = {
             updateQueryParam: (key, value) => {
+                console.log("Updating query param:", key, value);
                 const url = new URL(window.location.href);
 
-                for (const param of url.searchParams.keys()) {
+                for (const param of Array.from(url.searchParams.keys())) {
                     url.searchParams.delete(param);
                 }
 
                 url.searchParams.set(key, value);
-
-                window.history.replaceState({}, '', url);
+                console.log("Updated URL:", url.toString());
+                window.history.replaceState(history.state, '', url);
             },
             clearQueryParams: () => {
                 const url = new URL(window.location.href);
                 url.search = '';
-                window.history.replaceState({}, '', url);
+                window.history.replaceState(history.state, '', url);
             },
-            loadHome: () => {
+            loadComponent: (component, componentPlaceholder, queryKey, queryValue) => {
                 emptyComponents();
                 $('.footer').hide();
-                $('#home-placeholder').load('components/home.html');
+
+                let url = new URL(window.location.href);
+
+                if (queryKey && queryValue) {
+                    url.searchParams.set(queryKey, queryValue);
+                }
+
+                $(`#component-placeholder`).load(`components/${component}.html`, function () {
+                    history.pushState(
+                        { component, componentPlaceholder },
+                        null,
+                        url.toString()
+                    );
+                });
+
                 $('.footer').fadeIn(400);
                 closeNavbar();
             },
-            loadForum: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#forum-placeholder').load('components/forum.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
-            },
-            loadNewPost: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#new-post-placeholder').load('components/forum-new-post.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
-            },
+            loadAbout: () => window.app.scripts.loadComponent('about', 'about-placeholder'),
+            loadHome: () => window.app.scripts.loadComponent('home', 'home-placeholder'),
+            loadForum: () => window.app.scripts.loadComponent('forum', 'forum-placeholder'),
+            loadChatRoom: () => window.app.scripts.loadComponent('chat-room', 'chat-room-placeholder'),
+            loadMarketplace: () => window.app.scripts.loadComponent('marketplace', 'marketplace-placeholder'),
+            loadNewPost: () => window.app.scripts.loadComponent('new-post', 'new-post-placeholder'),
+            loadFinishSignUp: () => window.app.scripts.loadComponent('finish-signup', 'finish-signup-placeholder'),
+            loadUnauthorized: () => window.app.scripts.loadComponent('unauthorized', 'unauthorized-placeholder'),
             registerReadPostClick: (postId) => {
                 $(`.read-post-${postId}`).on('click', function (e) {
                     e.preventDefault();
-                    window.app.scripts.updateQueryParam('postId', postId);
-                    emptyComponents();
 
-                    $('.footer').hide();
-                    $('#read-post-placeholder').load('components/forum-single.html');
-                    $('.footer').fadeIn(400);
+                    console.log("Read post clicked:", postId);
 
-                    setTimeout(function () {
-                        $('.navbar__nav').removeClass('navbar__nav--is-open');
-                        $('.navbar__toggle').removeClass('navicon--toggle');
-                    }, 250);
-
-                    closeNavbar();
+                    window.app.scripts.loadComponent('forum-single', 'read-post-placeholder', 'postId', postId);
                 });
-            },
-            loadFinishSignUp: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#finish-signup-placeholder').load('components/finish-signup.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
-            },
-            loadUnauthorized: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#unauthorized-placeholder').load('components/unauthorized.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
             },
             isAuthorizedForPage: () => {
                 if (typeof user.isAuthenticated === "undefined")
                 {
-                    console.log("User is not defined, loading unauthorized page");
-                    emptyComponents();
-                    $('.footer').hide();
-                    $('#unauthorized-placeholder').load('components/unauthorized.html');
-                    $('.footer').fadeIn(400);
-                    closeNavbar();
+                    window.app.scripts.loadUnauthorized();
                     return false;
                 }
         
@@ -510,7 +413,5 @@
             }
         };
     </script>
-
-    <div id="custom-toast" class="custom-toast">You can only perform that action on your own post</div>
 </body>
 </html>
