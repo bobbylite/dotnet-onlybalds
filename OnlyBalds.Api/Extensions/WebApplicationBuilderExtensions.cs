@@ -102,14 +102,24 @@ public static class WebApplicationBuilderExtensions
 
         webApplicationBuilder.Services
             .AddAuthentication()
+            
             .AddJwtBearer();
 
         webApplicationBuilder.Services.AddAuthorization(o =>
         {
             o.AddPolicy(AuthorizationPolicies.UserAccess, p =>
-                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.UserAccess));
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.UserAccess)
+                .RequireAssertion(context =>
+                    context.User.HasClaim(c => 
+                        c.Type == AuthorizationClaims.EmailVerified && 
+                        c.Value.Equals(AuthorizationPermissions.EmailIsVerified, StringComparison.OrdinalIgnoreCase))));
+
             o.AddPolicy(AuthorizationPolicies.AdminAccess, p =>
-                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.AdminAccess));
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.AdminAccess)
+                .RequireAssertion(context =>
+                    context.User.HasClaim(c => 
+                        c.Type == AuthorizationClaims.EmailVerified && 
+                        c.Value.Equals(AuthorizationPermissions.EmailIsVerified, StringComparison.OrdinalIgnoreCase))));
         });
 
         webApplicationBuilder.Services.AddHttpContextAccessor();

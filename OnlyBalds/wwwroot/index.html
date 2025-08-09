@@ -227,6 +227,7 @@
 
                             var user = data;
                             var account = data.account;
+                            window.loggedInUser = user;
 
                             $(".sign-in").remove();
                             $(".greeting").empty().append(`Hi, ${user.name}`);
@@ -243,7 +244,8 @@
                             $("#loading-modal").fadeOut();
 
                             if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
-                                window.app.scripts.loadFinishSignUp();
+                                //window.app.scripts.loadFinishSignUp();
+                                window.location.href = '/auth/login';
                                 return;
                             }
 

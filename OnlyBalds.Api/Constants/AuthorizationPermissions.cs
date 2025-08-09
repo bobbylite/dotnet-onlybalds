@@ -15,4 +15,8 @@ public static class AuthorizationPermissions
     /// </summary>
     public const string AdminAccess = "admin:access";
 
+    /// <summary>
+    /// The name of the authorization claim for email verification status.
+    /// </summary>
+    public const string EmailIsVerified = "true";
 }

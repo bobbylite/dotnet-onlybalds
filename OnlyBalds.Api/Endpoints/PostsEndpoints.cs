@@ -129,6 +129,7 @@ public static class PostsEndpoints
 
             post.Title = string.IsNullOrEmpty(postItem.Title) ? post.Title : postItem.Title;
             post.Content = string.IsNullOrEmpty(postItem.Content) ? post.Content : postItem.Content;
+            // TODO: Push to a list of favorites where favorite contains identity and other data
 
             await postsRepository.UpdateById(Guid.Parse(postId));
 
