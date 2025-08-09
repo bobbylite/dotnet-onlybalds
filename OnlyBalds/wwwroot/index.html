@@ -215,9 +215,10 @@
             var success = urlParams.get('success');
 
             if (message && success) {
-                $("#loading-modal").fadeIn();
-
                 if (success === "true") {
+                    $("#loading-modal").fadeIn();
+                    $('#spinner-holder').remove();
+                    
                     $.ajax({
                         url: '/refresh-token',
                         method: 'GET',
