@@ -1,12 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using OnlyBalds.Models;
 
 namespace OnlyBalds.Endpoints;
@@ -52,13 +55,14 @@ public static class IdentityEndpoints
 
         var parameters = new Dictionary<string, string>
         {
-            { "grant_type", "refresh_token" },
+            { "grant_type", OpenIdConnectGrantTypes.RefreshToken },
             { "refresh_token", refreshToken! },
             { "client_id", oidcOptions.ClientId ?? string.Empty },
             { "client_secret", oidcOptions.ClientSecret ?? string.Empty }
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://onlybalds.us.auth0.com/oauth/token")
+        var tokenEndpoint = $"{oidcOptions.Authority}/oauth/token";
+        var request = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint)
         {
             Content = new FormUrlEncodedContent(parameters)
         };
@@ -84,7 +88,7 @@ public static class IdentityEndpoints
 
             var newClaims = jwtToken.Claims.ToList();
 
-            var newIdentity = new ClaimsIdentity(newClaims, CookieAuthenticationDefaults.AuthenticationScheme, "name", "role");
+            var newIdentity = new ClaimsIdentity(newClaims, CookieAuthenticationDefaults.AuthenticationScheme);
             var newPrincipal = new ClaimsPrincipal(newIdentity);
 
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -93,7 +97,7 @@ public static class IdentityEndpoints
             context.User = newPrincipal;
         }
 
-        context.Response.ContentType = "application/json";
+        context.Response.ContentType = MediaTypeNames.Application.Json;
         var user = context.User;
         var claims = user.Claims
             .ToDictionary(claim => claim.Type, claim => claim.Value);
