@@ -58,6 +58,18 @@ public class OnlyBaldsDataContext : DbContext
                 v => v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
+        modelBuilder.Entity<Favorite>()
+            .Property(f => f.FavoritedOn)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<PostItem>()
+            .HasMany(p => p.Favorites)
+            .WithOne()
+            .HasForeignKey(f => f.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<CommentItem>()
             .Property(t => t.PostedOn)
             .HasConversion(
