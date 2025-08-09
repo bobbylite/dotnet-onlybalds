@@ -412,4 +412,19 @@
         $('#messageInput').val('');
     });
 
+    $('#messageInput').on('keydown', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+
+            var $btn = $(this);
+            var originalText = $btn.html();
+            var message = $('#messageInput').val();
+
+            if (!message.trim()) return;
+
+            sendMessageToHub(message);
+            $('#messageInput').val('');
+        }
+    });
+
 </script>

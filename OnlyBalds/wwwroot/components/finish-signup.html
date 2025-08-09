@@ -371,23 +371,18 @@
     function validateForm() {
         let allValid = true;
 
-        // Validate all required inputs
         $('.required-input').each(function () {
             if ($(this).val() === "" || $(this).val() === "Select An Option") {
                 allValid = false;
             }
         });
 
-        // Validate radio button groups
         const radioGroups = ['newRoutine', 'activeBaldie'];
         radioGroups.forEach(function (name) {
             if ($('input[name="' + name + '"]:checked').length === 0) {
                 allValid = false;
             }
         });
-
-        // Enable or disable submit button
-        //$('#submit-questionnaire').prop('disabled', !allValid);
 
         if (!allValid) {
             window.app.scripts.showToast("Please fill in all required fields.");

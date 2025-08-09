@@ -57,8 +57,9 @@ public static class WebApplicationBuilderExtensions
             // Turn on service discovery by default
             http.AddServiceDiscovery();
         });
-        
+
         // Add a singleton service of type ITokenService. The same instance of TokenService will be used every time ITokenService is requested.
+        webApplicationBuilder.Services.AddSingleton<AccessTokenRefresher>();
         webApplicationBuilder.Services.AddSingleton<ITokenService, TokenService>();
         webApplicationBuilder.Services.AddSingleton<IWebStateService, WebStateService>();
         webApplicationBuilder.Services.AddHttpContextAccessor();
