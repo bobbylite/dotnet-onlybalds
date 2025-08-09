@@ -168,7 +168,13 @@
 		</div>
 	</div><!--/comment -->
 
-    <div id="component-placeholder" style="background-color: white;"></div>
+    <div id="component-placeholder" style="background-color: white;">
+        <div id="spinner-holder" class="box__holder" style="margin-top:100px; margin-bottom: 500px; height:auto; min-height: 400px;">
+            <div class="flex-center">
+                <div class="spinner-border" role="status" aria-label="Loading"></div>
+            </div>
+        </div>
+    </div>
 
 	<div class="footer" style="display: none;">
         <div class="container">
@@ -316,12 +322,13 @@
                         return;
                     }
 
+                    window.app.scripts.loadHome();
                 },
                 error: function (xhr, status, error) {
                     console.log("Error fetching user data:", error);
-
+                    
+                    window.app.scripts.loadHome();
                     $(".complete-signup").remove();
-                    window.app.scripts.showToast("Hey there! Please log in for full access.");
                 }
             });
 
@@ -366,8 +373,6 @@
         };
 
         const registerHome = () => {
-            window.app.scripts.loadHome();
-
             $('.navbar__logo').on('click', function (e) {
                 e.preventDefault();
 
