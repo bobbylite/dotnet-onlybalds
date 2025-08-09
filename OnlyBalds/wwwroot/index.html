@@ -64,6 +64,41 @@
             pointer-events: auto;
             cursor: pointer;
         }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content.loading-popup {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        .spinner {
+            margin: 0 auto 15px auto;
+            width: 48px;
+            height: 48px;
+            border: 5px solid #ddd;
+            border-top-color: #007bff; /* Blue spinner */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+        to { transform: rotate(360deg); }
+        }
     </style>
 
 </head>
@@ -149,6 +184,15 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
+    <!-- MODAL OVERLAY -->
+    <div id="loading-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content loading-popup">
+        <div class="spinner"></div>
+        <div class="loading-text">Verifying identity information...</div>
+    </div>
+    </div>
+
+
     <div id="custom-toast" class="custom-toast">You can only perform that action on your own post</div>
 
     <script src="/assets/scripts/App-5379555225.js"></script>
@@ -165,6 +209,8 @@
             var success = urlParams.get('success');
 
             if (message && success) {
+                $("#loading-modal").fadeIn();
+
                 if (success === "true") {
                     $.ajax({
                         url: '/refresh-token',
@@ -185,8 +231,9 @@
                                     </a>
                                 </li>
                             `);
-
+                            
                             window.app.scripts.showToast(message);
+                            $("#loading-modal").fadeOut();
 
                             if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
                                 window.app.scripts.loadFinishSignUp();
