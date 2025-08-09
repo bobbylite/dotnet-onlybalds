@@ -88,7 +88,7 @@ public static class IdentityEndpoints
 
             var newClaims = jwtToken.Claims.ToList();
 
-            var newIdentity = new ClaimsIdentity(newClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var newIdentity = new ClaimsIdentity(newClaims, CookieAuthenticationDefaults.AuthenticationScheme, "name", "role");
             var newPrincipal = new ClaimsPrincipal(newIdentity);
 
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
