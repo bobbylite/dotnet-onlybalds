@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
+using OnlyBalds.Api.Extensions;
 
 namespace OnlyBalds.Api.Endpoints;
 
@@ -39,6 +40,11 @@ public static class PostsEndpoints
 
         app.MapDelete("/posts", DeletePostAsync)
             .WithName(nameof(DeletePostAsync))
+            .WithOpenApi()
+            .RequireAuthorization(AuthorizationPolicies.UserAccess);
+
+        app.MapPost("/posts/favorites", AddPostToFavoritesAsync)
+            .WithName(nameof(AddPostToFavoritesAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
@@ -129,7 +135,6 @@ public static class PostsEndpoints
 
             post.Title = string.IsNullOrEmpty(postItem.Title) ? post.Title : postItem.Title;
             post.Content = string.IsNullOrEmpty(postItem.Content) ? post.Content : postItem.Content;
-            // TODO: Push to a list of favorites where favorite contains identity and other data
 
             await postsRepository.UpdateById(Guid.Parse(postId));
 
@@ -154,8 +159,59 @@ public static class PostsEndpoints
         ArgumentNullException.ThrowIfNull(commentsRepository);
         ArgumentNullException.ThrowIfNull(httpContextAccessor);
 
-        var accessJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Access"].FirstOrDefault();
-        var identityJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Identity"].FirstOrDefault();
+        if (string.IsNullOrEmpty(postId))
+        {
+            return Results.BadRequest("Post ID cannot be null or empty.");
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessJwt = httpContext.Request.Headers["X-Access"].FirstOrDefault();
+
+        ArgumentNullException.ThrowIfNull(accessJwt);
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessJwt);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessJwt);
+        var userId = await httpContext.GetUserIdAsync(accessJwt);
+
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var id = Guid.Parse(postId);
+        var post = postsRepository.GetById(id);
+        ArgumentNullException.ThrowIfNull(post);
+
+
+        if (post.UserId.ToString().Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+        {
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
+        }
+
+        await postsRepository.DeleteById(id);
+
+        return Results.NoContent();
+    }
+
+    private static async Task<IResult> AddPostToFavoritesAsync(
+        [FromBody] Favorite favorite,
+        [FromServices] IOnlyBaldsRepository<Favorite> favoritesRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
+    {
+        ArgumentNullException.ThrowIfNull(favorite);
+        ArgumentNullException.ThrowIfNull(favoritesRepository);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor);
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessJwt = httpContext.Request.Headers["X-Access"].FirstOrDefault();
+        var identityJwt = httpContext.Request.Headers["X-Identity"].FirstOrDefault();
 
         if (string.IsNullOrEmpty(accessJwt) ||
             string.IsNullOrEmpty(identityJwt))
@@ -163,142 +219,15 @@ public static class PostsEndpoints
             return Results.Unauthorized();
         }
 
-        if (string.IsNullOrEmpty(postId) is not true)
+        var userId = await httpContext.GetUserIdAsync(accessJwt);
+        if (string.IsNullOrEmpty(userId))
         {
-            var id = Guid.Parse(postId);
-            var post = postsRepository.GetById(id);
-            ArgumentNullException.ThrowIfNull(post);
-
-            var isAdmin = await IsAuthorizedAdminAsync(accessJwt);
-            if (isAdmin is true)
-            {
-                await postsRepository.DeleteById(id);
-
-                var comments = commentsRepository
-                    .GetAll()
-                    .Where(c => c.PostId == id)
-                    .ToList();
-
-                foreach (var comment in comments)
-                {
-                    await commentsRepository.DeleteById(comment.Id);
-                }
-
-                return Results.NoContent();
-            }
-
-            var userId = await GetUserIdAsync(accessJwt);
-            if (post.UserId.Equals(userId, StringComparison.InvariantCulture) is true)
-            {
-                await postsRepository.DeleteById(id);
-
-                var comments = commentsRepository
-                    .GetAll()
-                    .Where(c => c.PostId == id)
-                    .ToList();
-
-                foreach (var comment in comments)
-                {
-                    await commentsRepository.DeleteById(comment.Id);
-                }
-
-                return Results.NoContent();
-            }
-
             return Results.Unauthorized();
         }
 
-        return Results.BadRequest("Post ID cannot be null or empty.");
-    }
+        favorite.UserId = userId;
+        await favoritesRepository.Add(favorite);
 
-    private static async Task<bool> IsAuthorizedAdminAsync(string? accessToken)
-    {
-        if (string.IsNullOrEmpty(accessToken))
-        {
-            return false;
-        }
-
-        var issuer = "https://onlybalds.us.auth0.com/";
-        var audience = "https://OnlyBaldsBackendForFrontendsApi";
-
-        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-            $"{issuer}.well-known/openid-configuration",
-            new OpenIdConnectConfigurationRetriever()
-        );
-
-        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
-
-        var validationParameters = new TokenValidationParameters
-        {
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKeys = config.SigningKeys,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-
-        try
-        {
-            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
-
-            var permissions = principal.Claims
-                .Where(c => c.Type == "permissions")
-                .Select(c => c.Value)
-                .ToList();
-
-            var scope = principal.FindFirst("scope")?.Value ?? string.Empty;
-
-            return permissions.Contains(AuthorizationPolicies.AdminAccess) &&
-                scope.Contains(AuthorizationPolicies.AdminAccess);
-        }
-        catch (SecurityTokenException ex)
-        {
-            Console.WriteLine($"Token validation failed: {ex.Message}");
-            return false;
-        }
-    }
-
-    private static async Task<string> GetUserIdAsync(string accessToken)
-    {
-        var issuer = "https://onlybalds.us.auth0.com/";
-        var audience = "https://OnlyBaldsBackendForFrontendsApi";
-
-        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-            $"{issuer}.well-known/openid-configuration",
-            new OpenIdConnectConfigurationRetriever()
-        );
-
-        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
-
-        var validationParameters = new TokenValidationParameters
-        {
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKeys = config.SigningKeys,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-
-        try
-        {
-            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
-
-            var userId = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            return userId ?? string.Empty;
-        }
-        catch (SecurityTokenException ex)
-        {
-            Console.WriteLine($"Token validation failed: {ex.Message}");
-            return string.Empty;
-        }
+        return Results.Created($"/posts/favorites/{favorite.Id}", favorite);
     }
 }
