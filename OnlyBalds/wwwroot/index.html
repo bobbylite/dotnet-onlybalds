@@ -454,11 +454,17 @@
                 window.history.replaceState(history.state, '', url);
             },
             clearQueryParams: () => {
-                const url = new URL(window.location.href);
-                url.search = '';
-                window.history.replaceState(history.state, '', url);
+                var urlParams = new URLSearchParams(window.location.search);
+                
+                urlParams.delete('postId');
+                urlParams.delete('threadId');
+
+                var newQuery = urlParams.toString();
+                var newUrl = `${window.location.pathname}${newQuery ? '?' + newQuery : ''}${window.location.hash}`;
+                window.history.replaceState({}, document.title, newUrl);
             },
             loadComponent: (component, componentPlaceholder, queryKey, queryValue) => {
+                window.app.scripts.clearQueryParams();
                 emptyComponents();
                 $('.footer').hide();
 
