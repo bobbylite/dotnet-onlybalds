@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using OnlyBalds.Services;
 using OnlyBalds.Services.WebState;
@@ -8,6 +9,7 @@ namespace OnlyBalds.Hubs;
 /// <summary>
 /// Represents a SignalR hub for global chat features.
 /// </summary>
+[Authorize]
 public class ChatHub : Hub
 {
     

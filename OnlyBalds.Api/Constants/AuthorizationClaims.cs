@@ -10,4 +10,8 @@ public static class AuthorizationClaims
     /// </summary>
     public const string Permissions = "permissions";
 
+    /// <summary>
+    /// The name of the authorization claim for email verification status.
+    /// </summary>
+    public const string EmailVerified = "email_verified";
 }
