@@ -52,7 +52,9 @@ public class PostItem
     /// </summary>
     public Guid ThreadId { get; set; }
 
-    public IEnumerable<Favorite>? Favorites { get; set; } 
+    public IEnumerable<Favorite>? Favorites { get; set; }
+
+    public IEnumerable<CommentItem>? Comments { get; set; }
 }
 
 [Table("Favorites")]

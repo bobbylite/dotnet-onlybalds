@@ -69,6 +69,12 @@ public class OnlyBaldsDataContext : DbContext
             .WithOne()
             .HasForeignKey(f => f.PostId)
             .OnDelete(DeleteBehavior.Cascade);
+            
+        modelBuilder.Entity<PostItem>()
+            .HasMany(p => p.Comments)
+            .WithOne()
+            .HasForeignKey(c => c.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CommentItem>()
             .Property(t => t.PostedOn)
