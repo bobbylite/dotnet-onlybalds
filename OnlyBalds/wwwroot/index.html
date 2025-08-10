@@ -324,8 +324,9 @@
                         window.app.scripts.loadFinishSignUp();
                         return;
                     }
-
+                    
                     window.app.scripts.loadHome();
+                    $(".complete-signup").remove();
                 },
                 error: function (xhr, status, error) {
                     console.log("Error fetching user data:", error);
