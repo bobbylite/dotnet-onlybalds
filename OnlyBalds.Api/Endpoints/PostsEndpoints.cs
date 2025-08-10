@@ -168,8 +168,10 @@ public static class PostsEndpoints
         ArgumentNullException.ThrowIfNull(httpContext);
 
         var accessJwt = httpContext.Request.Headers["X-Access"].FirstOrDefault();
-
-        ArgumentNullException.ThrowIfNull(accessJwt);
+        if (string.IsNullOrEmpty(accessJwt))
+        {
+            return Results.BadRequest("Missing X-Access header for token validation.");
+        }
 
         var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessJwt);
         var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessJwt);
