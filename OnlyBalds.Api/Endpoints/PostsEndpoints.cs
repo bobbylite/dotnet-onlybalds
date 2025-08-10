@@ -8,6 +8,7 @@ using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 using OnlyBalds.Api.Extensions;
+using Microsoft.AspNetCore.Authentication;
 
 namespace OnlyBalds.Api.Endpoints;
 
@@ -167,15 +168,15 @@ public static class PostsEndpoints
         var httpContext = httpContextAccessor.HttpContext;
         ArgumentNullException.ThrowIfNull(httpContext);
 
-        var accessJwt = httpContext.Request.Headers["X-Access"].FirstOrDefault();
-        if (string.IsNullOrEmpty(accessJwt))
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
         {
-            return Results.BadRequest("Missing X-Access header for token validation.");
+            return Results.BadRequest("Could not retrieve access token.");
         }
 
-        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessJwt);
-        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessJwt);
-        var userId = await httpContext.GetUserIdAsync(accessJwt);
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
 
         if (isAuthorized is false || string.IsNullOrEmpty(userId))
         {
