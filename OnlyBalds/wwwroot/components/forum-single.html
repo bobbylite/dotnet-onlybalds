@@ -10,6 +10,67 @@
     align-self: flex-end;
 }
 
+/* Cool Favorites Action Styles */
+.favorites-btn {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: black;
+    color: white;
+    border: none;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s ease;
+}
+
+.favorites-btn:hover {
+    background-color: #333;
+}
+
+.favorites-btn:active {
+    transform: scale(0.95);
+}
+
+/* Favorite State (when favorited) */
+.favorites-btn.favorited {
+    background-color: #ff4757;
+    color: #fff;
+}
+
+.favorites-btn.favorited:hover {
+    background-color: #ff3742;
+}
+
+/* Favorite count badge */
+.favorites-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #000;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    transform: scale(0);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.favorites-count.show {
+    transform: scale(1);
+}
+
 </style>
 <!-- FORUM LISTINGS
 ============================================== -->
@@ -25,8 +86,9 @@
         <div class="article__content thread-header" data-aos="fade-up" data-aos-delay="150" data-aos-offset="0">
             <h1 id="article-title" class="h2 article__heading"></h1>
             <div class="article__actions thread-actions">
-                <button class="circle-btn" id="star-post" title="Star Post">
+                <button class="favorites-btn" id="star-post" title="Add to Favorites">
                     <i class="fa fa-heart"></i>
+                    <span class="favorites-count" id="favorites-count">0</span>
                 </button>
                 <button class="circle-btn" id="edit-post" title="Edit Post">
                     <i class="fa fa-pencil"></i>
@@ -409,5 +471,120 @@
         $('#edit-content').replaceWith(`<div id="article-content" class="article__body">${originalContent}</div>`);
         $('#save-post, #cancel-edit').remove();
         isEditing = false;
+    });
+
+    var isFavorited = false;
+    var favoritesCount = 0;
+    var favoriteId = null;
+
+    $(document).ready(function() {
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get("postId");
+        
+        loadFavoritesState(postId);
+    });
+
+    function loadFavoritesState(postId) {
+        $.ajax({
+            url: `/onlybalds-api/favorites?postId=${postId}`,
+            method: "GET",
+            success: function(data) {
+                console.log("Favorites state:", data);
+                data.forEach(favorite => {
+                    console.log("Favorite:", favorite);
+                    console.log("User ID:", user.claims.sub);
+                    if (favorite.userId === user.claims.sub) {
+                        console.log("User has favorited this post");
+                        isFavorited = true;
+                        favoriteId = favorite.id;
+                    }
+                });
+                favoritesCount = data.length;
+                updateFavoritesUI();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading favorites state:", error);
+                isFavorited = false;
+                favoritesCount = 0;
+                updateFavoritesUI();
+            }
+        });
+    }
+
+    function updateFavoritesUI() {
+        const $btn = $('#star-post');
+        const $count = $('#favorites-count');
+        
+        if (isFavorited) {
+            $btn.addClass('favorited');
+            $btn.attr('title', 'Remove from Favorites');
+        } else {
+            $btn.removeClass('favorited');
+            $btn.attr('title', 'Add to Favorites');
+        }
+        
+        $count.text(favoritesCount);
+        if (favoritesCount > 0) {
+            $count.addClass('show');
+        } else {
+            $count.removeClass('show');
+        }
+    }
+
+    $('#star-post').on('click', function(e) {
+        e.preventDefault();
+        
+        const $btn = $(this);
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get("postId");
+        
+        // Prevent double-clicking
+        if ($btn.hasClass('processing')) return;
+        $btn.addClass('processing');
+        
+        updateFavoritesUI();
+        
+        if (isFavorited)
+        {
+            $.ajax({
+                url: `/onlybalds-api/favorites?favoriteId=${favoriteId}`,
+                method: 'DELETE',
+                contentType: 'application/json',
+                success: function(response) {
+                    isFavorited = false
+                    favoritesCount = favoritesCount - 1;
+                    updateFavoritesUI();
+                    $btn.removeClass('processing');
+                },
+                error: function(xhr, status, error) {
+                    $btn.removeClass('processing');
+                    window.app.scripts.showToast("Failed to update favorites");
+                }
+            });
+        }
+
+        if (!isFavorited)
+        {
+            $.ajax({
+                url: '/onlybalds-api/favorites',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    postId: postId,
+                    userId: user.claims.sub
+                }),
+                success: function(response) {
+                    isFavorited = true;
+                    favoriteId = response.id;
+                    favoritesCount = favoritesCount + 1;
+                    updateFavoritesUI();
+                    $btn.removeClass('processing');
+                },
+                error: function(xhr, status, error) {
+                    $btn.removeClass('processing');
+                    window.app.scripts.showToast("Failed to update favorites");
+                }
+            });
+        }
     });
 </script>
