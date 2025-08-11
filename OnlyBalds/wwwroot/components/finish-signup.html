@@ -190,7 +190,8 @@
 
         try {
             console.log('Submitting form:', answers);
-
+            let answers = null;
+            
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
@@ -199,7 +200,7 @@
 
                     const baldType = $('#baldType').val();
                     const accountId = crypto.randomUUID();
-                    const answers = {
+                    answers = {
                         id: crypto.randomUUID(),
                         firstName: $('#firstName').val(),
                         lastName: $('#lastName').val(),
