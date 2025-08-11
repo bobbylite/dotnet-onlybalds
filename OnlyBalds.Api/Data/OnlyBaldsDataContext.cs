@@ -88,6 +88,12 @@ public class OnlyBaldsDataContext : DbContext
                 v => v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
+        modelBuilder.Entity<Account>()
+            .HasOne(a => a.Questionnaire)
+            .WithOne()
+            .HasForeignKey<QuestionnaireItems>(q => q.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         base.OnModelCreating(modelBuilder);
     }
 }

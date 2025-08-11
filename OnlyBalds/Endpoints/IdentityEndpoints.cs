@@ -137,7 +137,7 @@ public static class IdentityEndpoints
 
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
         var subject = context.User?.FindFirst("sub")?.Value;
-        var accountsResponse = await httpClient.GetAsync($"account?id={Uri.EscapeDataString(subject!)}");
+        var accountsResponse = await httpClient.GetAsync($"accounts?userId={Uri.EscapeDataString(subject!)}");
         AccountItem? account = null;
 
         if (accountsResponse.StatusCode is HttpStatusCode.NotFound ||
