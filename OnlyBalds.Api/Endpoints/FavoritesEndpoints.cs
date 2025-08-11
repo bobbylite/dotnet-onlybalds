@@ -103,16 +103,13 @@ public static class FavoritesEndpoints
             return Results.Unauthorized();
         }
 
-        var favorites = favoritesRepository
+        var existingFavorite = favoritesRepository
             .GetAll()
-            .Where(f => f.Id == favorite.PostId)
+            .Where(f => f.UserId.ToString().Equals(favorite.UserId.ToString(), StringComparison.OrdinalIgnoreCase) &&
+                        f.PostId.ToString().Equals(favorite.PostId.ToString(), StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-        var existingFavorite = favorites
-            .Where(f => f.UserId == userId)
-            .ToList();
-
-        if (existingFavorite.Count is > 0)
+        if (existingFavorite.Any())
         {
             return Results.Conflict("User has already liked this post.");
         }
