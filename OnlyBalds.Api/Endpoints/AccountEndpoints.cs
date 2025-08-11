@@ -1,7 +1,7 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using OnlyBalds.Api.Constants;
-using OnlyBalds.Api.Data;
+using OnlyBalds.Api.Extensions;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 
@@ -26,22 +26,17 @@ public static class AccountEndpoints
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapGet("/account", GetAccountByIdAsync)
-            .WithName(nameof(GetAccountByIdAsync))
-            .WithOpenApi()
-            .RequireAuthorization(AuthorizationPolicies.UserAccess);
-
-        app.MapPost("/account", CreateAccountAsync)
+        app.MapPost("/accounts", CreateAccountAsync)
             .WithName(nameof(CreateAccountAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapPut("/account/{id}", UpdateAccountAsync)
-            .WithName(nameof(UpdateAccountAsync))
+        app.MapPatch("/accounts", PatchAccountAsync)
+            .WithName(nameof(PatchAccountAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapDelete("/account/{id}", DeleteAccountAsync)
+        app.MapDelete("/accounts", DeleteAccountAsync)
             .WithName(nameof(DeleteAccountAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
@@ -54,37 +49,55 @@ public static class AccountEndpoints
     /// </summary>
     /// <param name="accountsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetAccountsAsync([FromServices] IOnlyBaldsRepository<Account> accountsRepository)
+    public static async Task<IResult> GetAccountsAsync(
+        string? accountId,
+        [FromServices] IOnlyBaldsRepository<Account> accountsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(accountsRepository);
 
-        var accounts = accountsRepository.GetAll();
-        ArgumentNullException.ThrowIfNull(accounts);
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
 
-        return Results.Ok(accounts);
-    }
-
-    /// <summary>
-    /// Retrieves accounts that match the id from the repository.
-    /// </summary>
-    /// <param name="accountsRepository"></param>
-    /// <param name="id"></param>
-    public static IResult GetAccountByIdAsync(
-        [FromServices] OnlyBaldsDataContext context,
-        [FromQuery] string id)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-        ArgumentNullException.ThrowIfNull(id);
-
-        var accountsRepository = context.Set<Account>();
-        var account = accountsRepository.SingleOrDefault(x => x.IdentityProviderId == id);
-
-        if (account is null)
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
         {
-            return Results.NotFound();
+            return Results.BadRequest("Could not retrieve access token.");
         }
 
-        return Results.Ok(account);
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        if (string.IsNullOrEmpty(accountId) is not true)
+        {
+            var account = accountsRepository.GetById(Guid.Parse(accountId));
+
+            if (account.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+            {
+                if (isAuthorizedAdmin is false)
+                {
+                    return Results.Unauthorized();
+                }
+            }
+
+            return Results.Ok(account);
+        }
+
+        if (isAuthorizedAdmin is false)
+        {
+            return Results.Ok(accountsRepository
+                .GetAll()
+                .Where(a => a.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase))
+                .ToList());
+        }
+
+        return Results.Ok(accountsRepository.GetAll());
     }
 
     /// <summary>
@@ -93,19 +106,44 @@ public static class AccountEndpoints
     /// <param name="accountItem"></param>
     /// <param name="accountsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreateAccountAsync([FromBody] Account accountItem, [FromServices] IOnlyBaldsRepository<Account> accountsRepository)
+    public static async Task<IResult> CreateAccountAsync(
+        [FromBody] Account accountItem,
+        [FromServices] IOnlyBaldsRepository<Account> accountsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(accountItem);
         ArgumentNullException.ThrowIfNull(accountsRepository);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor);
 
-        if (accountItem.Id == Guid.Empty)
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
         {
-            accountItem.Id = Guid.NewGuid();
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        if (accountItem.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+        {
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
         }
 
         await accountsRepository.Add(accountItem);
 
-        return Results.Created($"/accounts/{accountItem.Id}", accountItem);
+        return Results.Created($"/accounts?accountId={accountItem.Id}", accountItem);
     }
 
     /// <summary>
@@ -115,36 +153,111 @@ public static class AccountEndpoints
     /// <param name="accountItem"></param>
     /// <param name="accountsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdateAccountAsync(Guid id, [FromBody] Account accountItem, [FromServices] IOnlyBaldsRepository<Account> accountsRepository)
+    public static async Task<IResult> PatchAccountAsync(
+        string? accountId,
+        [FromBody] Account accountItem,
+        [FromServices] IOnlyBaldsRepository<Account> accountsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(id);
-        ArgumentNullException.ThrowIfNull(accountItem);
         ArgumentNullException.ThrowIfNull(accountsRepository);
 
-        var account = accountsRepository.GetById(id);
+        if (accountItem is null)
+        {
+            return Results.BadRequest("Account item cannot be null.");
+        }
+
+        if (string.IsNullOrEmpty(accountId))
+        {
+            return Results.BadRequest("Account ID cannot be null or empty.");
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var account = accountsRepository.GetById(Guid.Parse(accountId));
         ArgumentNullException.ThrowIfNull(account);
 
-        account.Email = accountItem.Email;
-        account.Username = accountItem.Username;
-        account.HasSubmittedQuistionnaire = accountItem.HasSubmittedQuistionnaire;
-        account.QuestionnaireId = accountItem.QuestionnaireId;
-        account.IdentityProviderId = accountItem.IdentityProviderId;
+        if (account.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+        {
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
+        }
 
-        await accountsRepository.UpdateById(id);
+        account.Email = string.IsNullOrEmpty(accountItem.Email) ? account.Email : accountItem.Email;
+        account.Address = string.IsNullOrEmpty(accountItem.Address) ? account.Address : accountItem.Address;
+        account.DisplayName = string.IsNullOrEmpty(accountItem.DisplayName) ? account.DisplayName : accountItem.DisplayName;
+        account.FirstName = string.IsNullOrEmpty(accountItem.FirstName) ? account.FirstName : accountItem.FirstName;
+        account.LastName = string.IsNullOrEmpty(accountItem.LastName) ? account.LastName : accountItem.LastName;
+
+        await accountsRepository.UpdateById(Guid.Parse(accountId));
 
         return Results.NoContent();
     }
 
     /// <summary>
-    /// Deletes a account by its identifier.
+    /// Deletes account by account id from the repository.
     /// </summary>
-    /// <param name="id"></param>
     /// <param name="accountsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeleteAccountAsync(Guid id, [FromServices] IOnlyBaldsRepository<Account> accountsRepository)
+    public static async Task<IResult> DeleteAccountAsync(
+        string? accountId,
+        [FromServices] IOnlyBaldsRepository<Account> accountsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(accountsRepository);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor);
+
+        if (string.IsNullOrEmpty(accountId))
+        {
+            return Results.BadRequest("Account ID cannot be null or empty.");
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (string.IsNullOrEmpty(userId) || isAuthorized is false)
+        {
+            return Results.Unauthorized();
+        }
+
+        var id = Guid.Parse(accountId);
+        var account = accountsRepository.GetById(id);
+        ArgumentNullException.ThrowIfNull(account);
+
+        if (account.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+        {
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
+        }
 
         await accountsRepository.DeleteById(id);
 

@@ -54,11 +54,11 @@ public static class PostsEndpoints
         [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
-        var dbSet = postsRepository.GetDbSet();
 
         if (string.IsNullOrEmpty(postId) is not true)
         {
-            var post = await dbSet
+            var post = await postsRepository
+                .GetDbSet()
                 .Include(p => p.Favorites)
                 .Include(p => p.Comments)
                 .Where(p => p.Id == Guid.Parse(postId))
@@ -71,7 +71,8 @@ public static class PostsEndpoints
 
         if (string.IsNullOrEmpty(threadId) is not true)
         {
-            var posts = await dbSet
+            var posts = await postsRepository
+                .GetDbSet()
                 .Include(p => p.Favorites)
                 .Include(p => p.Comments)
                 .Where(c => c.ThreadId == Guid.Parse(threadId))
@@ -82,7 +83,8 @@ public static class PostsEndpoints
             return Results.Ok(posts);
         }
 
-        var allPosts = await dbSet
+        var allPosts = await postsRepository
+            .GetDbSet()
             .Include(p => p.Favorites)
             .Include(p => p.Comments)
             .ToListAsync();

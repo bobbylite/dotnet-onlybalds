@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using OnlyBalds.Api.Constants;
 
 namespace OnlyBalds.Api.Extensions;
 
@@ -53,8 +54,8 @@ public static class HttpContextExtensions
                 .Contains("true");
         ArgumentNullException.ThrowIfNull(isEmailVerified);
 
-        var containsUserAccessPermission = accessPermissions.Contains("user:access");
-        var containsUserAccessScope = accessScope.Contains("user:access");
+        var containsUserAccessPermission = accessPermissions.Contains(AuthorizationPolicies.UserAccess);
+        var containsUserAccessScope = accessScope.Contains(AuthorizationPolicies.UserAccess);
 
         return containsUserAccessPermission && containsUserAccessScope && isEmailVerified;
     }
@@ -100,8 +101,8 @@ public static class HttpContextExtensions
                 .Contains("true");
         ArgumentNullException.ThrowIfNull(isEmailVerified);
 
-        var containsUserAccessPermission = accessPermissions.Contains("admin:access");
-        var containsUserAccessScope = accessScope.Contains("admin:access");
+        var containsUserAccessPermission = accessPermissions.Contains(AuthorizationPolicies.AdminAccess);
+        var containsUserAccessScope = accessScope.Contains(AuthorizationPolicies.AdminAccess);
 
         return containsUserAccessPermission && containsUserAccessScope && isEmailVerified;
     }
