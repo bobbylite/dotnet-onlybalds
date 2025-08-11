@@ -1,14 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 using OnlyBalds.Api.Extensions;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 namespace OnlyBalds.Api.Endpoints;
 
@@ -44,11 +40,6 @@ public static class PostsEndpoints
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapPost("/posts/favorites", AddPostToFavoritesAsync)
-            .WithName(nameof(AddPostToFavoritesAsync))
-            .WithOpenApi()
-            .RequireAuthorization(AuthorizationPolicies.UserAccess);
-
         return app;
     }
 
@@ -57,16 +48,21 @@ public static class PostsEndpoints
     /// </summary>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetPosts(
+    public static async Task<IResult> GetPosts(
         string? postId,
         string? threadId,
         [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
+        var dbSet = postsRepository.GetDbSet();
 
         if (string.IsNullOrEmpty(postId) is not true)
         {
-            var post = postsRepository.GetById(Guid.Parse(postId));
+            var post = await dbSet
+                .Include(p => p.Favorites)
+                .Include(p => p.Comments)
+                .Where(p => p.Id == Guid.Parse(postId))
+                .SingleOrDefaultAsync();
 
             ArgumentNullException.ThrowIfNull(post);
 
@@ -75,17 +71,23 @@ public static class PostsEndpoints
 
         if (string.IsNullOrEmpty(threadId) is not true)
         {
-            var posts = postsRepository
-                .GetAll()
+            var posts = await dbSet
+                .Include(p => p.Favorites)
+                .Include(p => p.Comments)
                 .Where(c => c.ThreadId == Guid.Parse(threadId))
-                .ToList();
+                .ToListAsync();
 
             ArgumentNullException.ThrowIfNull(posts);
 
             return Results.Ok(posts);
         }
 
-        return Results.BadRequest("Post ID and Thread ID cannot be null or empty.");
+        var allPosts = await dbSet
+            .Include(p => p.Favorites)
+            .Include(p => p.Comments)
+            .ToListAsync();
+
+        return Results.Ok(allPosts);
     }
 
     /// <summary>
@@ -110,7 +112,7 @@ public static class PostsEndpoints
 
         await postsRepository.Add(postItem);
 
-        return Results.Created($"/threads/{postItem.Id}", postItem);
+        return Results.Created($"/posts?postId={postItem.Id}", postItem);
     }
 
     /// <summary>
@@ -123,26 +125,52 @@ public static class PostsEndpoints
     public static async Task<IResult> PatchPostAsync(
         string? postId,
         [FromBody] PostItem postItem,
-        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(postId);
         ArgumentNullException.ThrowIfNull(postItem);
         ArgumentNullException.ThrowIfNull(postsRepository);
 
-        if (string.IsNullOrEmpty(postId) is not true)
+        if (string.IsNullOrEmpty(postId))
         {
-            var post = postsRepository.GetById(Guid.Parse(postId));
-            ArgumentNullException.ThrowIfNull(post);
-
-            post.Title = string.IsNullOrEmpty(postItem.Title) ? post.Title : postItem.Title;
-            post.Content = string.IsNullOrEmpty(postItem.Content) ? post.Content : postItem.Content;
-
-            await postsRepository.UpdateById(Guid.Parse(postId));
-
-            return Results.NoContent();
+            return Results.BadRequest("Post ID cannot be null or empty.");
         }
 
-        return Results.BadRequest("Post ID cannot be null or empty.");
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var post = postsRepository.GetById(Guid.Parse(postId));
+        ArgumentNullException.ThrowIfNull(post);
+
+        if (post.UserId.ToString().Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+        {
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
+        }
+
+        post.Title = string.IsNullOrEmpty(postItem.Title) ? post.Title : postItem.Title;
+        post.Content = string.IsNullOrEmpty(postItem.Content) ? post.Content : postItem.Content;
+
+        await postsRepository.UpdateById(Guid.Parse(postId));
+
+        return Results.NoContent();
     }
 
     /// <summary>
@@ -153,11 +181,9 @@ public static class PostsEndpoints
     public static async Task<IResult> DeletePostAsync(
         string? postId,
         [FromServices] IOnlyBaldsRepository<PostItem> postsRepository,
-        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository,
         [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
-        ArgumentNullException.ThrowIfNull(commentsRepository);
         ArgumentNullException.ThrowIfNull(httpContextAccessor);
 
         if (string.IsNullOrEmpty(postId))
@@ -199,38 +225,5 @@ public static class PostsEndpoints
         await postsRepository.DeleteById(id);
 
         return Results.NoContent();
-    }
-
-    private static async Task<IResult> AddPostToFavoritesAsync(
-        [FromBody] Favorite favorite,
-        [FromServices] IOnlyBaldsRepository<Favorite> favoritesRepository,
-        [FromServices] IHttpContextAccessor httpContextAccessor)
-    {
-        ArgumentNullException.ThrowIfNull(favorite);
-        ArgumentNullException.ThrowIfNull(favoritesRepository);
-        ArgumentNullException.ThrowIfNull(httpContextAccessor);
-
-        var httpContext = httpContextAccessor.HttpContext;
-        ArgumentNullException.ThrowIfNull(httpContext);
-
-        var accessJwt = httpContext.Request.Headers["X-Access"].FirstOrDefault();
-        var identityJwt = httpContext.Request.Headers["X-Identity"].FirstOrDefault();
-
-        if (string.IsNullOrEmpty(accessJwt) ||
-            string.IsNullOrEmpty(identityJwt))
-        {
-            return Results.Unauthorized();
-        }
-
-        var userId = await httpContext.GetUserIdAsync(accessJwt);
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Results.Unauthorized();
-        }
-
-        favorite.UserId = userId;
-        await favoritesRepository.Add(favorite);
-
-        return Results.Created($"/posts/favorites/{favorite.Id}", favorite);
     }
 }

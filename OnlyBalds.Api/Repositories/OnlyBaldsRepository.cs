@@ -19,12 +19,21 @@ public class OnlyBaldsRepository<T> : IOnlyBaldsRepository<T> where T : class
         _dbSet = _context.Set<T>();
     }
     
+    /// <summary>
+    /// Gets the database context.
+    /// </summary>
+    /// <returns></returns>
+    public DbSet<T> GetDbSet()
+    {
+        return _dbSet;
+    }
+    
     /// <inheritdoc/>
     public IEnumerable<T> GetAll()
     {
         var items = _dbSet.ToList();
         ArgumentNullException.ThrowIfNull(items);
-        
+
         return items;
     }
 

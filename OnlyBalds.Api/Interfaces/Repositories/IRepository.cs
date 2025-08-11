@@ -1,7 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace OnlyBalds.Api.Interfaces.Repositories;
 
 public interface IRepository<T> where T : class
 {
+    /// <summary>
+    /// Gets the database context.
+    /// </summary>
+    /// <returns></returns>
+    DbSet<T> GetDbSet();
+
     /// <summary>
     /// Gets an entity by its unique identifier.
     /// </summary>

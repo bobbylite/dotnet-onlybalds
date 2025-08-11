@@ -52,8 +52,14 @@ public class PostItem
     /// </summary>
     public Guid ThreadId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the list of users who favorited the post.
+    /// </summary>
     public IEnumerable<Favorite>? Favorites { get; set; }
 
+    /// <summary>
+    /// Gets or sets the list of comments on the post.
+    /// </summary>
     public IEnumerable<CommentItem>? Comments { get; set; }
 }
 
