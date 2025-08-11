@@ -53,10 +53,10 @@ public class Account
     /// <summary>
     /// Represents whether the identity of the account has submitted the questionnaire.
     /// </summary>
-    public bool HasSubmittedQuistionnaire { get; set; }
+    public bool HasSubmittedQuestionnaire { get; set; }
 
     /// <summary>
-    /// The identifier of the questionnaire.
+    /// Represents the questionnaire associated with the account.
     /// </summary>
-    public string QuestionnaireId { get; set; } = string.Empty;
+    public QuestionnaireItems? Questionnaire { get; set; } 
 }

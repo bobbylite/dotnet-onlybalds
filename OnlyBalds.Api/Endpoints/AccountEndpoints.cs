@@ -50,7 +50,7 @@ public static class AccountEndpoints
     /// <param name="accountsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
     public static async Task<IResult> GetAccountsAsync(
-        string? accountId,
+        string? userId,
         [FromServices] IOnlyBaldsRepository<Account> accountsRepository,
         [FromServices] IHttpContextAccessor httpContextAccessor)
     {
@@ -67,24 +67,32 @@ public static class AccountEndpoints
 
         var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
         var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
-        var userId = await httpContext.GetUserIdAsync(accessToken);
+        var identityProviderId = await httpContext.GetUserIdAsync(accessToken);
 
-        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        if (isAuthorized is false || string.IsNullOrEmpty(identityProviderId))
         {
             return Results.Unauthorized();
         }
 
-        if (string.IsNullOrEmpty(accountId) is not true)
+        if (string.IsNullOrEmpty(userId) is not true)
         {
-            var account = accountsRepository.GetById(Guid.Parse(accountId));
+            var account = accountsRepository
+                .GetAll()
+                .Where(a => a.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase))
+                .SingleOrDefault();
 
-            if (account.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+            if (account == null)
             {
-                if (isAuthorizedAdmin is false)
-                {
-                    return Results.Unauthorized();
-                }
+                return Results.NotFound();
             }
+
+            if (account?.IdentityProviderId.Equals(identityProviderId, StringComparison.OrdinalIgnoreCase) is false)
+                {
+                    if (isAuthorizedAdmin is false)
+                    {
+                        return Results.Unauthorized();
+                    }
+                }
 
             return Results.Ok(account);
         }
@@ -93,7 +101,7 @@ public static class AccountEndpoints
         {
             return Results.Ok(accountsRepository
                 .GetAll()
-                .Where(a => a.IdentityProviderId.Equals(userId, StringComparison.OrdinalIgnoreCase))
+                .Where(a => a.IdentityProviderId.Equals(identityProviderId, StringComparison.OrdinalIgnoreCase))
                 .ToList());
         }
 

@@ -39,6 +39,11 @@ public class QuestionnaireItems
     /// /// </summary>
     [JsonPropertyName("userId")]
     public string UserId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the account associated with the questionnaire.
+    /// </summary>
+    public Guid AccountId { get; set; }
 }
 
 /// <summary>
