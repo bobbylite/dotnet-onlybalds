@@ -189,9 +189,8 @@
         $btn.prop('disabled', true);
 
         try {
-            console.log('Submitting form:', answers);
             let answers = null;
-            
+
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
@@ -329,6 +328,8 @@
                         data: JSON.stringify(account),
                         success: function (response) {
                             console.log("Account Success:", response);
+                            console.log("Submitting Questionnaire:", answers);
+                            
                             $.ajax({
                                 url: "/onlybalds-api/questionnaire",
                                 method: "POST",
