@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace OnlyBalds.Http;
 
@@ -41,7 +42,8 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
             _logger.LogWarning("API returned 401. Triggering OIDC challenge to refresh token...");
-            await httpContext.ChallengeAsync("OpenIdConnect");
+            var authProps = new AuthenticationProperties { RedirectUri = httpContext.Request.Path };
+            await httpContext.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, authProps);
         }
 
         return response;
