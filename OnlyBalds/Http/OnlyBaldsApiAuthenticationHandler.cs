@@ -29,7 +29,8 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
         {
             _logger.LogWarning("Access token missing or expired. Triggering OIDC challenge...");
             
-            await httpContext.ChallengeAsync("OpenIdConnect");
+            var authProps = new AuthenticationProperties { RedirectUri = httpContext.Request.Path };
+            await httpContext.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, authProps);
 
             return new HttpResponseMessage(HttpStatusCode.Unauthorized);
         }
