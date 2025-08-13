@@ -29,7 +29,7 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
         {
             _logger.LogWarning("Access token missing or expired. Triggering OIDC challenge...");
             
-            var authProps = new AuthenticationProperties { RedirectUri = httpContext.Request.Path };
+            var authProps = new AuthenticationProperties { RedirectUri = "/" };
             await httpContext.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, authProps);
 
             return new HttpResponseMessage(HttpStatusCode.Unauthorized);
@@ -43,7 +43,7 @@ public class OnlyBaldsApiAuthenticationHandler : DelegatingHandler
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
             _logger.LogWarning("API returned 401. Triggering OIDC challenge to refresh token...");
-            var authProps = new AuthenticationProperties { RedirectUri = httpContext.Request.Path };
+            var authProps = new AuthenticationProperties { RedirectUri = "/" };
             await httpContext.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, authProps);
         }
 
