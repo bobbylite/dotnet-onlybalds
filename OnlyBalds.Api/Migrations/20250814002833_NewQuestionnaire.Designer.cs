@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OnlyBalds.Api.Data;
@@ -12,9 +13,11 @@ using OnlyBalds.Api.Data;
 namespace OnlyBalds.Api.Migrations
 {
     [DbContext(typeof(OnlyBaldsDataContext))]
-    partial class OnlyBaldsDataContextModelSnapshot : ModelSnapshot
+    [Migration("20250814002833_NewQuestionnaire")]
+    partial class NewQuestionnaire
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,13 +210,7 @@ namespace OnlyBalds.Api.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "productsUsed");
 
-                    b.Property<Guid>("QuestionnaireId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("QuestionnaireId")
-                        .IsUnique();
 
                     b.ToTable("QuestionnaireData");
 
@@ -234,6 +231,9 @@ namespace OnlyBalds.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "address");
+
+                    b.Property<Guid?>("DataId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -267,6 +267,8 @@ namespace OnlyBalds.Api.Migrations
 
                     b.HasIndex("AccountId")
                         .IsUnique();
+
+                    b.HasIndex("DataId");
 
                     b.ToTable("QuestionnaireItems");
                 });
@@ -322,15 +324,6 @@ namespace OnlyBalds.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OnlyBalds.Api.Models.QuestionnaireData", b =>
-                {
-                    b.HasOne("OnlyBalds.Api.Models.QuestionnaireItems", null)
-                        .WithOne("Data")
-                        .HasForeignKey("OnlyBalds.Api.Models.QuestionnaireData", "QuestionnaireId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("OnlyBalds.Api.Models.QuestionnaireItems", b =>
                 {
                     b.HasOne("OnlyBalds.Api.Models.Account", null)
@@ -338,6 +331,12 @@ namespace OnlyBalds.Api.Migrations
                         .HasForeignKey("OnlyBalds.Api.Models.QuestionnaireItems", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("OnlyBalds.Api.Models.QuestionnaireData", "Data")
+                        .WithMany()
+                        .HasForeignKey("DataId");
+
+                    b.Navigation("Data");
                 });
 
             modelBuilder.Entity("OnlyBalds.Api.Models.Account", b =>
@@ -350,11 +349,6 @@ namespace OnlyBalds.Api.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Favorites");
-                });
-
-            modelBuilder.Entity("OnlyBalds.Api.Models.QuestionnaireItems", b =>
-                {
-                    b.Navigation("Data");
                 });
 #pragma warning restore 612, 618
         }

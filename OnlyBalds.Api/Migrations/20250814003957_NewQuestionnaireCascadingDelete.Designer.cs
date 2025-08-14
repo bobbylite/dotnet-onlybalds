@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OnlyBalds.Api.Data;
@@ -12,9 +13,11 @@ using OnlyBalds.Api.Data;
 namespace OnlyBalds.Api.Migrations
 {
     [DbContext(typeof(OnlyBaldsDataContext))]
-    partial class OnlyBaldsDataContextModelSnapshot : ModelSnapshot
+    [Migration("20250814003957_NewQuestionnaireCascadingDelete")]
+    partial class NewQuestionnaireCascadingDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
