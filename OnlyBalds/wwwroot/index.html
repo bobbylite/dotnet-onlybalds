@@ -464,7 +464,11 @@
                 window.history.replaceState({}, document.title, newUrl);
             },
             loadComponent: (component, componentPlaceholder, queryKey, queryValue) => {
-                window.app.scripts.clearQueryParams();
+                if (component.includes('forum') === false)
+                {
+                    window.app.scripts.clearQueryParams();
+                }
+
                 emptyComponents();
                 $('.footer').hide();
 
