@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Extensions;
 using OnlyBalds.Api.Interfaces.Repositories;
@@ -69,7 +70,16 @@ public static class QuestionnaireEndpoints
 
         if (string.IsNullOrEmpty(questionnaireId) is not true)
         {
-            var questionnaire = questionnaireRepository.GetById(Guid.Parse(questionnaireId));
+            var questionnaire = questionnaireRepository
+                .GetDbSet()
+                .Include(q => q.Data)
+                .Where(q => q.Id == Guid.Parse(questionnaireId))
+                .SingleOrDefault();
+
+            if (questionnaire is null)
+            {
+                return Results.NotFound();
+            }
 
             if (questionnaire.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
             {
@@ -85,12 +95,13 @@ public static class QuestionnaireEndpoints
         if (isAuthorizedAdmin is false)
         {
             return Results.Ok(questionnaireRepository
-                .GetAll()
+                .GetDbSet()
+                .Include(q => q.Data)
                 .Where(a => a.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase))
                 .ToList());
         }
 
-        return Results.Ok(questionnaireRepository.GetAll());
+        return Results.Ok(questionnaireRepository.GetDbSet().Include(q => q.Data).ToList());
     }
 
     /// <summary>
@@ -101,14 +112,31 @@ public static class QuestionnaireEndpoints
     /// <returns><see cref="IResult"/></returns>
     public static async Task<IResult> CreateQuestionnaireAsync(
         [FromBody] QuestionnaireItems questionnaireItems,
-        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
+        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(questionnaireItems);
         ArgumentNullException.ThrowIfNull(questionnaireRepository);
 
-        if (questionnaireItems is null)
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
         {
-            return Results.BadRequest("Questionnaire items cannot be null.");
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (questionnaireItems.UserId != userId)
+        {
+            return Results.BadRequest("User ID does not match the authenticated user.");
+        }
+
+        if (string.IsNullOrEmpty(questionnaireItems.UserId))
+        {
+            questionnaireItems.UserId = userId;
         }
 
         if (questionnaireItems.Id == Guid.Empty)
@@ -116,54 +144,18 @@ public static class QuestionnaireEndpoints
             questionnaireItems.Id = Guid.NewGuid();
         }
 
-        if (questionnaireItems.Id == Guid.Empty)
-        {
-            questionnaireItems.Id = Guid.NewGuid();
-        }
-
-        if (questionnaireItems.Data?.Id == Guid.Empty)
+        if (questionnaireItems.Data != null && questionnaireItems.Data.Id == Guid.Empty)
         {
             questionnaireItems.Data.Id = Guid.NewGuid();
         }
 
-        foreach (var baldingOption in questionnaireItems.Data?.BaldingOptions!)
-        {
-            if (baldingOption.Id == Guid.Empty)
-            {
-                baldingOption.Id = Guid.NewGuid();
-            }
-
-            foreach (var option in baldingOption.Option!)
-            {
-                if (option.Id == Guid.Empty)
-                {
-                    option.Id = Guid.NewGuid();
-                }
-
-                foreach (var question in option.Questions!)
-                {
-                    if (question.Id == Guid.Empty)
-                    {
-                        question.Id = Guid.NewGuid();
-                    }
-                }
-            }
-        }
-
-        foreach (var question in questionnaireItems.Data?.Questions!)
-        {
-            if (question.Id == Guid.Empty)
-            {
-                question.Id = Guid.NewGuid();
-            }
-        }
-
-        questionnaireItems.StartDate = DateTime.UtcNow.ToUniversalTime();
+        questionnaireItems.StartDate = DateTime.UtcNow;
 
         await questionnaireRepository.Add(questionnaireItems);
 
         return Results.Created($"/Questionnaires/{questionnaireItems.Id}", questionnaireItems);
     }
+
 
     /// <summary>
     /// Deletes a questionnaire by its identifier.

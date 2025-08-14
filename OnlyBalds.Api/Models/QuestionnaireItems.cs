@@ -4,23 +4,47 @@ using System.Text.Json.Serialization;
 namespace OnlyBalds.Api.Models;
 
 /// <summary>
-/// Represents a questionnaire item for the balding website.
-/// This questionnaire is used to target specific products for users.
+/// Represents a questionnaire item.
 /// </summary>
 [Table("QuestionnaireItems")]
 public class QuestionnaireItems
 {
     /// <summary>
-    /// Gets or sets the unique identifier for the questionnaire item.
+    /// Unique identifier for the questionnaire item.
     /// </summary>
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the questionnaire is completed.
+    /// The first name of the user.
     /// </summary>
-    [JsonPropertyName("isCompleted")]
-    public bool IsCompleted { get; set; } = false;
+    [JsonPropertyName("firstName")]
+    public string FirstName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The last name of the user.
+    /// </summary>
+    [JsonPropertyName("lastName")]
+    public string LastName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The display name of the user.
+    /// </summary>
+    [JsonPropertyName("displayName")]
+    public string DisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the user identifier associated with the questionnaire.
+    /// </summary>
+    [JsonPropertyName("userId")]
+    public string UserId { get; set; } = string.Empty;
+
+
+    /// <summary>
+    /// The address of the user.
+    /// </summary>
+    [JsonPropertyName("address")]
+    public string Address { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the start date of the questionnaire.
@@ -29,16 +53,16 @@ public class QuestionnaireItems
     public DateTime StartDate { get; set; }
 
     /// <summary>
-    /// Gets or sets the data associated with the questionnaire.
+    /// Gets or sets a value indicating whether the questionnaire is completed.
+    /// </summary>
+    [JsonPropertyName("isCompleted")]
+    public bool IsCompleted { get; set; } = false;
+
+    /// <summary>
+    /// The data collected from the questionnaire.
     /// </summary>
     [JsonPropertyName("data")]
     public QuestionnaireData? Data { get; set; }
-
-    /// <summary>
-    /// Gets or sets the user identifier associated with the questionnaire.
-    /// /// </summary>
-    [JsonPropertyName("userId")]
-    public string UserId { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the account associated with the questionnaire.
@@ -47,90 +71,84 @@ public class QuestionnaireItems
 }
 
 /// <summary>
-/// Represents the data associated with a questionnaire.
+/// Represents the data collected from the questionnaire.
 /// </summary>
 public class QuestionnaireData
 {
     /// <summary>
-    /// Gets or sets the unique identifier for the item.
-    /// </summary>
-    [JsonPropertyName("id")]
-    public Guid Id { get; set; }
-    
-    /// <summary>
-    /// Gets or sets the list of questions in the questionnaire.
-    /// </summary>
-    [JsonPropertyName("questions")]
-    public IEnumerable<Question>? Questions { get; set; }
-
-    /// <summary>
-    /// Gets or sets the balding options available in the questionnaire.
-    /// </summary>
-    [JsonPropertyName("baldingOptions")]
-    public IEnumerable<BaldingOptions>? BaldingOptions { get; set; }
-}
-
-/// <summary>
-/// Represents a single question in the questionnaire.
-/// </summary>
-public class Question
-{
-    /// <summary>
-    /// Gets or sets the unique identifier for the item.
-    /// </summary>
-    public Guid Id { get; set; }
-
-    /// <summary>
-    /// Gets or sets the title of the question.
-    /// </summary>
-    [JsonPropertyName("title")]
-    public string Title { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the answer to the question.
-    /// </summary>
-    [JsonPropertyName("answer")]
-    public string Answer { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents the balding options available in the questionnaire.
-/// </summary>
-public class BaldingOptions
-{
-    /// <summary>
-    /// Gets or sets the unique identifier for the item.
+    /// Unique identifier for the questionnaire item.
     /// </summary>
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
 
     /// <summary>
-    /// Gets or sets the list of balding options.
+    /// Gets or sets the questionnaire identifier.
     /// </summary>
-    [JsonPropertyName("option")]
-    public IEnumerable<BaldingOption>? Option { get; set; }
-}
-
-/// <summary>
-/// Represents a single balding option in the questionnaire.
-/// </summary>
-public class BaldingOption
-{
-    /// <summary>
-    /// Gets or sets the unique identifier for the item.
-    /// </summary>
-    [JsonPropertyName("id")]
-    public Guid Id { get; set; }
+    public Guid QuestionnaireId { get; set; }
 
     /// <summary>
-    /// Gets or sets the title of the balding option.
+    /// The type of baldness the user identifies with.
     /// </summary>
-    [JsonPropertyName("baldingOptionTitle")]
-    public string BaldingOptionTitle { get; set; } = string.Empty;
+    [JsonPropertyName("baldType")]
+    public string BaldType { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the list of questions for the balding option.
+    /// The methods the user employs to clean their bald head.
     /// </summary>
-    [JsonPropertyName("questions")]
-    public IEnumerable<Question>? Questions { get; set; }
+    [JsonPropertyName("cleaningMethods")]
+    public List<string> CleaningMethods { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Additional cleaning methods the user employs.
+    /// </summary>
+    [JsonPropertyName("cleaningMethodsOther")]
+    public string? CleaningMethodsOther { get; set; }
+
+    /// <summary>
+    /// The user's bald care routine.
+    /// </summary>
+    [JsonPropertyName("baldCareRoutine")]
+    public string? BaldCareRoutine { get; set; }
+
+    /// <summary>
+    /// The products the user employs for bald care.
+    /// </summary>
+    [JsonPropertyName("productsUsed")]
+    public string? ProductsUsed { get; set; }
+
+    /// <summary>
+    /// The user's monthly spending on bald care products.
+    /// </summary>
+    [JsonPropertyName("monthlySpend")]
+    public string? MonthlySpend { get; set; }
+
+    /// <summary>
+    /// The user's confidence level regarding their baldness.
+    /// </summary>
+    [JsonPropertyName("confidenceLevel")]
+    public string? ConfidenceLevel { get; set; }
+
+    /// <summary>
+    /// The user's interests related to baldness.
+    /// </summary>
+    [JsonPropertyName("interests")]
+    public List<string> Interests { get; set; } = new List<string>();
+
+    /// <summary>
+    /// The user's goals related to baldness.
+    /// </summary>
+    [JsonPropertyName("goals")]
+    public List<string> Goals { get; set; } = new List<string>();
+
+    /// <summary>
+    /// Additional goals the user has related to baldness.
+    /// </summary>
+    [JsonPropertyName("goalsOther")]
+    public string? GoalsOther { get; set; }
+
+    /// <summary>
+    /// The user's new bald care routine.
+    /// </summary>
+    [JsonPropertyName("newRoutine")]
+    public string? NewRoutine { get; set; }
 }
