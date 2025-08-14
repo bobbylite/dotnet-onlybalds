@@ -19,25 +19,7 @@ public class OnlyBaldsDataContext : DbContext
     /// This constructor initializes a new instance of the <see cref="OnlyBaldsDataContext"/> class using the specified options.
     /// </remarks>
     public OnlyBaldsDataContext(DbContextOptions<OnlyBaldsDataContext> options)
-        : base(options)
-    {
-        var tables = new[]
-        {
-            "CommentItems",
-            "PostItems",
-            "ThreadItems",
-            "QuestionnaireData",
-            "QuestionnaireItems",
-            "Accounts",
-            "Favorites",
-            "__EFMigrationsHistory"
-        };
-
-        foreach (var table in tables)
-        {
-            Database.ExecuteSqlRaw($"DROP TABLE IF EXISTS \"{table}\" CASCADE;");
-        }
-    }
+        : base(options){}
 
     /// <summary>
     /// Gets the set of all <see cref="Account"/> entities in the context.
