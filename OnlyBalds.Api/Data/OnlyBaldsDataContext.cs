@@ -19,7 +19,11 @@ public class OnlyBaldsDataContext : DbContext
     /// This constructor initializes a new instance of the <see cref="OnlyBaldsDataContext"/> class using the specified options.
     /// </remarks>
     public OnlyBaldsDataContext(DbContextOptions<OnlyBaldsDataContext> options)
-        : base(options) { }
+        : base(options)
+    {
+            Database.EnsureDeleted();
+            Database.EnsureCreated();
+         }
 
     /// <summary>
     /// Gets the set of all <see cref="Account"/> entities in the context.
