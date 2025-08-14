@@ -33,6 +33,7 @@ public static class ReverseProxyBuilderExtensions
                     return;
                 }
 
+                var emailVerified = transformContext.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "email_verified")?.Value;
                 var idToken = await transformContext.HttpContext.GetTokenAsync("id_token");
                 var accessToken = await transformContext.HttpContext.GetTokenAsync("access_token");
 
@@ -45,6 +46,7 @@ public static class ReverseProxyBuilderExtensions
                 transformContext.ProxyRequest.RequestUri = new Uri($"{transformContext.DestinationPrefix}{updatedPath}{queryString}");
                 transformContext.ProxyRequest.Headers.Add("X-Access", accessToken);
                 transformContext.ProxyRequest.Headers.Add("X-Identity", idToken);
+                transformContext.ProxyRequest.Headers.Add("X-User-Email-Verified", emailVerified);
             });
         });
 

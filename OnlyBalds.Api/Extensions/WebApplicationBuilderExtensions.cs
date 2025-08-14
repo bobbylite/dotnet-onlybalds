@@ -102,14 +102,24 @@ public static class WebApplicationBuilderExtensions
 
         webApplicationBuilder.Services
             .AddAuthentication()
+            
             .AddJwtBearer();
 
         webApplicationBuilder.Services.AddAuthorization(o =>
         {
             o.AddPolicy(AuthorizationPolicies.UserAccess, p =>
-                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.UserAccess));
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.UserAccess)
+                .RequireAssertion(context =>
+                    context.User.HasClaim(c => 
+                        c.Type == AuthorizationClaims.EmailVerified && 
+                        c.Value.Equals(AuthorizationPermissions.EmailIsVerified, StringComparison.OrdinalIgnoreCase))));
+
             o.AddPolicy(AuthorizationPolicies.AdminAccess, p =>
-                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.AdminAccess));
+                p.RequireClaim(AuthorizationClaims.Permissions, AuthorizationPermissions.AdminAccess)
+                .RequireAssertion(context =>
+                    context.User.HasClaim(c => 
+                        c.Type == AuthorizationClaims.EmailVerified && 
+                        c.Value.Equals(AuthorizationPermissions.EmailIsVerified, StringComparison.OrdinalIgnoreCase))));
         });
 
         webApplicationBuilder.Services.AddHttpContextAccessor();
@@ -168,6 +178,7 @@ public static class WebApplicationBuilderExtensions
         webApplicationBuilder.Services.AddScoped<IHomeRepository, HomeRepository>();
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<ThreadItem>, OnlyBaldsRepository<ThreadItem>>();
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<PostItem>, OnlyBaldsRepository<PostItem>>();
+        webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<Favorite>, OnlyBaldsRepository<Favorite>>();
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<CommentItem>, OnlyBaldsRepository<CommentItem>>();
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<QuestionnaireItems>, OnlyBaldsRepository<QuestionnaireItems>>();
         webApplicationBuilder.Services.AddScoped<IOnlyBaldsRepository<Account>, OnlyBaldsRepository<Account>>();

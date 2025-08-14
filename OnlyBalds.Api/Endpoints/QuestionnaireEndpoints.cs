@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using OnlyBalds.Api.Constants;
+using OnlyBalds.Api.Extensions;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 
@@ -17,13 +20,8 @@ public static class QuestionnaireEndpoints
     /// <returns></returns>
     public static IEndpointRouteBuilder MapQuestionnaireEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/questionnaire", GetQuestionnaires)
-            .WithName(nameof(GetQuestionnaires))
-            .WithOpenApi()
-            .RequireAuthorization(AuthorizationPolicies.UserAccess);
-
-        app.MapGet("/questionnaire/{id}", GetQuestionnaireById)
-            .WithName(nameof(GetQuestionnaireById))
+        app.MapGet("/questionnaire", GetQuestionnairesAsync)
+            .WithName(nameof(GetQuestionnairesAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
@@ -32,12 +30,7 @@ public static class QuestionnaireEndpoints
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapPut("/questionnaire/{id}", UpdateQuestionnaireAsync)
-            .WithName(nameof(UpdateQuestionnaireAsync))
-            .WithOpenApi()
-            .RequireAuthorization(AuthorizationPolicies.UserAccess);
-
-        app.MapDelete("/questionnaire/{id}", DeleteQuestionnaireAsync)
+        app.MapDelete("/questionnaire", DeleteQuestionnaireAsync)
             .WithName(nameof(DeleteQuestionnaireAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
@@ -46,34 +39,69 @@ public static class QuestionnaireEndpoints
     }
 
     /// <summary>
-    /// Retrieves all questionnaire from the repository.
+    /// Retrieves all questionnaires from the repository.
     /// </summary>
     /// <param name="questionnaireRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetQuestionnaires([FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
+    public static async Task<IResult> GetQuestionnairesAsync(
+        string? questionnaireId,
+        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(questionnaireRepository);
 
-        var questionnaires = questionnaireRepository.GetAll();
-        ArgumentNullException.ThrowIfNull(questionnaires);
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
 
-        return Results.Ok(questionnaires);
-    }
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
 
-    /// <summary>
-    /// Retrieves a specific questionnaire by its identifier.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="questionnaireRepository"></param>
-    /// <returns><see cref="IResult"/></returns>
-    public static IResult GetQuestionnaireById(Guid id, [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
-    {
-        ArgumentNullException.ThrowIfNull(questionnaireRepository);
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
 
-        var questionnaire = questionnaireRepository.GetById(id);
-        ArgumentNullException.ThrowIfNull(questionnaire);
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
 
-        return Results.Ok(questionnaire);
+        if (string.IsNullOrEmpty(questionnaireId) is not true)
+        {
+            var questionnaire = questionnaireRepository
+                .GetDbSet()
+                .Include(q => q.Data)
+                .Where(q => q.Id == Guid.Parse(questionnaireId))
+                .SingleOrDefault();
+
+            if (questionnaire is null)
+            {
+                return Results.NotFound();
+            }
+
+            if (questionnaire.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+            {
+                if (isAuthorizedAdmin is false)
+                {
+                    return Results.Unauthorized();
+                }
+            }
+
+            return Results.Ok(questionnaire);
+        }
+
+        if (isAuthorizedAdmin is false)
+        {
+            return Results.Ok(questionnaireRepository
+                .GetDbSet()
+                .Include(q => q.Data)
+                .Where(a => a.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase))
+                .ToList());
+        }
+
+        return Results.Ok(questionnaireRepository.GetDbSet().Include(q => q.Data).ToList());
     }
 
     /// <summary>
@@ -84,84 +112,50 @@ public static class QuestionnaireEndpoints
     /// <returns><see cref="IResult"/></returns>
     public static async Task<IResult> CreateQuestionnaireAsync(
         [FromBody] QuestionnaireItems questionnaireItems,
-        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
+        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(questionnaireItems);
         ArgumentNullException.ThrowIfNull(questionnaireRepository);
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (questionnaireItems.UserId != userId)
+        {
+            return Results.BadRequest("User ID does not match the authenticated user.");
+        }
+
+        if (string.IsNullOrEmpty(questionnaireItems.UserId))
+        {
+            questionnaireItems.UserId = userId;
+        }
 
         if (questionnaireItems.Id == Guid.Empty)
         {
             questionnaireItems.Id = Guid.NewGuid();
         }
 
-        if (questionnaireItems.Data?.Id == Guid.Empty)
+        if (questionnaireItems.Data != null && questionnaireItems.Data.Id == Guid.Empty)
         {
             questionnaireItems.Data.Id = Guid.NewGuid();
         }
 
-        foreach(var baldingOption in questionnaireItems.Data?.BaldingOptions!)
-        {
-            if (baldingOption.Id == Guid.Empty)
-            {
-                baldingOption.Id = Guid.NewGuid();
-            }
-
-            foreach(var option in baldingOption.Option!)
-            {
-                if (option.Id == Guid.Empty)
-                {
-                    option.Id = Guid.NewGuid();
-                }
-
-                foreach(var question in option.Questions!)
-                {
-                    if (question.Id == Guid.Empty)
-                    {
-                        question.Id = Guid.NewGuid();
-                    }
-                }
-            }
-        }
-
-        foreach(var question in questionnaireItems.Data?.Questions!)
-        {
-            if (question.Id == Guid.Empty)
-            {
-                question.Id = Guid.NewGuid();
-            }
-        }
-
-        questionnaireItems.StartDate = DateTime.UtcNow.ToUniversalTime();
+        questionnaireItems.StartDate = DateTime.UtcNow;
 
         await questionnaireRepository.Add(questionnaireItems);
 
         return Results.Created($"/Questionnaires/{questionnaireItems.Id}", questionnaireItems);
     }
 
-    /// <summary>
-    /// Updates an existing questionnaire with new data.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="questionnaireItems"></param>
-    /// <param name="questionnaireRepository"></param>
-    /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdateQuestionnaireAsync(Guid id, 
-        [FromBody] QuestionnaireItems questionnaireItems,
-        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
-    {
-        ArgumentNullException.ThrowIfNull(id);
-        ArgumentNullException.ThrowIfNull(questionnaireItems);
-        ArgumentNullException.ThrowIfNull(questionnaireRepository);
-
-        var questionnaire = questionnaireRepository.GetById(id);
-        ArgumentNullException.ThrowIfNull(questionnaire);
-
-        questionnaire.Data = questionnaireItems.Data;
-
-        await questionnaireRepository.UpdateById(id);
-
-        return Results.NoContent();
-    }
 
     /// <summary>
     /// Deletes a questionnaire by its identifier.
@@ -169,11 +163,47 @@ public static class QuestionnaireEndpoints
     /// <param name="id"></param>
     /// <param name="questionnaireRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeleteQuestionnaireAsync(Guid id,
-        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository)
+    public static async Task<IResult> DeleteQuestionnaireAsync(
+        string? questionnaireId,
+        [FromServices] IOnlyBaldsRepository<QuestionnaireItems> questionnaireRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(questionnaireRepository);
+
+        if (string.IsNullOrEmpty(questionnaireId))
+        {
+            return Results.BadRequest("Questionnaire ID cannot be empty.");
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (string.IsNullOrEmpty(userId) || isAuthorized is false)
+        {
+            return Results.Unauthorized();
+        }
+
+        var id = Guid.Parse(questionnaireId);
+        var questionnaire = questionnaireRepository.GetById(id);
+        ArgumentNullException.ThrowIfNull(questionnaire);
+
+        if (questionnaire.UserId.Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+        {
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
+        }
 
         await questionnaireRepository.DeleteById(id);
 

@@ -1,5 +1,15 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Mime;
+using System.Security.Claims;
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using OnlyBalds.Models;
 
 namespace OnlyBalds.Endpoints;
@@ -19,10 +29,86 @@ public static class IdentityEndpoints
         ArgumentNullException.ThrowIfNull(endpoints);
 
         endpoints
-        .MapGet("/identity-information", GetIdentityInformation)
-        .RequireAuthorization();
+            .MapGet("/identity-information", GetIdentityInformation)
+            .RequireAuthorization();
+
+        endpoints
+            .MapGet("/refresh-token", RefreshToken)
+            .RequireAuthorization();
 
         return endpoints;
+    }
+
+    private static async Task RefreshToken(
+        HttpContext context,
+        [FromServices] IOptionsMonitor<OpenIdConnectOptions> openIdConnectOptionsMonitor
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor);
+
+        var oidcOptions = openIdConnectOptionsMonitor.Get(OpenIdConnectDefaults.AuthenticationScheme);
+        var authResult = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        ArgumentNullException.ThrowIfNull(authResult?.Properties);
+
+        var refreshToken = await context.GetTokenAsync("refresh_token");
+
+        var parameters = new Dictionary<string, string>
+        {
+            { "grant_type", OpenIdConnectGrantTypes.RefreshToken },
+            { "refresh_token", refreshToken! },
+            { "client_id", oidcOptions.ClientId ?? string.Empty },
+            { "client_secret", oidcOptions.ClientSecret ?? string.Empty }
+        };
+
+        var tokenEndpoint = $"{oidcOptions.Authority}/oauth/token";
+        var request = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint)
+        {
+            Content = new FormUrlEncodedContent(parameters)
+        };
+
+        var httpClient = new HttpClient();
+        var response = await httpClient.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode)
+        {
+            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(content);
+
+            ArgumentNullException.ThrowIfNull(tokenResponse?.AccessToken);
+            ArgumentNullException.ThrowIfNull(tokenResponse?.RefreshToken);
+            ArgumentNullException.ThrowIfNull(tokenResponse?.IdToken);
+
+            authResult.Properties.UpdateTokenValue("access_token", tokenResponse.AccessToken);
+            authResult.Properties.UpdateTokenValue("refresh_token", tokenResponse.RefreshToken);
+            authResult.Properties.UpdateTokenValue("id_token", tokenResponse.IdToken);
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(tokenResponse.IdToken);
+
+            var newClaims = jwtToken.Claims.ToList();
+
+            var newIdentity = new ClaimsIdentity(newClaims, CookieAuthenticationDefaults.AuthenticationScheme, "name", "role");
+            var newPrincipal = new ClaimsPrincipal(newIdentity);
+
+            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, newPrincipal, authResult.Properties);
+
+            context.User = newPrincipal;
+        }
+
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+        var user = context.User;
+        var claims = user.Claims
+            .ToDictionary(claim => claim.Type, claim => claim.Value);
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            IsAuthenticated = user.Identity?.IsAuthenticated,
+            Name = user.Identity?.Name,
+            Claims = claims,
+            refreshed = true 
+        });
     }
 
     private static async Task GetIdentityInformation(
@@ -51,10 +137,10 @@ public static class IdentityEndpoints
 
         var httpClient = httpClientFactory.CreateClient(HttpClientNames.OnlyBalds);
         var subject = context.User?.FindFirst("sub")?.Value;
-        var accountsResponse = await httpClient.GetAsync($"account?id={Uri.EscapeDataString(subject!)}");
+        var accountsResponse = await httpClient.GetAsync($"accounts?userId={Uri.EscapeDataString(subject!)}");
         AccountItem? account = null;
 
-        if (accountsResponse.StatusCode is HttpStatusCode.NotFound || 
+        if (accountsResponse.StatusCode is HttpStatusCode.NotFound ||
             accountsResponse.StatusCode is HttpStatusCode.NoContent ||
             accountsResponse.StatusCode is HttpStatusCode.Unauthorized ||
             accountsResponse.StatusCode is HttpStatusCode.Forbidden)

@@ -1,12 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
 using OnlyBalds.Api.Constants;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
+using OnlyBalds.Api.Extensions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 
 namespace OnlyBalds.Api.Endpoints;
 
@@ -50,7 +48,7 @@ public static class PostsEndpoints
     /// </summary>
     /// <param name="postsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetPosts(
+    public static async Task<IResult> GetPosts(
         string? postId,
         string? threadId,
         [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
@@ -59,7 +57,12 @@ public static class PostsEndpoints
 
         if (string.IsNullOrEmpty(postId) is not true)
         {
-            var post = postsRepository.GetById(Guid.Parse(postId));
+            var post = await postsRepository
+                .GetDbSet()
+                .Include(p => p.Favorites)
+                .Include(p => p.Comments)
+                .Where(p => p.Id == Guid.Parse(postId))
+                .SingleOrDefaultAsync();
 
             ArgumentNullException.ThrowIfNull(post);
 
@@ -68,17 +71,25 @@ public static class PostsEndpoints
 
         if (string.IsNullOrEmpty(threadId) is not true)
         {
-            var posts = postsRepository
-                .GetAll()
+            var posts = await postsRepository
+                .GetDbSet()
+                .Include(p => p.Favorites)
+                .Include(p => p.Comments)
                 .Where(c => c.ThreadId == Guid.Parse(threadId))
-                .ToList();
+                .ToListAsync();
 
             ArgumentNullException.ThrowIfNull(posts);
 
             return Results.Ok(posts);
         }
 
-        return Results.BadRequest("Post ID and Thread ID cannot be null or empty.");
+        var allPosts = await postsRepository
+            .GetDbSet()
+            .Include(p => p.Favorites)
+            .Include(p => p.Comments)
+            .ToListAsync();
+
+        return Results.Ok(allPosts);
     }
 
     /// <summary>
@@ -103,7 +114,7 @@ public static class PostsEndpoints
 
         await postsRepository.Add(postItem);
 
-        return Results.Created($"/threads/{postItem.Id}", postItem);
+        return Results.Created($"/posts?postId={postItem.Id}", postItem);
     }
 
     /// <summary>
@@ -116,26 +127,52 @@ public static class PostsEndpoints
     public static async Task<IResult> PatchPostAsync(
         string? postId,
         [FromBody] PostItem postItem,
-        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository)
+        [FromServices] IOnlyBaldsRepository<PostItem> postsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(postId);
         ArgumentNullException.ThrowIfNull(postItem);
         ArgumentNullException.ThrowIfNull(postsRepository);
 
-        if (string.IsNullOrEmpty(postId) is not true)
+        if (string.IsNullOrEmpty(postId))
         {
-            var post = postsRepository.GetById(Guid.Parse(postId));
-            ArgumentNullException.ThrowIfNull(post);
-
-            post.Title = string.IsNullOrEmpty(postItem.Title) ? post.Title : postItem.Title;
-            post.Content = string.IsNullOrEmpty(postItem.Content) ? post.Content : postItem.Content;
-
-            await postsRepository.UpdateById(Guid.Parse(postId));
-
-            return Results.NoContent();
+            return Results.BadRequest("Post ID cannot be null or empty.");
         }
 
-        return Results.BadRequest("Post ID cannot be null or empty.");
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var post = postsRepository.GetById(Guid.Parse(postId));
+        ArgumentNullException.ThrowIfNull(post);
+
+        if (post.UserId.ToString().Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
+        {
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
+        }
+
+        post.Title = string.IsNullOrEmpty(postItem.Title) ? post.Title : postItem.Title;
+        post.Content = string.IsNullOrEmpty(postItem.Content) ? post.Content : postItem.Content;
+
+        await postsRepository.UpdateById(Guid.Parse(postId));
+
+        return Results.NoContent();
     }
 
     /// <summary>
@@ -146,158 +183,49 @@ public static class PostsEndpoints
     public static async Task<IResult> DeletePostAsync(
         string? postId,
         [FromServices] IOnlyBaldsRepository<PostItem> postsRepository,
-        [FromServices] IOnlyBaldsRepository<CommentItem> commentsRepository,
         [FromServices] IHttpContextAccessor httpContextAccessor)
     {
         ArgumentNullException.ThrowIfNull(postsRepository);
-        ArgumentNullException.ThrowIfNull(commentsRepository);
         ArgumentNullException.ThrowIfNull(httpContextAccessor);
 
-        var accessJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Access"].FirstOrDefault();
-        var identityJwt = httpContextAccessor.HttpContext?.Request.Headers["X-Identity"].FirstOrDefault();
-
-        if (string.IsNullOrEmpty(accessJwt) ||
-            string.IsNullOrEmpty(identityJwt))
+        if (string.IsNullOrEmpty(postId))
         {
-            return Results.Unauthorized();
+            return Results.BadRequest("Post ID cannot be null or empty.");
         }
 
-        if (string.IsNullOrEmpty(postId) is not true)
-        {
-            var id = Guid.Parse(postId);
-            var post = postsRepository.GetById(id);
-            ArgumentNullException.ThrowIfNull(post);
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
 
-            var isAdmin = await IsAuthorizedAdminAsync(accessJwt);
-            if (isAdmin is true)
-            {
-                await postsRepository.DeleteById(id);
-
-                var comments = commentsRepository
-                    .GetAll()
-                    .Where(c => c.PostId == id)
-                    .ToList();
-
-                foreach (var comment in comments)
-                {
-                    await commentsRepository.DeleteById(comment.Id);
-                }
-
-                return Results.NoContent();
-            }
-
-            var userId = await GetUserIdAsync(accessJwt);
-            if (post.UserId.Equals(userId, StringComparison.InvariantCulture) is true)
-            {
-                await postsRepository.DeleteById(id);
-
-                var comments = commentsRepository
-                    .GetAll()
-                    .Where(c => c.PostId == id)
-                    .ToList();
-
-                foreach (var comment in comments)
-                {
-                    await commentsRepository.DeleteById(comment.Id);
-                }
-
-                return Results.NoContent();
-            }
-
-            return Results.Unauthorized();
-        }
-
-        return Results.BadRequest("Post ID cannot be null or empty.");
-    }
-
-    private static async Task<bool> IsAuthorizedAdminAsync(string? accessToken)
-    {
+        var accessToken = await httpContext.GetTokenAsync("access_token");
         if (string.IsNullOrEmpty(accessToken))
         {
-            return false;
+            return Results.BadRequest("Could not retrieve access token.");
         }
 
-        var issuer = "https://onlybalds.us.auth0.com/";
-        var audience = "https://OnlyBaldsBackendForFrontendsApi";
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
 
-        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-            $"{issuer}.well-known/openid-configuration",
-            new OpenIdConnectConfigurationRetriever()
-        );
-
-        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
-
-        var validationParameters = new TokenValidationParameters
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
         {
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKeys = config.SigningKeys,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-
-        try
-        {
-            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
-
-            var permissions = principal.Claims
-                .Where(c => c.Type == "permissions")
-                .Select(c => c.Value)
-                .ToList();
-
-            var scope = principal.FindFirst("scope")?.Value ?? string.Empty;
-
-            return permissions.Contains(AuthorizationPolicies.AdminAccess) &&
-                scope.Contains(AuthorizationPolicies.AdminAccess);
+            return Results.Unauthorized();
         }
-        catch (SecurityTokenException ex)
+
+        var id = Guid.Parse(postId);
+        var post = postsRepository.GetById(id);
+        ArgumentNullException.ThrowIfNull(post);
+
+
+        if (post.UserId.ToString().Equals(userId, StringComparison.OrdinalIgnoreCase) is false)
         {
-            Console.WriteLine($"Token validation failed: {ex.Message}");
-            return false;
+            if (isAuthorizedAdmin is false)
+            {
+                return Results.Unauthorized();
+            }
         }
-    }
 
-    private static async Task<string> GetUserIdAsync(string accessToken)
-    {
-        var issuer = "https://onlybalds.us.auth0.com/";
-        var audience = "https://OnlyBaldsBackendForFrontendsApi";
+        await postsRepository.DeleteById(id);
 
-        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-            $"{issuer}.well-known/openid-configuration",
-            new OpenIdConnectConfigurationRetriever()
-        );
-
-        var config = await configurationManager.GetConfigurationAsync(CancellationToken.None);
-
-        var validationParameters = new TokenValidationParameters
-        {
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKeys = config.SigningKeys,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-
-        try
-        {
-            var principal = handler.ValidateToken(accessToken, validationParameters, out var validatedToken);
-
-            var userId = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            return userId ?? string.Empty;
-        }
-        catch (SecurityTokenException ex)
-        {
-            Console.WriteLine($"Token validation failed: {ex.Message}");
-            return string.Empty;
-        }
+        return Results.NoContent();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using OnlyBalds.Services;
 using OnlyBalds.Services.WebState;
@@ -8,6 +9,7 @@ namespace OnlyBalds.Hubs;
 /// <summary>
 /// Represents a SignalR hub for global chat features.
 /// </summary>
+[Authorize]
 public class ChatHub : Hub
 {
     
@@ -100,10 +102,18 @@ public class ChatHub : Hub
     public override async Task OnConnectedAsync()
     {
         var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+        var emailVerified = Context?.User?.Claims.FirstOrDefault(c => c.Type == "email_verified")?.Value;
+        var isEmailVerified = !string.IsNullOrEmpty(emailVerified) && bool.Parse(emailVerified);
 
         if (string.IsNullOrEmpty(username))
         {
             _logger.LogWarning("User connected without a valid identity.");
+            return;
+        }
+
+        if (isEmailVerified is false)
+        {
+            _logger.LogWarning("User connected without a verified email.");
             return;
         }
 

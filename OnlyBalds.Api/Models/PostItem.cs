@@ -51,4 +51,38 @@ public class PostItem
     /// Gets or sets the unique identifier for the thread the post belongs to.
     /// </summary>
     public Guid ThreadId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of users who favorited the post.
+    /// </summary>
+    public IEnumerable<Favorite>? Favorites { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of comments on the post.
+    /// </summary>
+    public IEnumerable<CommentItem>? Comments { get; set; }
+}
+
+[Table("Favorites")]
+public class Favorite
+{
+    /// <summary>
+    /// Gets or sets the unique identifier for the favorite.
+    /// </summary>
+    public Guid Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the unique identifier for the user who favorited the post.
+    /// </summary>
+    public string UserId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the unique identifier for the post that was favorited.
+    /// </summary>
+    public Guid PostId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time the post was favorited.
+    /// </summary>
+    public DateTime FavoritedOn { get; set; }
 }

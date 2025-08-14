@@ -1,12 +1,14 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using OnlyBalds.Api.Constants;
+using OnlyBalds.Api.Extensions;
 using OnlyBalds.Api.Interfaces.Repositories;
 using OnlyBalds.Api.Models;
 
 namespace OnlyBalds.Api.Endpoints;
 
 /// <summary>
-/// Represents the endpoints for the threads api.
+/// Endpoints for the threads api.
 /// </summary>
 public static class ThreadsEndpoints
 {
@@ -22,22 +24,17 @@ public static class ThreadsEndpoints
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapGet("/threads/{id}", GetThreadById)
-            .WithName(nameof(GetThreadById))
-            .WithOpenApi()
-            .RequireAuthorization(AuthorizationPolicies.UserAccess);
-
         app.MapPost("/threads", CreateThreadAsync)
             .WithName(nameof(CreateThreadAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapPut("/threads/{id}", UpdateThreadAsync)
-            .WithName(nameof(UpdateThreadAsync))
+        app.MapPatch("/threads", PatchThreadAsync)
+            .WithName(nameof(PatchThreadAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
 
-        app.MapDelete("/threads/{id}", DeleteThreadAsync)
+        app.MapDelete("/threads", DeleteThreadAsync)
             .WithName(nameof(DeleteThreadAsync))
             .WithOpenApi()
             .RequireAuthorization(AuthorizationPolicies.UserAccess);
@@ -50,30 +47,20 @@ public static class ThreadsEndpoints
     /// </summary>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static IResult GetThreads([FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
+    public static IResult GetThreads(
+        string? threadId,
+        [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
     {
         ArgumentNullException.ThrowIfNull(threadsRepository);
 
-        var threads = threadsRepository.GetAll();
-        ArgumentNullException.ThrowIfNull(threads);
+        if (string.IsNullOrEmpty(threadId) is not true)
+        {
+            var thread = threadsRepository.GetById(Guid.Parse(threadId));
 
-        return Results.Ok(threads);
-    }
+            return Results.Ok(thread);
+        }
 
-    /// <summary>
-    /// Retrieves a specific thread by its identifier.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="threadsRepository"></param>
-    /// <returns><see cref="IResult"/></returns>
-    public static IResult GetThreadById(Guid id, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
-    {
-        ArgumentNullException.ThrowIfNull(threadsRepository);
-
-        var thread = threadsRepository.GetById(id);
-        ArgumentNullException.ThrowIfNull(thread);
-
-        return Results.Ok(thread);
+        return Results.Ok(threadsRepository.GetAll());
     }
 
     /// <summary>
@@ -82,7 +69,9 @@ public static class ThreadsEndpoints
     /// <param name="threadItem"></param>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> CreateThreadAsync([FromBody] ThreadItem threadItem, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
+    public static async Task<IResult> CreateThreadAsync(
+        [FromBody] ThreadItem threadItem,
+        [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
     {
         ArgumentNullException.ThrowIfNull(threadItem);
         ArgumentNullException.ThrowIfNull(threadsRepository);
@@ -106,35 +95,99 @@ public static class ThreadsEndpoints
     /// <param name="threadItem"></param>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> UpdateThreadAsync(Guid id, [FromBody] ThreadItem threadItem, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
+    public static async Task<IResult> PatchThreadAsync(
+        string? threadId,
+        [FromBody] ThreadItem threadItem,
+        [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(threadItem);
         ArgumentNullException.ThrowIfNull(threadsRepository);
 
-        var thread = threadsRepository.GetById(id);
+        if (string.IsNullOrEmpty(threadId))
+        {
+            return Results.BadRequest("Thread ID cannot be null or empty.");
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (isAuthorized is false || string.IsNullOrEmpty(userId))
+        {
+            return Results.Unauthorized();
+        }
+
+        var thread = threadsRepository.GetById(Guid.Parse(threadId));
         ArgumentNullException.ThrowIfNull(thread);
 
-        thread.Title = threadItem.Title;
-        thread.PostsCount = threadItem.PostsCount;
-        thread.Summary = threadItem.Summary;
-        thread.Creator = threadItem.Creator;
+        if (isAuthorizedAdmin is false)
+        {
+            return Results.Unauthorized();
+        }
 
-        await threadsRepository.UpdateById(id);
+        thread.Summary = string.IsNullOrEmpty(threadItem.Summary) ? thread.Summary : threadItem.Summary;
+        thread.Title = string.IsNullOrEmpty(threadItem.Title) ? thread.Title : threadItem.Title;
+        thread.PostsCount = threadItem.PostsCount > 0 ? threadItem.PostsCount : thread.PostsCount;
+
+        await threadsRepository.UpdateById(Guid.Parse(threadId));
 
         return Results.NoContent();
     }
 
     /// <summary>
-    /// Deletes a thread by its identifier.
+    /// Deletes thread by thread id from the repository.
     /// </summary>
-    /// <param name="id"></param>
     /// <param name="threadsRepository"></param>
     /// <returns><see cref="IResult"/></returns>
-    public static async Task<IResult> DeleteThreadAsync(Guid id, [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository)
+    public static async Task<IResult> DeleteThreadAsync(
+        string? threadId,
+        [FromServices] IOnlyBaldsRepository<ThreadItem> threadsRepository,
+        [FromServices] IHttpContextAccessor httpContextAccessor)
     {
-        ArgumentNullException.ThrowIfNull(id);
         ArgumentNullException.ThrowIfNull(threadsRepository);
+        ArgumentNullException.ThrowIfNull(httpContextAccessor);
+
+        if (string.IsNullOrEmpty(threadId))
+        {
+            return Results.BadRequest("Thread ID cannot be null or empty.");
+        }
+
+        var httpContext = httpContextAccessor.HttpContext;
+        ArgumentNullException.ThrowIfNull(httpContext);
+
+        var accessToken = await httpContext.GetTokenAsync("access_token");
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            return Results.BadRequest("Could not retrieve access token.");
+        }
+
+        var isAuthorized = await httpContext.IsAuthorizedUserAsync(accessToken);
+        var isAuthorizedAdmin = await httpContext.IsAuthorizedAdminAsync(accessToken);
+        var userId = await httpContext.GetUserIdAsync(accessToken);
+
+        if (string.IsNullOrEmpty(userId) || isAuthorized is false)
+        {
+            return Results.Unauthorized();
+        }
+
+        var id = Guid.Parse(threadId);
+        var thread = threadsRepository.GetById(id);
+        ArgumentNullException.ThrowIfNull(thread);
+
+        if (isAuthorizedAdmin is false)
+        {
+            return Results.Unauthorized();
+        }
 
         await threadsRepository.DeleteById(id);
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="background-color: white;">
+<html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -64,6 +64,41 @@
             pointer-events: auto;
             cursor: pointer;
         }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content.loading-popup {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        .spinner {
+            margin: 0 auto 15px auto;
+            width: 48px;
+            height: 48px;
+            border: 5px solid #ddd;
+            border-top-color: #007bff; /* Blue spinner */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+        to { transform: rotate(360deg); }
+        }
     </style>
 
 </head>
@@ -108,7 +143,7 @@
             </a>
             <ul id="menu-options" class="dropdown__nav dropdown__nav--user">
                 <li class="dropdown__item dropdown__item--title greeting"></li>
-                <li class="dropdown__item">
+                <li class="dropdown__item complete-signup">
                     <button class="dropdown__link dropdown__link--icon finish-signup" style="width: 100%;">
                         <i class="fa fa-edit"></i> 
                         Complete Signup
@@ -133,15 +168,14 @@
 		</div>
 	</div><!--/comment -->
 
-    <div id="about-placeholder"></div>
-    <div id="home-placeholder"></div>
-    <div id="forum-placeholder"></div>
-    <div id="new-post-placeholder"></div>
-    <div id="read-post-placeholder"></div>
-    <div id="chat-room-placeholder"></div>
-    <div id="marketplace-placeholder"></div>
-    <div id="finish-signup-placeholder"></div>
-    <div id="unauthorized-placeholder"></div>
+    <div id="component-placeholder" style="background-color: white;">
+        <div id="spinner-holder" class="box__holder" style="margin-top:100px; margin-bottom: 500px; height:auto; min-height: 400px;">
+            <div class="flex-center">
+                <div class="spinner-border" role="status" aria-label="Loading"></div>
+            </div>
+        </div>
+    </div>
+
 	<div class="footer" style="display: none;">
         <div class="container">
             <div class="footer__buttons">
@@ -156,6 +190,17 @@
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
+    <!-- MODAL OVERLAY -->
+    <div id="loading-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content loading-popup">
+        <div class="spinner"></div>
+        <div class="loading-text">Verifying identity information...</div>
+    </div>
+    </div>
+
+
+    <div id="custom-toast" class="custom-toast">You can only perform that action on your own post</div>
+
     <script src="/assets/scripts/App-5379555225.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -165,12 +210,83 @@
         var user = {};
 
         $(() => {
+            var urlParams = new URLSearchParams(window.location.search);
+            var message = urlParams.get('message');
+            var success = urlParams.get('success');
+
+            if (message && success) {
+                if (success === "true") {
+                    $("#loading-modal").fadeIn();
+                    $('#spinner-holder').remove();
+                    
+                    $.ajax({
+                        url: '/refresh-token',
+                        method: 'GET',
+                        success: function(data) {
+                            console.log('Token refreshed:', data);
+
+                            var user = data;
+                            var account = data.account;
+                            window.loggedInUser = user;
+
+                            $(".sign-in").remove();
+                            $(".greeting").empty().append(`Hi, ${user.name}`);
+                            $("#menu-options").append(`
+                                <li class="dropdown__item sign-out">
+                                    <a href="/auth/logout" class="dropdown__link dropdown__link--icon">
+                                        <i class="fa fa-sign-out"></i> 
+                                        Sign Out
+                                    </a>
+                                </li>
+                            `);
+                            
+                            window.app.scripts.showToast(message);
+                            $("#loading-modal").fadeOut();
+
+                            if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
+                                //window.app.scripts.loadFinishSignUp();
+                                window.location.href = '/auth/login';
+                                return;
+                            }
+
+                            if (user.claims.email_verified === "false") {
+                                console.log("Email not verified, redirecting to verify page.");
+                                window.app.scripts.loadVerify();
+                                return;
+                            }
+
+                            if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
+                                window.app.scripts.loadFinishSignUp();
+                                return;
+                            }
+
+                            if (account.hasSubmittedQuestionnaire !== true) {
+                                window.app.scripts.loadFinishSignUp();
+                                return;
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Failed to refresh token:', error);
+                        }
+                    });
+                } else {
+                    window.app.scripts.showToast("Error: " + message);
+                }
+            }
+            else {
+                bootstrapPage();
+            }
+        });
+
+        const bootstrapPage = () => {
             $.ajax({
                 url: "/identity-information",
                 method: "GET",
                 success: function (data) {
                     user = data;
+
                     let userName = user.name;
+                    console.log("User data:", user);
                     console.log("User name:", userName);
                     $(".sign-in").remove();
                     $(".greeting").empty().append(`Hi, ${userName}`);
@@ -185,39 +301,60 @@
 
                     var account = user.account;
 
-                    if (account === null || account === undefined) {
+                    console.log("User claims:", user.claims);
+                    console.log("User account:", account);
+
+                    if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
+                        window.app.scripts.loadFinishSignUp();
+                        return;
+                    }
+
+                    if (user.claims.email_verified === "false") {
+                        console.log("Email not verified, redirecting to verify page.");
+                        window.app.scripts.loadVerify();
+                        return;
+                    }
+
+                    if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
+                        window.app.scripts.loadFinishSignUp();
+                        return;
+                    }
+
+                    if (account.hasSubmittedQuestionnaire !== true) {
                         window.app.scripts.loadFinishSignUp();
                         return;
                     }
                     
-                    if (account.hasSubmittedQuistionnaire !== true) {
-                        window.app.scripts.loadFinishSignUp();
-                        return;
-                    }
-                    
+                    window.app.scripts.loadHome();
+                    $(".complete-signup").remove();
                 },
                 error: function (xhr, status, error) {
+                    console.log("Error fetching user data:", error);
+                    
+                    window.app.scripts.loadHome();
+                    $(".complete-signup").remove();
                 }
             });
-        });
+
+            window.onpopstate = function(event) {
+                window.app.scripts.loadComponent(event.state.component, event.state.componentPlaceholder);
+            };
+        }
     </script>
 
     <script>
-        $(function () {
-            loadSignUp();
-            loadAbout();
-            loadHome();
-            loadForum();
-            loadChatRoom();
-            loadMarketplace();
-            loadNewPost();
+        $(() => {
+            registerHome();
+            registerSignUp();
+            registerAbout();
+            registerForum();
+            registerChatRoom();
+            registerMarketplace();
         });
 
-        const loadSignUp = () => {
+        const registerSignUp = () => {
             $('.finish-signup').on('click', function (e) {
                 e.preventDefault();
-
-                window.app.scripts.clearQueryParams();
 
                 emptyComponents();
 
@@ -226,70 +363,29 @@
                     return;
                 }
 
-                $('.footer').hide();
-                $('#finish-signup-placeholder').load('components/finish-signup.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadFinishSignUp();
             });
         };
 
-        const loadAbout = () => {
+        const registerAbout = () => {
             $('.about').on('click', function (e) {
                 e.preventDefault();
-
-                window.app.scripts.clearQueryParams();
-
+                
                 emptyComponents();
-
-                $('.footer').hide();
-                $('#about-placeholder').load('components/about.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadAbout();
             });
         };
 
-        const loadHome = () => {
-            $('.footer').hide();
-            $('#home-placeholder').load('components/home.html');
-            $('.footer').fadeIn(400);
-
-            $('.navbar__nav').removeClass('navbar__nav--is-open');
-            $('.navbar__toggle').removeClass('navicon--toggle');
-
-            closeNavbar();
-
+        const registerHome = () => {
             $('.navbar__logo').on('click', function (e) {
                 e.preventDefault();
 
-                window.app.scripts.clearQueryParams();
                 emptyComponents();
-
-                $('.footer').hide();
-                $('#home-placeholder').load('components/home.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadHome();
             });
         };
 
-        const loadForum = () => {
+        const registerForum = () => {
             $('.forum').on('click', function (e) {
                 e.preventDefault();
 
@@ -300,51 +396,14 @@
                     return;
                 }
 
-                $('.footer').hide();
-                $('#forum-placeholder').load('components/forum.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadForum();
             });
         };
 
-        const loadNewPost = () => {
-            $('.new-post').on('click', function (e) {
-                e.preventDefault();
-
-                emptyComponents();
-
-                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
-                if (!isAuthorizedForPage) {
-                    return;
-                }
-
-                $('.footer').hide();
-                $('#new-post-placeholder').load('components/forum-new-post.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
-            });
-        };
-
-
-
-        const loadChatRoom = () => {
+        const registerChatRoom = () => {
             $('.chat-room').on('click', function (e) {
                 e.preventDefault();
 
-                window.app.scripts.clearQueryParams();
-
                 emptyComponents();
 
                 let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
@@ -352,36 +411,16 @@
                     return;
                 }
 
-                $('.footer').hide();
-                $('#chat-room-placeholder').load('components/chat-room.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadChatRoom();
             });
         };
 
-        const loadMarketplace = () => {
+        const registerMarketplace = () => {
             $('.marketplace').on('click', function (e) {
                 e.preventDefault();
 
-                window.app.scripts.clearQueryParams();
                 emptyComponents();
-
-                $('.footer').hide();
-                $('#marketplace-placeholder').load('components/marketplace.html');
-                $('.footer').fadeIn(400);
-
-                setTimeout(function () {
-                    $('.navbar__nav').removeClass('navbar__nav--is-open');
-                    $('.navbar__toggle').removeClass('navicon--toggle');
-                }, 250);
-
-                closeNavbar();
+                window.app.scripts.loadMarketplace();
             });
         };
 
@@ -391,15 +430,6 @@
         }
 
         function emptyComponents() {            
-            $('#about-placeholder').empty();
-            $('#home-placeholder').empty();
-            $('#forum-placeholder').empty();
-            $('#read-post-placeholder').empty();
-            $('#marketplace-placeholder').empty();
-            $('#chat-room-placeholder').empty();
-            $('#unauthorized-placeholder').empty();
-            $('#finish-signup-placeholder').empty();
-
             window.state = 
             {
                 isUserOnline: false
@@ -412,83 +442,85 @@
         window.app = window.app || {};
         window.app.scripts = {
             updateQueryParam: (key, value) => {
+                console.log("Updating query param:", key, value);
                 const url = new URL(window.location.href);
 
-                for (const param of url.searchParams.keys()) {
+                for (const param of Array.from(url.searchParams.keys())) {
                     url.searchParams.delete(param);
                 }
 
                 url.searchParams.set(key, value);
-
-                window.history.replaceState({}, '', url);
+                console.log("Updated URL:", url.toString());
+                window.history.replaceState(history.state, '', url);
             },
             clearQueryParams: () => {
-                const url = new URL(window.location.href);
-                url.search = '';
-                window.history.replaceState({}, '', url);
+                var urlParams = new URLSearchParams(window.location.search);
+                
+                urlParams.delete('postId');
+                urlParams.delete('threadId');
+
+                var newQuery = urlParams.toString();
+                var newUrl = `${window.location.pathname}${newQuery ? '?' + newQuery : ''}${window.location.hash}`;
+                window.history.replaceState({}, document.title, newUrl);
             },
-            loadHome: () => {
+            loadComponent: (component, componentPlaceholder, queryKey, queryValue) => {
+                if (component.includes('forum') === false)
+                {
+                    window.app.scripts.clearQueryParams();
+                }
+
                 emptyComponents();
                 $('.footer').hide();
-                $('#home-placeholder').load('components/home.html');
+
+                let url = new URL(window.location.href);
+
+                if (queryKey && queryValue) {
+                    url.searchParams.set(queryKey, queryValue);
+                }
+
+                $(`#component-placeholder`).load(`components/${component}.html`, function () {
+                    history.pushState(
+                        { component, componentPlaceholder },
+                        null,
+                        url.toString()
+                    );
+                });
+
                 $('.footer').fadeIn(400);
                 closeNavbar();
             },
-            loadForum: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#forum-placeholder').load('components/forum.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
-            },
-            loadNewPost: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#new-post-placeholder').load('components/forum-new-post.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
-            },
+            loadAbout: () => window.app.scripts.loadComponent('about', 'about-placeholder'),
+            loadHome: () => window.app.scripts.loadComponent('home', 'home-placeholder'),
+            loadForum: () => window.app.scripts.loadComponent('forum', 'forum-placeholder'),
+            loadChatRoom: () => window.app.scripts.loadComponent('chat-room', 'chat-room-placeholder'),
+            loadMarketplace: () => window.app.scripts.loadComponent('marketplace', 'marketplace-placeholder'),
+            loadNewPost: () => window.app.scripts.loadComponent('forum-new-post', 'new-post-placeholder'),
+            loadFinishSignUp: () => window.app.scripts.loadComponent('finish-signup', 'finish-signup-placeholder'),
+            loadVerify: () => window.app.scripts.loadComponent('verify', 'verify-placeholder'),
+            loadUnauthorized: () => window.app.scripts.loadComponent('unauthorized', 'unauthorized-placeholder'),
             registerReadPostClick: (postId) => {
                 $(`.read-post-${postId}`).on('click', function (e) {
                     e.preventDefault();
-                    window.app.scripts.updateQueryParam('postId', postId);
-                    emptyComponents();
 
-                    $('.footer').hide();
-                    $('#read-post-placeholder').load('components/forum-single.html');
-                    $('.footer').fadeIn(400);
+                    console.log("Read post clicked:", postId);
 
-                    setTimeout(function () {
-                        $('.navbar__nav').removeClass('navbar__nav--is-open');
-                        $('.navbar__toggle').removeClass('navicon--toggle');
-                    }, 250);
-
-                    closeNavbar();
+                    window.app.scripts.loadComponent('forum-single', 'read-post-placeholder', 'postId', postId);
                 });
             },
-            loadFinishSignUp: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#finish-signup-placeholder').load('components/finish-signup.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
-            },
-            loadUnauthorized: () => {
-                emptyComponents();
-                $('.footer').hide();
-                $('#unauthorized-placeholder').load('components/unauthorized.html');
-                $('.footer').fadeIn(400);
-                closeNavbar();
+            registerNewPostClick: () => {
+                $('.write-new-post').on('click', function (e) {
+                    e.preventDefault();
+
+                    console.log("New post clicked");
+
+                    window.app.scripts.loadComponent('forum-new-post', 'new-post-placeholder');
+                    
+                });
             },
             isAuthorizedForPage: () => {
                 if (typeof user.isAuthenticated === "undefined")
                 {
-                    console.log("User is not defined, loading unauthorized page");
-                    emptyComponents();
-                    $('.footer').hide();
-                    $('#unauthorized-placeholder').load('components/unauthorized.html');
-                    $('.footer').fadeIn(400);
-                    closeNavbar();
+                    window.app.scripts.loadUnauthorized();
                     return false;
                 }
         
@@ -510,7 +542,5 @@
             }
         };
     </script>
-
-    <div id="custom-toast" class="custom-toast">You can only perform that action on your own post</div>
 </body>
 </html>

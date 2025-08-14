@@ -10,7 +10,6 @@
     </div>
 </div><!--/banner -->
 
-
 <!-- BALDIE QUESTIONNAIRE
 ============================================== -->
 <div class="section section--gray">
@@ -22,152 +21,246 @@
                 <div class="box__section box__section--chat-frame">
                     <form action="" id="baldie-questionnaire">
                         <div class="grid">
+                            <!-- First Name -->
                             <div class="grid__column grid__column--12 grid__column--6--md control">
                                 <label for="firstName" class="control__label">What is your first name?</label>
                                 <input type="text" id="firstName" name="firstName" class="control__input required-input">
                             </div>
+
+                            <!-- Last Name -->
                             <div class="grid__column grid__column--12 grid__column--6--md control">
                                 <label for="lastName" class="control__label">What is your last name?</label>
                                 <input type="text" id="lastName" name="lastName" class="control__input required-input">
                             </div>
+
+                            <!-- Display Name -->
                             <div class="grid__column grid__column--12 grid__column--6--md control">
                                 <label for="displayName" class="control__label">What would you like us to call you?</label>
                                 <input type="text" id="displayName" name="displayName" class="control__input required-input">
                             </div>
+
+                            <!-- Address -->
                             <div class="grid__column grid__column--12 grid__column--6--md control">
                                 <label for="address" class="control__label">What is your current address?</label>
                                 <input type="text" id="address" name="address" class="control__input required-input" autocomplete="on">
                             </div>
-                            <div class="grid__column grid__column--12 grid__column--6--md control">
-                                <label for="hearAbout" class="control__label">How Did You Hear About Us?</label>
-                                <select class="select control__input required-input" id="hearAbout" name="hearAbout">
-                                    <option value="Select An Option">Select An Option</option>
-                                    <option value="Social Media">Social Media</option>
-                                    <option value="Friend">Friend</option>
-                                    <option value="Facebook">Facebook</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div class="grid__column grid__column--12 grid__column--6--md control">
-                                <label for="whereYouBuy" class="control__label">Where do you buy your products currently?</label>
-                                <input type="text" id="whereYouBuy" name="whereYouBuy" class="control__input required-input">
 
-                            </div>
-                            <div class="grid__column grid__column--12 grid__column--6--md control">
-                                <label for="apparelSize" class="control__label">Apparel Size</label>
-                                <select class="select control__input required-input" id="apparelSize" name="apparelSize">
-                                    <option value="Select An Option">Select An Option</option>
-                                    <option value="S">S</option>
-                                    <option value="M">M</option>
-                                    <option value="L">L</option>
-                                    <option value="XL">XL</option>
-                                </select>
-                            </div>
-                            <div class="grid__column grid__column--12 grid__column--6--md control">
-                                <label for="monthlySpend" class="control__label">How much do you spend monthly on bald/beard products?</label>
-                                <input type="text" id="monthlySpend" name="monthlySpend" class="control__input required-input">
-                            </div>
-                            <div class="grid__column grid__column--12 grid__column--6--md control">
-                                <label for="newRoutine" class="control__label" name="newRoutine">Are you open to trying new products/routines?</label>
-                                <label for="new-routine-1">
-                                    <input type="radio" name="newRoutine" id="new-routine-1" value="Yes"> Yes
-                                </label>
-                                <label for="new-routine-2">
-                                    <input type="radio" name="newRoutine" id="new-routine-2" value="Yes"> No
-                                </label>
-                            </div>
-                            <div class="grid__column grid__column--12 grid__column--6--md control">
-                                <label for="activeBaldie" class="control__label" name="activeBaldie">Are you an active baldie? (workout, run, etc.)</label>
-                                <label for="active-baldie-1">
-                                    <input type="radio" name="activeBaldie" id="active-baldie-1" value="Yes"> Yes
-                                </label>
-                                <label for="active-baldie-2">
-                                    <input type="radio" name="activeBaldie" id="active-baldie-2" value="Yes"> No
-                                </label>
-                            </div>
-                            <div class="grid__column grid__column--12">
-                                <h2 class="control__heading">What Type of Bald Are You?</h2>
+                            <!-- Bald Type -->
+                            <div class="grid__column grid__column--12 control">
+                                <h2 class="control__heading">Tell Us About Your Bald Life</h2>
                             </div>
                             <div class="grid__column grid__column--12 grid__column--12--md control">
-                                <label for="baldType" class="control__label">Choose Your Bald Type</label>
-                                <select class="select control__input" id="baldType" name="baldType">
+                                <label for="baldType" class="control__label">What type of Baldie are you?</label>
+                                <select class="select control__input required-input" id="baldType" name="baldType">
                                     <option value="select">Select An Option</option>
-                                    <option value="veteran">Veteran/Confident Baldie</option>
-                                    <option value="denier">The Denier Baldie</option>
-                                    <option value="rookie">Rookie Up and Comer</option>
+                                    <option value="veteran">Veteran</option>
+                                    <option value="denier">Denier</option>
+                                    <option value="rookie">Rookie/Newbie</option>
                                     <option value="beard">Beard Baldie</option>
-                                    <option value="notBald">Not a Baldie</option>
                                 </select>
+                            </div>
 
-                                <div class="select-collapse veteran">
-                                    <div class="control">
-                                        <label for="shaveOrBuzz" class="control__label">Do you shave or buzz?</label>
-                                        <input type="text" class="control__input" id="shaveOrBuzz" name="shaveOrBuzz" placeholder="Shave or buzz">
-                                    </div>          
-                                    <div class="control">
-                                        <label for="howLong" class="control__label">How long have you been bald?</label>
-                                        <input type="text" class="control__input" id="howLong" name="howLong" placeholder="Enter years">
-                                    </div>   
-                                    <div class="control">
-                                        <label for="chromeCap" class="control__label">Do you have the chrome cap?</label>
-                                        <input type="text" class="control__input" id="chromeCap" name="chromeCap" placeholder="Yes or No">
-                                    </div>                                
-                                </div>
-                                <div class="select-collapse denier">  
-                                    <div class="control">
-                                        <label for="selfConscious" class="control__label">Are you self-conscious about being bald?</label>
-                                        <input type="text" class="control__input" id="selfConscious" name="selfConscious" placeholder="Yes or No">
-                                    </div>
-                                    <div class="control">
-                                        <label for="selfConsciousReason" class="control__label">Reason?</label>
-                                        <input type="text" class="control__input" id="selfConsciousReason" name="selfConsciousReason" placeholder="Enter reason">
-                                    </div>                              
-                                </div>
-                                <div class="select-collapse rookie">  
-                                    <div class="control">
-                                        <label for="haveABeard" class="control__label">Do you have a beard?</label>
-                                        <input type="text" class="control__input" id="haveABeard" name="haveABeard" placeholder="Yes or No">
-                                    </div>
-                                    <div class="control">
-                                        <label for="lookingForRecommendations" class="control__label">Are you looking for recommendations?</label>
-                                        <input type="text" class="control__input" id="lookingForRecommendations" name="lookingForRecommendations" placeholder="Yes or No">
-                                    </div>                              
-                                </div>
-                                <div class="select-collapse beard">  
-                                    <div class="control">
-                                        <label for="typeOfBeard" class="control__label">What type of beard do you have?</label>
-                                        <select class="select control__input" id="typeOfBeard" name="typeOfBeard">
-                                            <option value="Select An Option">Select An Option</option>
-                                            <option value="1">Full Beard</option>
-                                            <option value="2">Mustache</option>
-                                            <option value="3">Goatee</option>
-                                        </select>
-                                    </div>                            
-                                </div>
-                                <div class="select-collapse notBald">  
-                                    <div class="control">
-                                        <label for="typeOfNotBald" class="control__label">Not a Baldie?</label>
-                                        <select class="select control__input" id="typeOfNotBald" name="typeOfNotBald">
-                                            <option value="Select An Option">Select An Option</option>
-                                            <option value="1">I'm here for someone else</option>
-                                            <option value="2">Not bald yet</option>
-                                            <option value="3">Not bald, but still want to help</option>
-                                        </select>
-                                    </div>                            
+                            <!-- Bald Head Cleaning -->
+                            <div class="grid__column grid__column--12 control">
+                                <label class="control__label">
+                                    How do you keep your bald head clean? <small>(Select all that apply)</small>
+                                </label>
+                                <ul class="control" style="list-style: none; padding: 0; margin: 0;">
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="cleaningMethods" value="Buzz it down with clippers">
+                                            Buzz it down with clippers
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="cleaningMethods" value="Disposable razors">
+                                            Disposable razors
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="cleaningMethods" value="High-end razors">
+                                            High-end razors
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="cleaningMethods" value="Shave with cleanser before/after">
+                                            Shave with cleanser before/after
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="cleaningMethods" value="Shaving cream or gel">
+                                            Shaving cream or gel
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="cleaningMethods" value="Just bar soap">
+                                            Just bar soap
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="cleaningMethods" value="Other">
+                                            Other:
+                                            <input type="text" name="cleaningMethodsOther" class="control__input">
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+                            <!-- Bald Care Routine -->
+                            <div class="grid__column grid__column--12 control">
+                                <label for="baldCareRoutine" class="control__label">Describe your bald care routine</label>
+                                <textarea id="baldCareRoutine" name="baldCareRoutine" class="control__input required-input" rows="3"></textarea>
+                            </div>
+
+                            <!-- Products Used -->
+                            <div class="grid__column grid__column--12 control">
+                                <label for="productsUsed" class="control__label">What products do you use regularly for shaving or scalp care?</label>
+                                <textarea id="productsUsed" name="productsUsed" class="control__input required-input" rows="3"></textarea>
+                            </div>
+
+                            <!-- Monthly Spend -->
+                            <div class="grid__column grid__column--12 control">
+                                <label class="control__label">How much do you spend per month on bald-related products or grooming?</label>
+                                <select class="select control__input required-input" id="monthlySpend" name="monthlySpend">
+                                    <option value="select">Select An Option</option>
+                                    <option value="under10">Under $10/month</option>
+                                    <option value="10-30">$10–30/month</option>
+                                    <option value="30-50">$30–50/month</option>
+                                    <option value="50plus">$50+/month</option>
+                                    <option value="notSure">Not sure</option>
+                                </select>
+                            </div>
+
+                            <!-- Confidence Level -->
+                            <div class="grid__column grid__column--12 control">
+                                <label class="control__label">How confident do you feel about being bald?</label>
+                                <select class="select control__input required-input" id="confidenceLevel" name="confidenceLevel">
+                                    <option value="select">Select An Option</option>
+                                    <option value="superConfident">Super confident</option>
+                                    <option value="prettyGood">Pretty good</option>
+                                    <option value="meh">Meh, working on it</option>
+                                    <option value="notConfidentYet">Not confident yet</option>
+                                </select>
+                            </div>
+
+                            <!-- Interests -->
+                            <div class="grid__column grid__column--12 control">
+                                <label class="control__label">
+                                    Are you interested in any of the following? <small>(Select all that apply)</small>
+                                </label>
+                                <ul class="control" style="list-style: none; padding: 0; margin: 0;">
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="interests" value="Hair transplant">
+                                            Hair transplant
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="interests" value="Scalp micropigmentation">
+                                            Scalp micropigmentation
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="interests" value="Hair growth meds/treatments">
+                                            Hair growth meds/treatments
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="interests" value="Just owning the bald life">
+                                            Just owning the bald life
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="interests" value="Not sure yet">
+                                            Not sure yet
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Goals -->
+                            <div class="grid__column grid__column--12 control">
+                                <label class="control__label">
+                                    What are you looking to get from Only Balds? <small>(Select all that apply)</small>
+                                </label>
+                                <ul class="control" style="list-style: none; padding: 0; margin: 0;">
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="goals" value="Product recommendations">
+                                            Product recommendations
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="goals" value="Education/tips">
+                                            Education/tips
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="goals" value="Community support">
+                                            Community support
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="goals" value="Fun/entertainment">
+                                            Fun/entertainment
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="goals" value="Exclusive deals">
+                                            Exclusive deals
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            <input type="checkbox" name="goals" value="New product drops">
+                                            New product drops
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label>
+                                            Something specific:
+                                            <input type="text" name="goalsOther" class="control__input">
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+                            <!-- Open to new products -->
+                            <div class="grid__column grid__column--12 control">
+                                <label class="control__label">Are you open to trying new products or routines?</label>
+                                <div class="control">
+                                    <label><input type="radio" name="newRoutine" value="Hell yes"> Hell yes</label>
+                                    <label><input type="radio" name="newRoutine" value="Maybe"> Maybe</label>
+                                    <label><input type="radio" name="newRoutine" value="Nah, I'm set"> Nah, I'm set</label>
                                 </div>
                             </div>
+
+                            <!-- Submit -->
                             <div class="grid__column grid__column--12 control">
                                 <button id="submit-questionnaire" class="btn btn--blue" type="submit">Submit Questionnaire!</button>
                             </div>
+
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
     </div>
 </div><!--/baldie questionnaire-->
 
@@ -175,224 +268,93 @@
 <script src="/assets/scripts/App-5379555225.js"></script>
 
 <script>
-    $('#submit-questionnaire').click(async function (event) {
-        event.preventDefault();
+$('#submit-questionnaire').click(async function(event) {
+    event.preventDefault();
 
-        var isValid = validateForm();
-
-        if (!isValid) {
-            return;
+    let allValid = true;
+    $('.required-input').each(function() {
+        if ($(this).val() === "" || $(this).val() === "Select An Option") {
+            allValid = false;
         }
+    });
+    if (!$('input[name="newRoutine"]:checked').length) allValid = false;
 
-        var $btn = $(this);
-        $btn.html(`<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...`);
-        $btn.prop('disabled', true);
+    if (!allValid) {
+        alert("Please fill in all required fields.");
+        return;
+    }
 
-        const baldType = $('#baldType').val();
+    const $btn = $(this);
+    $btn.html(`<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending...`);
+    $btn.prop('disabled', true);
 
-        const answers = {
-            id: crypto.randomUUID(),
+    try {
+        const user = await $.ajax({ url: "/identity-information", method: "GET" });
+        console.log(user);
+
+        const accountId = crypto.randomUUID();
+        const account = {
+            id: accountId,
+            hasSubmittedQuestionnaire: true,
+            identityProviderId: user.claims.sub,
             firstName: $('#firstName').val(),
             lastName: $('#lastName').val(),
             displayName: $('#displayName').val(),
             address: $('#address').val(),
-            isCompleted: true,
+            email: user.claims.email,
+            username: user.claims.nickname
+        };
+
+        const accountResponse = await $.ajax({
+            url: "/onlybalds-api/accounts",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(account)
+        });
+
+        console.log("Account created successfully:", accountResponse);
+
+        const answers = {
+            id: crypto.randomUUID(),
+            firstName: account.firstName,
+            lastName: account.lastName,
+            displayName: account.displayName,
+            address: account.address,
+            accountId: accountId,
+            userId: user.claims.sub,
             data: {
-                questions: [
-                    {
-                    title: "How did you hear about us?",
-                        answer: $('#hearAbout').val()
-                    },
-                    {
-                        title: "Where do you usually buy products?",
-                        answer: $('#whereYouBuy').val()
-                    },
-                    {
-                        title: "Apparel size",
-                        answer: $('#apparelSize').val()
-                    },
-                    {
-                        title: "Monthly spend on grooming products",
-                        answer: $('#monthlySpend').val()
-                    },
-                    {
-                        title: "Are you open to trying new products/routines?",
-                        answer: $('input[name="newRoutine"]:checked').val()
-                    },
-                    {
-                        title: "Are you an active baldie?",
-                        answer: $('input[name="activeBaldie"]:checked').val()
-                    },
-                    {
-                        title: "Type of bald",
-                        answer: baldType
-                    }
-                ],
-                baldingOptions: [
-                {
-                    option: [
-                    {
-                        baldingOptionTitle: "Beard Baldie",
-                        questions: [
-                        {
-                            title: "What type of beard do you have?",
-                            answer: $('#typeOfBeard').val()
-                        }
-                        ]
-                    },
-                    {
-                        baldingOptionTitle: "Rookie Baldie",
-                        questions: [
-                        {
-                            title: "Do you have a beard?",
-                            answer: $('#haveABeard').val()
-                        },
-                        {
-                            title: "Are you looking for recommendations?",
-                            answer: $('#lookingForRecommendations').val()
-                        }
-                        ]
-                    },
-                    {
-                        baldingOptionTitle: "Denier Baldie",
-                        questions: [
-                        {
-                            title: "Are you self-conscious about being bald?",
-                            answer: $('#selfConscious').val()
-                        },
-                        {
-                            title: "Reason?",
-                            answer: $('#selfConsciousReason').val()
-                        }
-                        ]
-                    },
-                    {
-                        baldingOptionTitle: "Confident Baldie",
-                        questions: [
-                        {
-                            title: "Do you shave or buzz?",
-                            answer: $('#shaveOrBuzz').val()
-                        },
-                        {
-                            title: "How long have you been bald?",
-                            answer: $('#howLong').val()
-                        },
-                        {
-                            title: "Do you have the chrome cap?",
-                            answer: $('#chromeCap').val()
-                        }
-                        ]
-                    },
-                    {
-                        baldingOptionTitle: "Not a Baldie",
-                        questions: [
-                        {
-                            title: "Not a Baldie?",
-                            answer: $('#typeOfNotBald').val()
-                        }
-                        ]
-                    }
-                    ]
-                }]
+                baldType: $('#baldType').val(),
+                cleaningMethods: $('input[name="cleaningMethods"]:checked').map(function(){ return this.value }).get(),
+                cleaningMethodsOther: $('#cleaningMethodsOther').val(),
+                baldCareRoutine: $('#baldCareRoutine').val(),
+                productsUsed: $('#productsUsed').val(),
+                monthlySpend: $('#monthlySpend').val(),
+                confidenceLevel: $('#confidenceLevel').val(),
+                interests: $('input[name="interests"]:checked').map(function(){ return this.value }).get(),
+                goals: $('input[name="goals"]:checked').map(function(){ return this.value }).get(),
+                goalsOther: $('#goalsOther').val(),
+                newRoutine: $('input[name="newRoutine"]:checked').val()
             }
         };
 
-        try {
-            console.log('Submitting form:', answers);
+        console.log("QUESTIONNAIRE JSON TO POST:", JSON.stringify(answers, null, 2));
 
-            $.ajax({
-                url: "/identity-information",
-                method: "GET",
-                success: function (data) {
-                    user = data;
-
-                    $.ajax({
-                        url: "/onlybalds-api/questionnaire",
-                        method: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(answers),
-                        success: function (response) {
-
-                            $btn.html("Send Message");
-                            $btn.prop('disabled', false);
-
-                            let account = 
-                            {
-                                questionnaireId: answers.id,
-                                hasSubmittedQuistionnaire: true,
-                                identityProviderId: user.claims.sub,
-                                firstName: $('#firstName').val(),
-                                lastName: $('#lastName').val(),
-                                displayName: $('#displayName').val(),
-                                address: $('#address').val(),
-                                email: user.claims.email,
-                                username: user.claims.nickname,
-                            };
-
-                            $.ajax({
-                                url: "/onlybalds-api/account",
-                                method: "POST",
-                                contentType: "application/json",
-                                data: JSON.stringify(account),
-                                success: function (response) {
-                                    console.log("Account Success:", response);
-                                    window.location.replace('/');
-                                },
-                                error: function (xhr, status, error) {
-                                    console.error("Error:", status, error);
-                                }
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("Error:", status, error);
-                        }
-                    });
-                },
-                error: function (xhr, status, error) {
-                }
-            });
-        } catch (error) {
-            console.error('Error submitting form:', error);
-        }
-    });
-</script>
-
-<script>
-    function initAutocomplete() {
-        const input = document.getElementById('address');
-        const options = {
-            types: ['address'],
-            componentRestrictions: { country: 'us' }
-        };
-
-        new google.maps.places.Autocomplete(input, options);
-    }
-
-    function validateForm() {
-        let allValid = true;
-
-        // Validate all required inputs
-        $('.required-input').each(function () {
-            if ($(this).val() === "" || $(this).val() === "Select An Option") {
-                allValid = false;
-            }
+        const questionnaireResponse = await $.ajax({
+            url: "/onlybalds-api/questionnaire",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(answers)
         });
 
-        // Validate radio button groups
-        const radioGroups = ['newRoutine', 'activeBaldie'];
-        radioGroups.forEach(function (name) {
-            if ($('input[name="' + name + '"]:checked').length === 0) {
-                allValid = false;
-            }
-        });
+        console.log("Questionnaire submitted successfully:", questionnaireResponse);
+        $btn.html("Submit Questionnaire!");
+        $btn.prop('disabled', false);
+        window.location.replace('/');
 
-        // Enable or disable submit button
-        //$('#submit-questionnaire').prop('disabled', !allValid);
-
-        if (!allValid) {
-            window.app.scripts.showToast("Please fill in all required fields.");
-        }
-
-        return allValid;
+    } catch (err) {
+        console.error("Error submitting account or questionnaire:", err);
+        $btn.html("Submit Questionnaire!");
+        $btn.prop('disabled', false);
     }
+});
 </script>

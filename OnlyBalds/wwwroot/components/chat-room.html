@@ -108,6 +108,43 @@
     var messages = [];
     var user = null;
     var activeUsers = [];
+    
+    function loadFromSessionStorage() {
+        const storedUserCount = sessionStorage.getItem('chatUserCount');
+        const storedActiveUsers = sessionStorage.getItem('chatActiveUsers');
+        
+        if (storedUserCount && storedActiveUsers) {
+            const userCount = parseInt(storedUserCount);
+            activeUsers = JSON.parse(storedActiveUsers);
+            
+            $("#userCount").text(`${userCount} Members Are Here!`);
+            updateActiveUsersList();
+        }
+    }
+    
+    function saveToSessionStorage(userCount, users) {
+        sessionStorage.setItem('chatUserCount', userCount.toString());
+        sessionStorage.setItem('chatActiveUsers', JSON.stringify(users));
+    }
+    
+    function updateActiveUsersList() {
+        var $chatList = $("#activeUsers");
+        $chatList.empty();
+        activeUsers.forEach(activeUser => {
+            $chatList.append(`
+                <li class="user-list__item">
+                    <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
+                            class="bi bi-person-fill" viewBox="0 0 16 16">
+                            <path
+                                d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                        </svg>
+                    </div>                            
+                    <span class="user-list__name">${activeUser}</span>
+                </li>
+            `);
+        });
+    }
 
     function connectToChatHub(user) {
         console.debug("HubConnection state before creation:", hubConnection ? hubConnection.state : "No connection");
@@ -138,23 +175,11 @@
             hubConnection.on("UserCountChanged", function (count, users) {
                 activeUsers = JSON.parse(users);
                 
+                // Save to session storage
+                saveToSessionStorage(count, activeUsers);
+                
                 $("#userCount").text(`${count} Members Are Here!`);
-                var $chatList = $("#activeUsers");
-                $chatList.empty();
-                activeUsers.forEach(activeUser => {
-                    $chatList.append(`
-                        <li class="user-list__item">
-                            <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
-                                    class="bi bi-person-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-                                </svg>
-                            </div>                            
-                            <span class="user-list__name">${activeUser}</span>
-                        </li>
-                    `);
-                });
+                updateActiveUsersList();
             });
 
             hubConnection.start().then(function () {
@@ -376,6 +401,20 @@
         success: function (data) {
             user = data;
             let userName = user.name;
+
+            if (user.claims.email_verified === "false")
+            {
+                window.app.scripts.loadVerify();
+                return;
+            }
+            if (user.account === null)
+            {
+                window.app.scripts.loadFinishSignUp();
+                return;
+            }
+            
+            loadFromSessionStorage();
+            
             connectToChatHub(userName);
         },
         error: function (xhr, status, error) {
@@ -410,6 +449,21 @@
 
         sendMessageToHub(message);
         $('#messageInput').val('');
+    });
+
+    $('#messageInput').on('keydown', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            e.preventDefault();
+
+            var $btn = $(this);
+            var originalText = $btn.html();
+            var message = $('#messageInput').val();
+
+            if (!message.trim()) return;
+
+            sendMessageToHub(message);
+            $('#messageInput').val('');
+        }
     });
 
 </script>
