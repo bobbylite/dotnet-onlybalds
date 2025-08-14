@@ -46,6 +46,24 @@ public class OnlyBaldsDataContext : DbContext
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Account>()
+            .HasOne(a => a.Questionnaire)
+            .WithOne()
+            .HasForeignKey<QuestionnaireItems>(q => q.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<QuestionnaireItems>()
+            .Property(t => t.StartDate)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+        modelBuilder.Entity<QuestionnaireItems>()
+            .HasOne(q => q.Data)
+            .WithOne()
+            .HasForeignKey<QuestionnaireData>(q => q.QuestionnaireId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<ThreadItem>()
             .Property(t => t.StartDate)
             .HasConversion(
@@ -57,13 +75,7 @@ public class OnlyBaldsDataContext : DbContext
             .HasConversion(
                 v => v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        modelBuilder.Entity<Favorite>()
-            .Property(f => f.FavoritedOn)
-            .HasConversion(
-                v => v.ToUniversalTime(),
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
+        
         modelBuilder.Entity<PostItem>()
             .HasMany(p => p.Favorites)
             .WithOne()
@@ -76,23 +88,17 @@ public class OnlyBaldsDataContext : DbContext
             .HasForeignKey(c => c.PostId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Favorite>()
+            .Property(f => f.FavoritedOn)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
         modelBuilder.Entity<CommentItem>()
             .Property(t => t.PostedOn)
             .HasConversion(
                 v => v.ToUniversalTime(),
                 v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-        
-        modelBuilder.Entity<QuestionnaireItems>()
-            .Property(t => t.StartDate)
-            .HasConversion(
-                v => v.ToUniversalTime(),
-                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-        modelBuilder.Entity<Account>()
-            .HasOne(a => a.Questionnaire)
-            .WithOne()
-            .HasForeignKey<QuestionnaireItems>(q => q.AccountId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }
