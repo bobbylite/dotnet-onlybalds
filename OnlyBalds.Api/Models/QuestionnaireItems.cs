@@ -96,7 +96,7 @@ public class QuestionnaireData
     /// The methods the user employs to clean their bald head.
     /// </summary>
     [JsonPropertyName("cleaningMethods")]
-    public List<string>? CleaningMethods { get; set; } = new List<string>();
+    public List<string>? CleaningMethods { get; set; }
 
     /// <summary>
     /// Additional cleaning methods the user employs.
@@ -132,13 +132,13 @@ public class QuestionnaireData
     /// The user's interests related to baldness.
     /// </summary>
     [JsonPropertyName("interests")]
-    public List<string>? Interests { get; set; } = new List<string>();
+    public List<string>? Interests { get; set; }
 
     /// <summary>
     /// The user's goals related to baldness.
     /// </summary>
     [JsonPropertyName("goals")]
-    public List<string>? Goals { get; set; } = new List<string>();
+    public List<string>? Goals { get; set; }
 
     /// <summary>
     /// Additional goals the user has related to baldness.
