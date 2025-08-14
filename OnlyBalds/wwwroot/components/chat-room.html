@@ -401,8 +401,18 @@
         success: function (data) {
             user = data;
             let userName = user.name;
+
+            if (user.claims.email_verified === "false")
+            {
+                window.app.scripts.loadVerify();
+                return;
+            }
+            if (user.account === null)
+            {
+                window.app.scripts.loadFinishSignUp();
+                return;
+            }
             
-            // Load stored data before connecting
             loadFromSessionStorage();
             
             connectToChatHub(userName);

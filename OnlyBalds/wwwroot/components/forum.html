@@ -40,7 +40,17 @@
         success: function (data) {
             console.log("User data:", data);
             user = data;
-            
+            if (user.claims.email_verified === "false")
+            {
+                window.app.scripts.loadVerify();
+                return;
+            }
+            if (user.claims.email_verified === "true" && user.account === null)
+            {
+                window.app.scripts.loadFinishSignUp();
+                return;
+            }
+
             GetThreads(user);
         },
         error: function (xhr, status, error) {
@@ -86,8 +96,7 @@
             error: function (xhr, status, error) {
                 console.error("Error fetching threads:", xhr);
                 if (xhr.status === 403) {
-                    console.log("Email not verified, redirecting to verify page.");
-                    window.app.scripts.loadFinishSignUp();
+                    console.error("Access denied. User may not be authenticated or authorized.");
                     return;
                 }
             }
