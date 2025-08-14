@@ -21,9 +21,23 @@ public class OnlyBaldsDataContext : DbContext
     public OnlyBaldsDataContext(DbContextOptions<OnlyBaldsDataContext> options)
         : base(options)
     {
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
-         }
+        var tables = new[]
+        {
+            "CommentItems",
+            "PostItems",
+            "ThreadItems",
+            "QuestionnaireData",
+            "QuestionnaireItems",
+            "Accounts",
+            "Favorites",
+            "__EFMigrationsHistory"
+        };
+
+        foreach (var table in tables)
+        {
+            Database.ExecuteSqlRaw($"DROP TABLE IF EXISTS \"{table}\" CASCADE;");
+        }
+    }
 
     /// <summary>
     /// Gets the set of all <see cref="Account"/> entities in the context.
