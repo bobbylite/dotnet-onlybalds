@@ -21,6 +21,11 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     position: relative;
 }
+
+.list-group-item {
+    list-style: none !important;
+}
+
 </style>
 
 <!-- BANNER
@@ -213,7 +218,7 @@
             if (msg.user === currentUsername)
             {
                 messageTemplate = `
-                <li class="list-group-item d-flex justify-content-center">
+                <li class="list-group-item d-flex justify-content-center" style="list-style: none !important;">
                     <div class="chat-item chat-item--message chat-item--is-you d-flex align-items-center" style="max-width: 600px; width: 100%;">
                         <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
@@ -235,7 +240,7 @@
             else if (msg.user === "Moderator" && msg.content.includes("has joined."))
             {
                 messageTemplate = `
-                <li class="list-group-item d-flex justify-content-center">
+                <li class="list-group-item d-flex justify-content-center" style="list-style: none !important;">
                     <div class="chat-item chat-item--joined d-flex align-items-center" style="max-width: 600px; width: 100%;">
                         <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
@@ -257,7 +262,7 @@
             else if (msg.user === "Moderator" && msg.content.includes("has left."))
             {
                 messageTemplate = `
-                <li class="list-group-item d-flex justify-content-center">
+                <li class="list-group-item d-flex justify-content-center" style="list-style: none !important;">
                     <div class="chat-item chat-item--joined d-flex align-items-center" style="max-width: 600px; width: 100%;">
                         <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
@@ -279,7 +284,7 @@
             else if (msg.user === "Moderator" && msg.content.includes("rejoined the chat room."))
             {
                 messageTemplate = `
-                <li class="list-group-item d-flex justify-content-center">
+                <li class="list-group-item d-flex justify-content-center" style="list-style: none !important;">
                     <div class="chat-item chat-item--joined d-flex align-items-center" style="max-width: 600px; width: 100%;">
                         <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
@@ -301,7 +306,7 @@
             else if (msg.user === "Moderator" && msg.content.includes("blocked"))
             {
                 messageTemplate = `
-                <li class="list-group-item d-flex justify-content-center">
+                <li class="list-group-item d-flex justify-content-center" style="list-style: none !important;">
                     <div class="chat-item chat-item--left d-flex align-items-center" style="max-width: 600px; width: 100%;">
                         <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
@@ -323,7 +328,7 @@
             else if (msg.user === "Moderator")
             {
                 messageTemplate = `
-                <li class="list-group-item d-flex justify-content-center">
+                <li class="list-group-item d-flex justify-content-center" style="list-style: none !important;">
                     <div class="chat-item chat-item--message d-flex align-items-center" style="max-width: 600px; width: 100%;">
                         <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
@@ -346,7 +351,7 @@
             {
                 messageTemplate = 
                 `
-                <li class="list-group-item d-flex justify-content-center">
+                <li class="list-group-item d-flex justify-content-center" style="list-style: none !important;">
                     <div class="chat-item chat-item--message d-flex align-items-center" style="max-width: 600px; width: 100%;">
                         <div class="chat-item__profile-picture me-3 d-flex justify-content-center align-items-center text-center" style="width: 40px; height: 40px;">
                             <svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 10px; margin-top: 5px;" width="30" height="30" fill="currentColor"
