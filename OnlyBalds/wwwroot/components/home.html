@@ -106,3 +106,29 @@
         </div>
     </div>
 </div><!--/join the balds -->
+
+<script>
+    $.ajax({
+        url: "/identity-information",
+        method: "GET",
+        success: function (data) {
+            user = data;
+            let userName = user.name;
+
+            if (user.claims.email_verified === "false")
+            {
+                window.app.scripts.loadVerify();
+                return;
+            }
+
+            if (user.account === null)
+            {
+                window.app.scripts.loadFinishSignUp();
+                return;
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Failed to get identity info:", error);
+        }
+    });
+</script>
