@@ -372,6 +372,12 @@
                 e.preventDefault();
                 
                 emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+
                 window.app.scripts.loadAbout();
             });
         };
@@ -420,6 +426,12 @@
                 e.preventDefault();
 
                 emptyComponents();
+
+                let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+                if (!isAuthorizedForPage) {
+                    return;
+                }
+                
                 window.app.scripts.loadMarketplace();
             });
         };
