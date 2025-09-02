@@ -57,6 +57,7 @@
                                     <option value="denier">Denier</option>
                                     <option value="rookie">Rookie/Newbie</option>
                                     <option value="beard">Beard Baldie</option>
+                                    <option value="notBaldie">Not A Baldie</option>
                                 </select>
                             </div>
 
@@ -329,7 +330,7 @@ $('#submit-questionnaire').click(async function(event) {
                 baldCareRoutine: $('#baldCareRoutine').val(),
                 productsUsed: $('#productsUsed').val(),
                 monthlySpend: $('#monthlySpend').val(),
-                confidenceLevel: $('#confidenceLevel').val(),
+                confidenceLevel: $('#confidenceLevel').val(), 
                 interests: $('input[name="interests"]:checked').map(function(){ return this.value }).get(),
                 goals: $('input[name="goals"]:checked').map(function(){ return this.value }).get(),
                 goalsOther: $('#goalsOther').val(),
