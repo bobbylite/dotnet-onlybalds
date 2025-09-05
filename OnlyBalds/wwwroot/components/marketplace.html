@@ -39,13 +39,15 @@
 
             if (user.claims.email_verified === "false")
             {
-                window.app.scripts.loadVerify();
+                // window.app.scripts.loadVerify();
+                console.log("Email not verified");
                 return;
             }
 
             if (user.account === null)
             {
-                window.app.scripts.loadFinishSignUp();
+                // window.app.scripts.loadFinishSignUp();
+                console.log("User account not found");
                 return;
             }
         },
