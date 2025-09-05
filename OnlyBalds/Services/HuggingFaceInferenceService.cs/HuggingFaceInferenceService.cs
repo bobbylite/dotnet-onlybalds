@@ -40,7 +40,7 @@ public class HuggingFaceInferenceService : IHuggingFaceInferenceService
         var inferenceClient = _httpClientFactory.CreateClient(HttpClientNames.HuggingFaceInferenceApi);
 
         _logger.LogDebug("Performing toxicity classification using the Hugging Face Inference API");
-        var inferenceResponse = await inferenceClient.PostAsJsonAsync("/models/s-nlp/roberta_toxicity_classifier", inferenceInputs);
+        var inferenceResponse = await inferenceClient.PostAsJsonAsync("/hf-inference/models/s-nlp/roberta_toxicity_classifier", inferenceInputs);
 
         if (!inferenceResponse.IsSuccessStatusCode)
         {
