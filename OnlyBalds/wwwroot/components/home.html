@@ -31,12 +31,12 @@
                 </div> -->
             </div>
             <div class="crop-box__aside">
-                <a href="/forum" class="link-box"  data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
+                <a href="#" onclick="loadForum()" class="link-box forum"  data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
                     <img src="/assets/images/filler-forum-thumb.jpg" alt="Preview of forum page" class="link-box__background">
                     <h3 class="link-box__title">Join the Forum</h3>
                     <span class="link-box__arrow"><img src="/assets/images/white-arrow-right.png" alt=""></span>
                 </a>
-                <a href="/chat-room" class="link-box"  data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
+                <a href="#" onclick="loadChatRoom()" class="link-box chat-room"  data-aos="fade-up" data-aos-delay="300" data-aos-offset="0">
                     <img src="/assets/images/chat-room.jpg" alt="Preview of chat room page" class="link-box__background">
                     <h3 class="link-box__title">Visit the Chat Room</h3>
                     <span class="link-box__arrow"><img src="/assets/images/white-arrow-right.png" alt=""></span>
@@ -80,7 +80,7 @@
             <div class="product-row__content">
                 <h2 class="section__heading">The <span class="heading-highlight">Products</span> You Need</h2>
                 <p class="lead">No matter what stage of balding, we have the products for you.</p>
-                <a href="/marketplace" class="text-link text-link--blue">View All Products</a>
+                <button class="text-link text-link--blue" onclick="window.app.scripts.loadMarketplace()">View All Products</button>
             </div>
                 <div class="product-row__images">
                 <img src="/assets/images/cleanser-product.jpg" alt="cleanser bottle with pump top" class="product-row__image">
@@ -131,4 +131,22 @@
             console.error("Failed to get identity info:", error);
         }
     });
+
+    function loadChatRoom() {
+        let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+        if (!isAuthorizedForPage) {
+            return;
+        }
+
+        window.app.scripts.loadChatRoom();
+    }
+    
+    function loadForum() {
+        let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
+        if (!isAuthorizedForPage) {
+            return;
+        }
+
+        window.app.scripts.loadForum();
+    }
 </script>

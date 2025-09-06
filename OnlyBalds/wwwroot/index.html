@@ -206,11 +206,10 @@
         <div class="container">
             <div class="footer__buttons">
                 <ul class="footer__button-links">
-                    <li><button onclick="window.app.scripts.loadForum()" class="btn btn--rounded btn--faded">Forum</button></li>
-                    <li><button onclick="window.app.scripts.loadChatRoom()" class="btn btn--rounded btn--faded">Chat Room</button></li>
-                    <li><button onclick="window.app.scripts.loadMarketplace()" class="btn btn--rounded btn--faded">Marketplace</button></li>
+                    <li><button class="btn btn--rounded btn--faded forum">Forum</button></li>
+                    <li><button class="btn btn--rounded btn--faded chat-room">Chat Room</button></li>
+                    <li><button class="btn btn--rounded btn--faded marketplace">Marketplace</button></li>
                     <li class="footer__right-list-item"><a href="/auth/login" class="btn btn--rounded btn--white">Become A Member</a></li>
-                </ul>
             </div>
         </div>
         <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
@@ -399,11 +398,6 @@
                 
                 emptyComponents();
 
-                //let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
-                //if (!isAuthorizedForPage) {
-                    //return;
-                //}
-
                 window.app.scripts.loadAbout();
             });
         };
@@ -452,11 +446,6 @@
                 e.preventDefault();
 
                 emptyComponents();
-
-                //let isAuthorizedForPage = window.app.scripts.isAuthorizedForPage();
-                //if (!isAuthorizedForPage) {
-                    //return;
-                //}
 
                 window.app.scripts.loadMarketplace();
             });
