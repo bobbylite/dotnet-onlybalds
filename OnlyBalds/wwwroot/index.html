@@ -463,15 +463,6 @@
         }
 
         function emptyComponents() {      
-            if (window.location.hash || window.location.pathname !== "/") {
-                var rootUrl = window.location.protocol + "//" + window.location.hostname;
-                if (window.location.port) {
-                    rootUrl += ":" + window.location.port;
-                }
-
-                history.replaceState(null, '', rootUrl + '/');
-            }
-
             window.state = 
             {
                 isUserOnline: false
