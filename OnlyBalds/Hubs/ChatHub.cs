@@ -61,15 +61,7 @@ public class ChatHub : Hub
             return;
         }
 
-        var toxicityInferences = inferences.FirstOrDefault();
-
-        if (toxicityInferences is null)
-        {
-            _logger.LogError("Failed to retrieve toxicity inference");
-            return;
-        }
-
-        foreach(var inference in toxicityInferences)
+        foreach(var inference in inferences)
         {
             if (inference.Label?.ToLower() is not "toxic")
             {

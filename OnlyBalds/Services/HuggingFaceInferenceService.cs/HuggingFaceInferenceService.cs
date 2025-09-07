@@ -1,4 +1,9 @@
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
+using System.Threading;
+using Microsoft.Extensions.Options;
+using OnlyBalds.Configuration;
 using OnlyBalds.Models;
 
 namespace OnlyBalds.Services;
@@ -10,6 +15,7 @@ public class HuggingFaceInferenceService : IHuggingFaceInferenceService
 {
     private readonly ILogger<HuggingFaceInferenceService> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly InferenceApiOptions _apiOptions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="HuggingFaceInferenceService"/> class.
@@ -20,39 +26,52 @@ public class HuggingFaceInferenceService : IHuggingFaceInferenceService
     /// <paramref name="httpClientFactory"/> is <see langword="null"/>.</exception>
     public HuggingFaceInferenceService(
         ILogger<HuggingFaceInferenceService> logger,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        IOptionsMonitor<InferenceApiOptions> apiOptions)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(httpClientFactory);
+        ArgumentNullException.ThrowIfNull(apiOptions);
 
         _logger = logger;
         _httpClientFactory = httpClientFactory;
+        _apiOptions = apiOptions.CurrentValue;
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<IEnumerable<InferenceModel>>> UseRobertaToxicityClassifier(string text)
+    public async Task<IEnumerable<InferenceModel>> UseRobertaToxicityClassifier(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
 
-        var inferenceInputs = new { inputs = text};
+        var inferenceInputs = new { inputs = text };
 
         _logger.LogDebug("Creating a new HTTP client for the Hugging Face Inference API");
         var inferenceClient = _httpClientFactory.CreateClient(HttpClientNames.HuggingFaceInferenceApi);
 
         _logger.LogDebug("Performing toxicity classification using the Hugging Face Inference API");
-        var inferenceResponse = await inferenceClient.PostAsJsonAsync("/models/s-nlp/roberta_toxicity_classifier", inferenceInputs);
 
-        if (!inferenceResponse.IsSuccessStatusCode)
+        var json = JsonSerializer.Serialize(inferenceInputs);
+
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var inferenceResponsePayload = await inferenceClient.PostAsync(
+            _apiOptions.BaseUrl,
+            content
+        );
+
+        if (!inferenceResponsePayload.IsSuccessStatusCode)
         {
-            _logger.LogError("Status code: {StatusCode}", inferenceResponse.StatusCode);
+            _logger.LogError("Status code: {StatusCode}", inferenceResponsePayload.StatusCode);
             return null!;
         }
 
         _logger.LogDebug("Reading the inference model content asynchronously");
-        var inferenceContent = await inferenceResponse.Content.ReadAsStringAsync();
+        var inferenceContent = await inferenceResponsePayload.Content.ReadAsStringAsync();
 
         _logger.LogDebug("Deserializing the inference model");
-        var inferenceModel = JsonSerializer.Deserialize<IEnumerable<IEnumerable<InferenceModel>>>(inferenceContent);
+        _logger.LogInformation(inferenceContent);
+        var inferenceModel = JsonSerializer.Deserialize<IEnumerable<InferenceModel>>(inferenceContent);
 
         if (inferenceModel is null)
         {
