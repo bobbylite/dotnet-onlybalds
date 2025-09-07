@@ -30,20 +30,15 @@
 </div>
 
 <script>
-    // Initializes the Ecwid marketplace widget.
+    $(() => {
+        initializeMarketplace("ecwid-marketplace");
+    });
+
     function initializeMarketplace (elementId) {
         $(document).ready(async function() {
-            $('#ecwid-marketplace').empty();
-
-            // Remove Ecwid Vue attribute if set
-            $('#ecwid-marketplace').removeAttr('data-v-app');
-
-            // Remove Ecwid script if it exists
-            $('script[src^="https://app.ecwid.com/script.js?"]').remove();
-
             const currentUrl = window.location.href;
 
-            const storeId = '103074754';
+            const storeId = '122977265';
             const scriptUrl = `https://app.ecwid.com/script.js?${storeId}&data_platform=code&data_date=${Date.now()}`;
             let container = document.getElementById(elementId);
 
@@ -65,6 +60,7 @@
                     "searchView=list",
                     `id=${elementId}`
                 );
+
                 console.log("Marketplace initialized.");
 
                 $('#app-holder').css('display', 'block');
@@ -87,9 +83,12 @@
 
             try {
                 if (existingScript) {
+                    console.log('Existing Ecwid script found.');
                     loadWidget();
                     return;
                 }
+                
+                console.log('Loading Ecwid script...');
                 await loadScript();
                 loadWidget();
             } catch (error) {
@@ -97,6 +96,4 @@
             }
         });
     };
-
-    initializeMarketplace("ecwid-marketplace");
 </script>
