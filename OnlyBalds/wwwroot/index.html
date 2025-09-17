@@ -305,6 +305,13 @@
                 }
             }
             else {
+                var target = urlParams.get('target');
+
+                if (target === 'marketplace') {
+                    window.app.scripts.loadMarketplace();
+                    return;
+                }
+
                 bootstrapPage();
             }
         });
