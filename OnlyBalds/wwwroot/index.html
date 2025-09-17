@@ -94,6 +94,13 @@
             font-weight: 600;
             color: #333;
         }
+        .footer {
+            display: block;
+            width: 100%;
+            padding: 1rem 0;
+            box-sizing: border-box;
+            height: 445px;
+        }
 
         /* Spinner animation */
         @keyframes spin {
@@ -123,8 +130,34 @@
 						<i class="fa fa-angle-down dropdown__toggle-icon"></i>
 					</a>
 					<ul class="dropdown__nav">
-						<li class="dropdown__item"><a href="#" class="dropdown__link dropdown__link--icon" target="_blank"><i class="fa fa-facebook-square"></i> Facebook</a></li>
-						<li class="dropdown__item"><a href="https://www.instagram.com/onlybaldsllc/" class="dropdown__link dropdown__link--icon" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li>
+                        <li class="dropdown__item"><a href="https://www.instagram.com/onlybaldsllc/" class="dropdown__link dropdown__link--icon" target="_blank"><i class="fa fa-instagram"></i> Instagram</a></li>
+
+                        <li class="dropdown__item">
+                        <a href="https://www.tiktok.com/@Onlybaldsz" class="dropdown__link dropdown__link--icon" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 48 48" style="vertical-align: middle;">
+                            <path d="M41.9 17.6c-2.9.1-5.7-1-7.9-2.9V25c0 8.1-6.6 14.7-14.7 14.7S4.6 33.1 4.6 25s6.6-14.7 14.7-14.7c1.2 0 2.4.2 3.6.5v7.5c-.9-.3-1.9-.4-2.9-.4-4.1 0-7.4 3.3-7.4 7.4S15.9 33 20 33c3.6 0 6.7-2.6 7.3-6.1 0-.4.1-.9.1-1.3V4h7.5c.3 2.6 1.6 5 3.6 6.8 1.7 1.5 3.8 2.5 6.1 2.8v7.9h-.1z"/>
+                            </svg>
+                            TikTok
+                        </a>
+                        </li>
+
+                        <li class="dropdown__item">
+                        <a href="https://twitter.com/onlybaldsllc" class="dropdown__link dropdown__link--icon" target="_blank">
+                            <i class="fa fa-twitter"></i> X / Twitter
+                        </a>
+                        </li>
+
+                        <li class="dropdown__item">
+                        <a href="https://www.reddit.com/user/Onlybalds" class="dropdown__link dropdown__link--icon" target="_blank">
+                            <i class="fa fa-reddit-square"></i> Reddit
+                        </a>
+                        </li>
+
+                        <li class="dropdown__item">
+                        <a href="mailto:boldbaldiesbiz@gmail.com" class="dropdown__link dropdown__link--icon">
+                            <i class="fa fa-envelope"></i> Email
+                        </a>
+                        </li>
 					</ul>
 				</li>
 			</ul>
@@ -176,18 +209,17 @@
         </div>
     </div>
 
-	<div class="footer" style="display: none;">
+	<div class="footer" style="display: none;" style="bottom: auto !important;">
         <div class="container">
             <div class="footer__buttons">
                 <ul class="footer__button-links">
-                    <li><a href="/forum" class="btn btn--rounded btn--faded">Forum</a></li>
-                    <li><a href="/chat-room" class="btn btn--rounded btn--faded">Chat Room</a></li>
-                    <li><a href="/marketplace" class="btn btn--rounded btn--faded">Marketplace</a></li>
-                    <li class="footer__right-list-item"><a href="/account-questionnaire" class="btn btn--rounded btn--white">Become A Member</a></li>
-                </ul>
+                    <li><button class="btn btn--rounded btn--faded forum">Forum</button></li>
+                    <li><button class="btn btn--rounded btn--faded chat-room">Chat Room</button></li>
+                    <li><button class="btn btn--rounded btn--faded marketplace">Marketplace</button></li>
+                    <li class="footer__right-list-item"><a href="/auth/login" class="btn btn--rounded btn--white">Become A Member</a></li>
             </div>
         </div>
-        <img src="/assets/images/only-balds-face-icon.png" alt="" aria-hidden="true" class="footer__face-icon">
+        <img src="/assets/images/only-balds-face-icon.png" style="bottom: auto !important;" alt="" aria-hidden="true" class="footer__face-icon">
     </div>
 
     <!-- MODAL OVERLAY -->
@@ -244,7 +276,6 @@
                             $("#loading-modal").fadeOut();
 
                             if (user.claims.email_verified === "true" && (account === null || account === undefined)) {
-                                //window.app.scripts.loadFinishSignUp();
                                 window.location.href = '/auth/login';
                                 return;
                             }
@@ -274,6 +305,13 @@
                 }
             }
             else {
+                var target = urlParams.get('target');
+
+                if (target === 'marketplace') {
+                    window.app.scripts.loadMarketplace();
+                    return;
+                }
+
                 bootstrapPage();
             }
         });
@@ -372,6 +410,7 @@
                 e.preventDefault();
                 
                 emptyComponents();
+
                 window.app.scripts.loadAbout();
             });
         };
@@ -420,6 +459,7 @@
                 e.preventDefault();
 
                 emptyComponents();
+
                 window.app.scripts.loadMarketplace();
             });
         };
@@ -429,7 +469,7 @@
             $('.navbar__toggle').removeClass('navicon--toggle');
         }
 
-        function emptyComponents() {            
+        function emptyComponents() {      
             window.state = 
             {
                 isUserOnline: false

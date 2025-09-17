@@ -19,4 +19,9 @@ public static class HttpClientNames
     /// The name of the HTTP client used to communicate with the HuggingFace Inference API.
     /// </summary>
     public const string HuggingFaceInferenceApi = "HuggingFace.Inference.Api";
+
+    /// <summary>
+    /// The name of the HTTP client used to communicate with the Private HuggingFace Inference API.
+    /// </summary>
+    public const string PrivateHuggingFaceInferenceApi = "Private.HuggingFace.Inference.Api";
 }
