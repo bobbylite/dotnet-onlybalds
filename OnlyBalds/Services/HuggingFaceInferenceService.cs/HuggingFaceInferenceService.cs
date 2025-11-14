@@ -71,7 +71,7 @@ public class HuggingFaceInferenceService : IHuggingFaceInferenceService
 
         _logger.LogDebug("Deserializing the inference model");
         _logger.LogInformation(inferenceContent);
-        var inferenceModel = JsonSerializer.Deserialize<IEnumerable<InferenceModel>>(inferenceContent);
+        var inferenceModel = JsonSerializer.Deserialize<IEnumerable<IEnumerable<InferenceModel>>>(inferenceContent);
 
         if (inferenceModel is null)
         {
@@ -79,7 +79,10 @@ public class HuggingFaceInferenceService : IHuggingFaceInferenceService
             return null!;
         }
 
+        var inference = inferenceModel.FirstOrDefault();
+        ArgumentNullException.ThrowIfNull(inference);
+
         _logger.LogDebug("Successfully classified text with Roberta toxicity classifier");
-        return inferenceModel;
+        return inference;
     }
 }
