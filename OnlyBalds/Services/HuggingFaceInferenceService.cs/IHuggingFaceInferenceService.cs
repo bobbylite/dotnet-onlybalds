@@ -13,5 +13,5 @@ public interface IHuggingFaceInferenceService
     /// </summary>
     /// <param name="text">The text to analyze.</param>
     /// <returns>A collection of toxicity scores.</returns>
-    Task<IEnumerable<IEnumerable<InferenceModel>>> UseRobertaToxicityClassifier(string text);
+    Task<IEnumerable<InferenceModel>> UseRobertaToxicityClassifier(string text);
 }
